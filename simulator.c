@@ -11,13 +11,13 @@
 #include <sys/types.h>
 
 
-int TAPS = 0 // how many filter taps
+int TAPS = 0; // how many filter taps
 
 typedef struct 
 {
-  float coefficients[TAPS];
+  float coefficients[20]; //WARNING SHOULD NOT HAVE MORE THAN 20 TAPS/COEF!!!
   unsigned  next_sample;
-  float samples[TAPS];
+  float samples[20];
 } filter;
 
 /* firFilterCreate()
@@ -83,7 +83,7 @@ int main(int argc, char **argv) {
         
         char coef[256];
         strcpy(coef,argv[2]);
-        FILE *f = fopen(arg[3],"r");
+        FILE *f = fopen(argv[3],"r");
         if(NULL==f){
           printf("Could not open the data set\n");
         }
@@ -98,33 +98,34 @@ int main(int argc, char **argv) {
         //Variables from the data set
         int d_left=0, d_right=0, d_rear=0.0;
         int t_left=0, t_right=0, t_rear=0.0;
-        
         int x=0, y=0;
         float theta = 0.0;
         
          //Variables created by FIR filter
-        int fir_d_left=0, fir_d_right=0, fir_d_rear=0.0;
-        int fir_t_left=0, fir_t_right=0, fir_t_rear=0.0;
-        
-        int fir_x=0, fir_y=0;
-        float fir_theta = 0.0;
+        int f_d_left=0, f_d_right=0, f_d_rear=0.0;
+        int f_t_left=0, f_t_right=0, f_t_rear=0.0;
+        int f_x=0, f_y=0;
+        float f_theta = 0.0;
         
         // Action loop
-        fscanf(f,"%d %d %f %d %d %d %d %d %d\n", x, y, theta, d_left, d_right, d_rear, t_left, t_right, t_rear" {
+        while(9==fscanf(f,"%d %d %f %d %d %d %d %d %d\n", 
+          &x, &y, &theta,
+          &d_left, &d_right, &d_rear, 
+          &t_left, &t_right, &t_rear)) {
                
                // printf("N %ld.%ld %d %d %f\n",now.tv_sec, now.tv_usec, ri_getX(&ri), ri_getY(&ri), ri_getTheta(&ri));
-                d_left = firFilter(&fir_left, ri_getWheelEncoder(&ri,RI_WHEEL_LEFT));
-                d_right = firFilter(&fir_right, ri_getWheelEncoder(&ri,RI_WHEEL_RIGHT);
-                d_rear = firFilter(&fir_rear, ri_getWheelEncoder(&ri,RI_WHEEL_REAR);
-                t_left +=d_left;
-                t_right +=d_right;
-                t_rear +=d_rear;
+                f_d_left = firFilter(fir_left, d_left);
+                f_d_right = firFilter(fir_right, d_right);
+                f_d_rear = firFilter(fir_rear, d_rear);
+                f_t_left +=f_d_left;
+                f_t_right +=f_d_right;
+                f_t_rear +=f_d_rear;
                
-               x = firFilter(&fir_x, ri_getX(&ri));
-               y = firFilter(&fir_y, ri_getY(&ri);
-               theta = firFilter(&fir_theta, ri_getTheta(&ri));
+               f_x = firFilter(fir_x, x);
+               f_y = firFilter(fir_y, y);
+               f_theta = firFilter(fir_theta,theta);
                
-               printf("%d %d %f %d %d %d %d\n", x, y, theta, d_left, d_right, d_rear, t_left, t_right, t_rear);
+               printf("%d %d %f %d %d %d %d\n", f_x, f_y, f_theta, f_d_left, f_d_right, f_d_rear, f_t_left, f_t_right, f_t_rear);
            
         } while(1);
 
