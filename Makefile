@@ -1,8 +1,8 @@
 #/bin/bash
 
 CFLAGS=-ggdb -g3
-LIB_FLAGS=-L. -lrobot_if
-LIB_LINK=-lhighgui -lcv -lcxcore -lm
+LIB_FLAGS=-L. -lrobot_if 
+LIB_LINK=-lhighgui -lcv -lcxcore -lm -lcxcore
 
 all: data_collector simulator
 

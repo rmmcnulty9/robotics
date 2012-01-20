@@ -2,13 +2,13 @@
  * Used to simulate data sets with different FIR filter taps and coef
  * simulator <data_file> <coef_file>
  */
-
-#include <robot_if.h>
+#include <string.h>
 #include <stdio.h>
 #include <stdlib.h>
 #include <unistd.h>
 #include <sys/time.h>
 #include <sys/types.h>
+
 
 
 int TAPS = 0; // how many filter taps
@@ -72,18 +72,17 @@ float firFilter(filter *f, float val)
 
 
 int main(int argc, char **argv) {
-        robot_if_t ri;
 
         // Make sure we have a valid command line argument
         if(argc != 3) {
-                printf("Usage: simulator <data_file> <coef_file>\n");
-                exit(-1);
+              printf("Usage: simulator <data_file> <coef_file>\n");
+              exit(-1);
         }
 
         
         char coef[256];
-        strcpy(coef,argv[2]);
-        FILE *f = fopen(argv[3],"r");
+        strcpy(coef,argv[1]);
+        FILE *f = fopen(argv[2],"r");
         if(NULL==f){
           printf("Could not open the data set\n");
         }
@@ -113,21 +112,19 @@ int main(int argc, char **argv) {
           &d_left, &d_right, &d_rear, 
           &t_left, &t_right, &t_rear)) {
                
-               // printf("N %ld.%ld %d %d %f\n",now.tv_sec, now.tv_usec, ri_getX(&ri), ri_getY(&ri), ri_getTheta(&ri));
-                f_d_left = firFilter(fir_left, d_left);
-                f_d_right = firFilter(fir_right, d_right);
-                f_d_rear = firFilter(fir_rear, d_rear);
+                f_d_left = (int)firFilter(fir_left, (float)d_left);
+                f_d_right = (int)firFilter(fir_right, (float)d_right);
+                f_d_rear = (int)firFilter(fir_rear, (float)d_rear);
                 f_t_left +=f_d_left;
                 f_t_right +=f_d_right;
                 f_t_rear +=f_d_rear;
                
-               f_x = firFilter(fir_x, x);
-               f_y = firFilter(fir_y, y);
-               f_theta = firFilter(fir_theta,theta);
+               f_x = (int)firFilter(fir_x, (float)x);
+               f_y = (int)firFilter(fir_y, (float)y);
+               f_theta = firFilter(fir_theta, theta);
                
                printf("%d %d %f %d %d %d %d\n", f_x, f_y, f_theta, f_d_left, f_d_right, f_d_rear, f_t_left, f_t_right, f_t_rear);
-           
-        } while(1);
+        }
 
         return 0;
 }
