@@ -2,74 +2,71 @@
 #include <iostream>
 #include <string>
 #include <math.h>
+#include "RobotPose.h"
 
-class RobotPose
-{
-public:
-//constructor 
-RobotPose(RobotInterface *r){
-	robot = r;
+
+RobotPose::RobotPose(RobotInterface *r){
+  robot = r;
 	robot->update();
 	resetCoord();
-};
-resetCoord(){
-	pose_start[0] = robot->X();
-	pose_start[1] = robot->Y();
-	pose_start[2] = robot->Theta();
+}
+
+ void RobotPose::resetCoord(){
+	pose_start.x = robot->X();
+	pose_start.y = robot->Y();
+	pose_start.theta = robot->Theta();
 	
-	pose_ns[0] = 0;
-	pose_ns[1] = 0;
-	pose_ns[2] = 0;
+	pose_ns.x = 0;
+	pose_ns.y = 0;
+	pose_ns.theta = 0;
 	
-	pose_we[0] = 0;
-	pose_we[1] = 0;
-	pose_we[2] = 0;
+	pose_we.x = 0;
+	pose_we.y = 0;
+	pose_we.theta = 0;
 
 	room_start = robot->roomID();
 	room_cur = room_start;
-};
-updatePosition(){
+}
+
+void RobotPose::updatePosition(){
 	robot->update();
 	updateWE();
 	updateNS();
-};
-float[] getPositionWE(){
-	return pose_we;
-};
-float[] getPositionNS(){
-	return pose_ns;
-};
+}
+bool RobotPose::getPositionWE(pose& we){
+	we.x = pose_we.x;
+  we.y = pose_we.y;
+  we.theta = pose_we.theta;
+  return true;
+}
+bool RobotPose::getPositionNS(pose& ns){
+	return true;
+}
 
-private:
-updateWE(){
-  	int left  = robot->getWheelEncoder(RI_WHEEL_LEFT);
+bool RobotPose::updateWE(){
+  int left  = robot->getWheelEncoder(RI_WHEEL_LEFT);
 	int right = robot->getWheelEncoder(RI_WHEEL_RIGHT);
 	int rear  = robot->getWheelEncoder(RI_WHEEL_REAR);
-	float dy = ((left * sin(150 * PI/180)) + (right_tot * sin(30 * PI/180)))/2;
-	float dx = ((left * cos(150 * PI/180)) + (right_tot * cos(30 * PI/180)))/2;
-	float dtheta = rear/(29*PI);
-	pose_we[0] = dx*we_to_cm;
-	pose_we[1] = dy*we_to_cm;
-	pose_we[3] = dtheta*we_to_cm;
-};
+	float dy = ((left * sin(150 * M_PI/180)) + (right * sin(30 * M_PI/180)))/2;
+	float dx = ((left * cos(150 * M_PI/180)) + (right * cos(30 * M_PI/180)))/2;
+	float dtheta = rear/(29*M_PI);
+	pose_we.x = dx*we_to_cm;
+	pose_we.y = dy*we_to_cm;
+	pose_we.theta = dtheta*we_to_cm;
+  return true;
+}
 
-updateNS(){
+bool RobotPose::updateNS(){
   	int x = robot->X();
 	int y = robot->Y();
 	int theta = robot->Theta();
 	int room = robot->roomID();
-
-};
-
-const float PI = 3.14159265;
-const float we_to_cm = 1/20;
-const float ns_to_cm = 1/300;
-
-RobotInterface *robot;
-float pose_start[3];
-float pose_we[3];
-float pose_ns[3];
-
-int room_start;
-int room_cur;
-};
+  /*
+   * Conversion
+   */
+   
+   /*
+    * Set the NS pose
+    */
+  return true;
+}
