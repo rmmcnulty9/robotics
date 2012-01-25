@@ -33,7 +33,7 @@ filter *firFilterCreate(char *coef_file)
   }
   
   //Read in coef & count, for TAPS
-  while(1){
+  for (i = 0; i < 30; i++){
     f->samples[i] = 0;
     if(1!=fscanf(fp,"%e ", &f->coefficients[i])){
       fclose(fp);
