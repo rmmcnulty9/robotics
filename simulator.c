@@ -10,10 +10,9 @@
 #include <sys/types.h>
 
 
-typedef struct 
-{
+typedef struct {
   float coefficients[30]; //WARNING SHOULD NOT HAVE MORE THAN 30 TAPS/COEF!!!
-  unsigned int next_sample;
+  int next_sample;
   float samples[30];
   int TAPS;
 } filter;
@@ -26,6 +25,7 @@ filter *firFilterCreate(char *coef_file)
 {
   int i;
   filter *f = malloc(sizeof(filter));
+  //printf("%d\n", sizeof(filter));
   f->TAPS = 0;
   f->next_sample = 0;
   FILE *fp = fopen(coef_file,"r+");
@@ -49,6 +49,8 @@ filter *firFilterCreate(char *coef_file)
   for (i = 0; i < f->TAPS; i++) {
     printf("%d: %f\n", i, f->coefficients[i]);
   }
+  
+  return f;
 }
 
 // firFilter 
@@ -141,6 +143,7 @@ int main(int argc, char **argv) {
         }
         
         filter *fir_x = firFilterCreate(coef);
+	//printf("derp %d\n", fir_x->next_sample);
         filter *fir_y = firFilterCreate(coef);
         filter *fir_theta = firFilterCreate(coef);
         
@@ -165,6 +168,7 @@ int main(int argc, char **argv) {
           &x, &y, &theta,
           &d_left, &d_right, &d_rear, 
           &t_left, &t_right, &t_rear)) {
+
          /*      printf("O %d %d %f %d %d %d %d %d %d\n", 
           x, y, theta,
           d_left, d_right, d_rear, 
@@ -172,11 +176,11 @@ int main(int argc, char **argv) {
                 f_d_left = (int)firFilter(fir_left, (float)d_left);
                 f_d_right = (int)firFilter(fir_right, (float)d_right);
                 f_d_rear = (int)firFilter(fir_rear, (float)d_rear);
-                
+
                 f_t_left +=f_d_left;
                 f_t_right +=f_d_right;
                 f_t_rear +=f_d_rear;
-               
+
                f_x = (int)firFilter(fir_x, (float)x);
                f_y = (int)firFilter(fir_y, (float)y);
                f_theta = firFilter(fir_theta, theta);
