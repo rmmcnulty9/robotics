@@ -24,7 +24,7 @@ RobotPose::RobotPose(RobotInterface *r){
 	pose_we.y = 0;
 	pose_we.theta = 0;
 
-	room_start = robot->roomID();
+	room_start = robot->RoomID();
 	room_cur = room_start;
 }
 
@@ -60,7 +60,7 @@ bool RobotPose::updateNS(){
   	int x = robot->X();
 	int y = robot->Y();
 	int theta = robot->Theta();
-	int room = robot->roomID();
+	int room = robot->RoomID();
   /*
    * Conversion
    */
