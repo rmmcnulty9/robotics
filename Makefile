@@ -2,7 +2,8 @@
 
 CFLAGS=-ggdb -g3
 LIB_FLAGS=-L. -lrobot_if 
-LIB_LINK=-lhighgui -lcv -lcxcore -lm -lcxcore
+CPP_LIB_FLAGS=${LIB_FLAGS} -lrobot_if++
+LIB_LINK=-lhighgui -lcv -lcxcore -lm
 
 all: data_collector simulator RobotPose
 
@@ -16,7 +17,7 @@ data_collector: data_collector.c
 
 RobotPose: RobotPose.cpp
 	gcc ${CFLAGS} -c RobotPose.cpp
-	gcc ${CFLAGS} -o RobotPose RobotPose.o ${LIB_FLAGS} ${LIB_LINK}
+	gcc ${CFLAGS} -o RobotPose RobotPose.o ${CPP_LIB_FLAGS} ${LIB_LINK}
 
 clean:
 	rm -rf *.o
