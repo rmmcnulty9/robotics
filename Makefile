@@ -17,7 +17,7 @@ data_collector: data_collector.c
 
 RobotPose: RobotPose.cpp
 	g++ ${CFLAGS} -c RobotPose.cpp
-	g++ ${CFLAGS} -o RobotPose RobotPose.o ${CPP_LIB_FLAGS} ${LIB_LINK}
+	#g++ ${CFLAGS} -o RobotPose RobotPose.o ${CPP_LIB_FLAGS} ${LIB_LINK}
 
 clean:
 	rm -rf *.o
