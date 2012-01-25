@@ -13,7 +13,7 @@
 typedef struct 
 {
   float coefficients[30]; //WARNING SHOULD NOT HAVE MORE THAN 30 TAPS/COEF!!!
-  unsigned  next_sample;
+  unsigned int next_sample;
   float samples[30];
   int TAPS;
 } filter;
@@ -26,6 +26,8 @@ filter *firFilterCreate(char *coef_file)
 {
   int i;
   filter *f = malloc(sizeof(filter));
+  f->TAPS = 0;
+  f->next_sample = 0;
   FILE *fp = fopen(coef_file,"r+");
   if(fp==NULL){
     printf("Coefficients could not be loaded from %s\n", coef_file);
@@ -40,10 +42,13 @@ filter *firFilterCreate(char *coef_file)
       break;
     }
    // printf("%f\n", f->coefficients[i]);
-    f->TAPS+=1;
+    f->TAPS++;
   }
-   
-  f->next_sample = 0;
+  
+  printf("Coefficients:\n");
+  for (i = 0; i < f->TAPS; i++) {
+    printf("%d: %f\n", i, f->coefficients[i]);
+  }
 }
 
 // firFilter 
