@@ -30,7 +30,7 @@ filter *firFilterCreate(char *coef_file)
   f->next_sample = 0;
   FILE *fp = fopen(coef_file,"r+");
   if(fp==NULL){
-    printf("Coefficients could not be loaded from %s\n", coef_file);
+//    printf("Coefficients could not be loaded from %s\n", coef_file);
     exit(-1);
   }
   
