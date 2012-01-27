@@ -21,6 +21,8 @@ RobotPose::RobotPose(RobotInterface *r, char* coef_file){
   RobotPose::createFilter(coef_file, right_we);
   RobotPose::createFilter(coef_file, rear_we);
 }
+RobotPose::~RobotPose(){
+}
 
  void RobotPose::resetCoord(){
 	pose_start.x = robot->X();
@@ -61,9 +63,9 @@ bool RobotPose::updateWE(){
 	float dy = ((left * sin(150 * M_PI/180)) + (right * sin(30 * M_PI/180)))/2;
 	float dx = ((left * cos(150 * M_PI/180)) + (right * cos(30 * M_PI/180)))/2;
 	float dtheta = rear/(29*M_PI);
-	pose_we.x = dx*we_to_cm;
-	pose_we.y = dy*we_to_cm;
-	pose_we.theta = dtheta*we_to_cm;
+	pose_we.x += dx*we_to_cm;
+	pose_we.y += dy*we_to_cm;
+	pose_we.theta += dtheta*we_to_cm;
   return true;
 }
 
