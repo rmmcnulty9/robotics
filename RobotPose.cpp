@@ -12,13 +12,13 @@ RobotPose::RobotPose(RobotInterface *r, char* coef_file){
 	resetCoord();
   //Create all six FIR filters
   
-  filter *x_ns = firFilterCreate(coef_file);
-  filter *y_ns = firFilterCreate(coef_file);
-  filter *theta_ns = firFilterCreate(coef_file);
+  RobotPose::createFilter(coef_file, x_ns);
+  RobotPose::createFilter(coef_file, y_ns);
+  RobotPose::createFilter(coef_file, theta_ns);
   
-  filter *left_we = firFilterCreate(coef_file);
-  filter *right_we = firFilterCreate(coef_file);
-  filter *rear_we = firFilterCreate(coef_file);
+  RobotPose::createFilter(coef_file, left_we);
+  RobotPose::createFilter(coef_file, right_we);
+  RobotPose::createFilter(coef_file, rear_we);
 }
 
  void RobotPose::resetCoord(){
@@ -84,10 +84,10 @@ bool RobotPose::updateNS(){
 // firFilterCreate()
 // creates, allocates,  and initializes a new firFilter
  
-filter *firFilterCreate(char *coef_file)
+filter *RobotPose::createFilter(char *coef_file, filter *f)
 {
   int i;
-  filter *f = (filter *)malloc(sizeof(filter));
+  f = (filter *)malloc(sizeof(filter));
   //printf("%d\n", sizeof(filter));
   f->TAPS = 0;
   f->next_sample = 0;
@@ -122,22 +122,22 @@ filter *firFilterCreate(char *coef_file)
 //incorporates new sample into filter data array
  
 
-float firFilter(filter *f, float val)
+float RobotPose::firFilter(filter& f, float val)
 {
   float sum =0;
   int i,j;
 
   // assign  new value to "next" slot 
-  f->samples[f->next_sample] = val;
+  f.samples[f.next_sample] = val;
 
   // calculate a  weighted sum
   //   i tracks the next coeficeint
   //   j tracks the samples w/wrap-around 
-  for( i=0,j=f->next_sample; i<f->TAPS; i++) {
-    sum += f->coefficients[i]*f->samples[j++];
-    if(j == f->TAPS)  j=0;
+  for( i=0,j=f.next_sample; i<f.TAPS; i++) {
+    sum += f.coefficients[i]*f.samples[j++];
+    if(j == f.TAPS)  j=0;
   }
-  if(++(f->next_sample) == f->TAPS) f->next_sample = 0;
+  if(++(f.next_sample) == f.TAPS) f.next_sample = 0;
   return(sum);
 }
 
