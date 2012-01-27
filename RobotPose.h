@@ -15,7 +15,7 @@ typedef struct {
 class RobotPose {
   
   public:
-  RobotPose(RobotInterface *r);
+  RobotPose(RobotInterface *r, char* coef_file);
   ~RobotPose();
   
   void resetCoord();
@@ -26,8 +26,8 @@ class RobotPose {
   private:
   bool updateWE();
   bool updateNS();
-  filter *createFilter(char *coef);
-  float firFilter(filter *f, float val);
+  filter *createFilter(char *coef, filter *f);
+  float firFilter(filter& f, float val);
   
   RobotInterface *robot;
   pose pose_start;
@@ -38,12 +38,12 @@ class RobotPose {
   int room_cur;
   
   //Filters
-  filter left_we;
-  filter right_we;
-  filter rear_we;
-  filter x_ns;
-  filter y_ns;
-  filter theta_ns;
+  filter *left_we;
+  filter *right_we;
+  filter *rear_we;
+  filter *x_ns;
+  filter *y_ns;
+  filter *theta_ns;
 
 };
 
