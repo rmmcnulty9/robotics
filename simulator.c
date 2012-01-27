@@ -30,7 +30,7 @@ filter *firFilterCreate(char *coef_file)
   f->next_sample = 0;
   FILE *fp = fopen(coef_file,"r+");
   if(fp==NULL){
-//    printf("Coefficients could not be loaded from %s\n", coef_file);
+    printf("Coefficients could not be loaded from %s\n", coef_file);
     exit(-1);
   }
   
@@ -45,10 +45,10 @@ filter *firFilterCreate(char *coef_file)
     f->TAPS++;
   }
   
-  printf("Coefficients:\n");
-  for (i = 0; i < f->TAPS; i++) {
-    printf("%d: %f\n", i, f->coefficients[i]);
-  }
+//  printf("Coefficients:\n");
+//  for (i = 0; i < f->TAPS; i++) {
+//    printf("%d: %f\n", i, f->coefficients[i]);
+//  }
   
   return f;
 }
