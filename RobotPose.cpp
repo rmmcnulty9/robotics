@@ -80,9 +80,9 @@ bool RobotPose::updateNS(){
     */
   return true;
 }
+
 // firFilterCreate()
 // creates, allocates,  and initializes a new firFilter
- 
  
 filter *firFilterCreate(char *coef_file)
 {

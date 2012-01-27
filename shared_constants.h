@@ -1,9 +1,8 @@
 /*
  * Some shared Constants/Structs across this Rob
  * */
-#ifndef __SHARED_CONSTANTS__
-#define __SHARED_CONSTANTS__
- 
+ #ifndef __CONSTANTS__
+ #define __CONSTANTS__
 typedef struct {
     float x;
     float y;
@@ -14,4 +13,4 @@ typedef struct {
 const float we_to_cm = 1/20.0;
 const float ns_to_cm = 1/300.0;
 
-#endif 
+#endif

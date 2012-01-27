@@ -9,28 +9,46 @@
 #include <sys/time.h>
 #include <sys/types.h>
 #include "shared_constants.h"
+ 
 
-
-/*
-#define TAPS  4 // how many filter taps
-
-typedef struct 
-{
-  float coefficients[TAPS];
-  unsigned  next_sample;
-  float samples[TAPS];
+typedef struct {
+  float coefficients[30]; //WARNING SHOULD NOT HAVE MORE THAN 30 TAPS/COEF!!!
+  int next_sample;
+  float samples[30];
+  int TAPS;
 } filter;
 
-
-filter *firFilterCreate()
+ 
+filter *firFilterCreate(char *coef_file)
 {
   int i;
-  filter *f = malloc(sizeof(filter));
-  for (i=0; i<TAPS; i++) {
-    f->samples[i] = 0;
-    f->coefficients[i] = 1. /(float) TAPS; // user must set coef's
-  }
+  filter *f = (filter *)malloc(sizeof(filter));
+  //printf("%d\n", sizeof(filter));
+  f->TAPS = 0;
   f->next_sample = 0;
+  FILE *fp = fopen(coef_file,"r+");
+  if(fp==NULL){
+    printf("Coefficients could not be loaded from %s\n", coef_file);
+    exit(-1);
+  }
+  
+  //Read in coef & count, for TAPS
+  for (i = 0; i < 30; i++){
+    f->samples[i] = 0;
+    if(1!=fscanf(fp,"%e ", &f->coefficients[i])){
+      fclose(fp);
+      break;
+    }
+   // printf("%f\n", f->coefficients[i]);
+    f->TAPS++;
+  }
+  
+//  printf("Coefficients:\n");
+//  for (i = 0; i < f->TAPS; i++) {
+//    printf("%d: %f\n", i, f->coefficients[i]);
+//  }
+  
+  return f;
 }
 
 // firFilter 
@@ -47,18 +65,16 @@ float firFilter(filter *f, float val)
   // assign  new value to "next" slot 
   f->samples[f->next_sample] = val;
 
-  //calculate a  weighted sum
+  // calculate a  weighted sum
   //   i tracks the next coeficeint
   //   j tracks the samples w/wrap-around 
-  for( i=0,j=f->next_sample; i<TAPS; i++) {
+  for( i=0,j=f->next_sample; i<f->TAPS; i++) {
     sum += f->coefficients[i]*f->samples[j++];
-    if(j==TAPS)  j=0;
+    if(j == f->TAPS)  j=0;
   }
-  if(++(f->next_sample) == TAPS) f->next_sample = 0;
+  if(++(f->next_sample) == f->TAPS) f->next_sample = 0;
   return(sum);
 }
-
-*/
 
 int main(int argc, char **argv) {
 

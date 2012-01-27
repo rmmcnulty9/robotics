@@ -2,7 +2,7 @@
 #ifndef __ROBOT_POSE__
 #define __ROBOT_POSE__
 
-#include "shared_constants.h"
+# include "shared_constants.h"
 
 typedef struct {
   float coefficients[30]; //WARNING SHOULD NOT HAVE MORE THAN 30 TAPS/COEF!!!
@@ -11,11 +11,6 @@ typedef struct {
   int TAPS;
 } filter;
 
-typedef struct {
-    float x;
-    float y;
-    float theta;
-} pose;
 
 class RobotPose {
   
@@ -50,8 +45,6 @@ class RobotPose {
   filter y_ns;
   filter theta_ns;
 
-
-  
 };
 
 
