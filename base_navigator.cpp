@@ -14,20 +14,28 @@ int main(int argc, char **argv)
 		exit(-1);
 	}
     
-	RobotInterface *r = new RobotInterface(argc[1],0);
-	RobotPose robot(r);
+	RobotInterface *robot = new RobotInterface(argc[1],0);
+	RobotPose robotPose(robot);
 	pose *we;
+	bool turn = false;
 	do {
 		  // Update the robot's sensor information
-		  robot.updatePosition();
-		  robot.getPositionWE(we);
+		  robotPose.updatePosition();
+		  robotPose.getPositionWE(we);
 		  std::cout << we->x << "," << we->y << "," << we->theta << std::endl;
+		  if(we->y > 300 && !turn){
+			robot->Move(RI_TURN_LEFT_20DEG, RI_FASTEST); 
+			robot->Move(RI_TURN_LEFT_20DEG, RI_FASTEST); 
+			robot->Move(RI_TURN_LEFT_20DEG, RI_FASTEST); 
+			robot->Move(RI_TURN_LEFT_20DEG, RI_FASTEST); 
+			turn = true;
+		  }
                 // Move forward unless there's something in front of the robot
-		  if(!r->IR_Detected())
+		  if(!robot->IR_Detected())
 			  robot->Move(RI_MOVE_FORWARD, RI_FASTEST);
 	
 	} while(1);
-	delete(r);
+	delete(robot);
 	return 0;
 }
 
