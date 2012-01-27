@@ -1,6 +1,7 @@
 %% Script for doing some basic plotting for FIR filters
 
 load test_data/straight3m_1.txt;
+
 load o.txt;
 
 plot(straight3m_1(:,1),'b.-')
@@ -42,15 +43,15 @@ xlabel('Steps')
 ylabel('WE Delta Right')
 legend('Raw','Filtered')
 
-figure
-plot(straight3m_1(:,6),'b.-')
-hold on
-plot(o(:,6),'g.-')
-xlabel('Steps')
-ylabel('WE Delta Rear')
-legend('Raw','Filtered')
+%figure
+%plot(straight3m_1(:,6),'b.-')
+%hold on
+%plot(o(:,6),'g.-')
+%xlabel('Steps')
+%ylabel('WE Delta Rear')
+%legend('Raw','Filtered')
 
-%% 'Press any key to close all Figures'
+'Press any key to close all Figures'
 pause
 close all
 %% Maybe plot the WE totals also?
