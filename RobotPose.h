@@ -4,6 +4,19 @@
 
 #include "shared_constants.h"
 
+typedef struct {
+  float coefficients[30]; //WARNING SHOULD NOT HAVE MORE THAN 30 TAPS/COEF!!!
+  int next_sample;
+  float samples[30];
+  int TAPS;
+} filter;
+
+typedef struct {
+    float x;
+    float y;
+    float theta;
+} pose;
+
 class RobotPose {
   
   public:
@@ -18,6 +31,8 @@ class RobotPose {
   private:
   bool updateWE();
   bool updateNS();
+  filter *createFilter(char *coef);
+  float firFilter(filter *f, float val);
   
   RobotInterface *robot;
   pose pose_start;
