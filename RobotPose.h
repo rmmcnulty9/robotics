@@ -2,15 +2,7 @@
 #ifndef __ROBOT_POSE__
 #define __ROBOT_POSE__
 
-typedef struct robot_pose {
-    float x;
-    float y;
-    float theta;
-}pose;
-
-
-const float we_to_cm = 1/20.0;
-const float ns_to_cm = 1/300.0;
+#include "shared_constants.h"
 
 class RobotPose {
   
