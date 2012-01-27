@@ -21,23 +21,23 @@ int main(int argv, char **argc)
 	RobotPose robotPose(robot, coefFile);
 	pose we;
 	bool turn = false;
-	do {
+	for(int i=0; i<18; i++){
 		  // Update the robot's sensor information
 		  robotPose.updatePosition();
 		  robotPose.getPositionWE(we);
 		  std::cout << we.x << ",\t" << we.y << ",\t" << we.theta << std::endl;
-		  if(we.y > 300 && !turn){
-			robot->Move(RI_TURN_LEFT_20DEG, RI_FASTEST); 
-			robot->Move(RI_TURN_LEFT_20DEG, RI_FASTEST); 
-			robot->Move(RI_TURN_LEFT_20DEG, RI_FASTEST); 
-			robot->Move(RI_TURN_LEFT_20DEG, RI_FASTEST); 
-			turn = true;
+		  // Move forward unless there's something in front of the robot
+		  if(!robot->IR_Detected()){
+			  robot->Move(RI_TURN_LEFT_20DEG, RI_FASTEST);
+			  //robot->Move(RI_MOVE_FORWARD, RI_FASTEST);
 		  }
-                // Move forward unless there's something in front of the robot
-		  if(!robot->IR_Detected())
-			  robot->Move(RI_MOVE_FORWARD, RI_FASTEST);
+		  else{
+			std::cout << "Wall!\n";
+			break;
+		  }
+		 
 	
-	} while(1);
+	}
 	delete(robot);
 	return 0;
 }
