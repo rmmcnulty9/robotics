@@ -3,12 +3,22 @@
 #include <string>
 #include <math.h>
 #include "RobotPose.h"
+#include "shared_constants.h"
 
 
-RobotPose::RobotPose(RobotInterface *r){
+RobotPose::RobotPose(RobotInterface *r, char* coef_file){
   robot = r;
 	robot->update();
 	resetCoord();
+  //Create all six FIR filters
+  
+  filter *x_ns = firFilterCreate(coef_file);
+  filter *y_ns = firFilterCreate(coef_file);
+  filter *theta_ns = firFilterCreate(coef_file);
+  
+  filter *left_we = firFilterCreate(coef_file);
+  filter *right_we = firFilterCreate(coef_file);
+  filter *rear_we = firFilterCreate(coef_file);
 }
 
  void RobotPose::resetCoord(){

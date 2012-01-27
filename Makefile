@@ -19,7 +19,7 @@ RobotPose: RobotPose.cpp
 	g++ ${CFLAGS} -c RobotPose.cpp
 	#g++ ${CFLAGS} -o RobotPose RobotPose.o ${CPP_LIB_FLAGS} ${LIB_LINK}
 
-RobotPose: base_navigator.cpp
+base_navigator: base_navigator.cpp
 	g++ ${CFLAGS} -c base_navigator.cpp
 	g++ ${CFLAGS} -o base_navigator base_navigator.o ${CPP_LIB_FLAGS} ${LIB_LINK}
 
@@ -28,3 +28,4 @@ clean:
 	rm -rf data_collector
 	rm -rf simulator
 	rm -rf RobotPose
+	rm -rf base_navigator

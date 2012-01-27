@@ -26,6 +26,15 @@ class RobotPose {
 
   int room_start;
   int room_cur;
+  
+  //Filters
+  filter left_we;
+  filter right_we;
+  filter rear_we;
+  filter x_ns;
+  filter y_ns;
+  filter theta_ns;
+
 
   
 };
