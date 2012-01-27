@@ -1,5 +1,6 @@
 #include <robot_if++.h>
 #include <iostream>
+#include <stdio.h>
 #include <string>
 #include <math.h>
 #include "RobotPose.h"
