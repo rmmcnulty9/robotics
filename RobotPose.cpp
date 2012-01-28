@@ -66,11 +66,7 @@ bool RobotPose::updateWE(){
 	float left  = robot->getWheelEncoder(RI_WHEEL_LEFT);
 	float right = robot->getWheelEncoder(RI_WHEEL_RIGHT);
 	float rear  = robot->getWheelEncoder(RI_WHEEL_REAR);
-	std::cout << "[" << left << ",\t\t" << right << ",\t\t" << rear << "]\n";
-	left = firFilter(left_we, left);
-	right = firFilter(left_we, right);
-	rear = firFilter(left_we, rear);
-	std::cout << "{" << left << ",\t" << right << ",\t" << rear << "}\n";
+
 	float dy = ((left * sin(150 * M_PI/180 + pose_we.theta)) + (right * sin(30 * M_PI/180 + pose_we.theta)))/2;
 	float dx = ((left * cos(150 * M_PI/180 + pose_we.theta)) + (right * cos(30 * M_PI/180 + pose_we.theta)))/2;
 	float dtheta = rear/(robot_radius*M_PI);

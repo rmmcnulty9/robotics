@@ -7,6 +7,7 @@ typedef struct {
     float x;
     float y;
     float theta;
+    float theta_orig;
 } pose;
 
 
