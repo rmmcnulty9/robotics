@@ -11,7 +11,7 @@ typedef struct {
 } pose;
 
 
-const float we_to_cm = 1/20.0;
+const float we_to_cm = 1/2.0;
 const float ns_to_cm = 1/300.0;
-
+const float robot_radius = 8.0;
 #endif

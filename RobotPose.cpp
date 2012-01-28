@@ -1,5 +1,6 @@
 #include <robot_if++.h>
 #include <iostream>
+#include <stdio.h>
 #include <string>
 #include <math.h>
 #include <cstdio>
@@ -45,6 +46,8 @@ RobotPose::RobotPose(RobotInterface *r, char* coef_file){
   RobotPose::createFilter(coef_file, right_we);
   RobotPose::createFilter(coef_file, rear_we);
 }
+RobotPose::~RobotPose(){
+}
 
 void RobotPose::resetCoord() {
 	pose_start.x = robot->X();
@@ -70,25 +73,25 @@ void RobotPose::updatePosition(){
 }
 bool RobotPose::getPositionWE(pose& we){
 	we.x = pose_we.x;
-  we.y = pose_we.y;
-  we.theta = pose_we.theta;
-  return true;
+	we.y = pose_we.y;
+	we.theta = pose_we.theta;
+	return true;
 }
 bool RobotPose::getPositionNS(pose& ns){
 	return true;
 }
 
 bool RobotPose::updateWE(){
-  int left  = robot->getWheelEncoder(RI_WHEEL_LEFT);
+	int left  = robot->getWheelEncoder(RI_WHEEL_LEFT);
 	int right = robot->getWheelEncoder(RI_WHEEL_RIGHT);
 	int rear  = robot->getWheelEncoder(RI_WHEEL_REAR);
-	float dy = ((left * sin(150 * M_PI/180)) + (right * sin(30 * M_PI/180)))/2;
-	float dx = ((left * cos(150 * M_PI/180)) + (right * cos(30 * M_PI/180)))/2;
-	float dtheta = rear/(29*M_PI);
-	pose_we.x = dx*we_to_cm;
-	pose_we.y = dy*we_to_cm;
-	pose_we.theta = dtheta*we_to_cm;
-  return true;
+	float dy = ((left * sin(150 * M_PI/180 + pose_we.theta)) + (right * sin(30 * M_PI/180 + pose_we.theta)))/2;
+	float dx = ((left * cos(150 * M_PI/180 + pose_we.theta)) + (right * cos(30 * M_PI/180 + pose_we.theta)))/2;
+	float dtheta = rear/(robot_radius*M_PI);
+	pose_we.x += dx*we_to_cm;
+	pose_we.y += dy*we_to_cm;
+	pose_we.theta += dtheta*we_to_cm;
+	return true;
 }
 
 bool RobotPose::updateNS(){

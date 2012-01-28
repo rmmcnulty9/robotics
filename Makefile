@@ -5,7 +5,7 @@ LIB_FLAGS=-L. -lrobot_if
 CPP_LIB_FLAGS=${LIB_FLAGS} -lrobot_if++
 LIB_LINK=-lhighgui -lcv -lcxcore -lm
 
-all: data_collector simulator RobotPose
+all: data_collector simulator RobotPose base_navigator
 
 simualtor: simulator.c
 	gcc ${CFLAGS} -c simulator.c
