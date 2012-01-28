@@ -164,8 +164,8 @@ float RobotPose::firFilter(filter* f, float val)
   //   i tracks the next coeficeint
   //   j tracks the samples w/wrap-around 
   for( i=0,j=f->next_sample; i<f->TAPS; i++) {
-    sum += f->coefficients[i]*f->samples[j++];
-    if(j == f->TAPS)  j=0;
+          sum += f->coefficients[i]*f->samples[j++];
+          if(j == f->TAPS)  j=0;
   }
   if(++(f->next_sample) == f->TAPS) f->next_sample = 0;
   return(sum);

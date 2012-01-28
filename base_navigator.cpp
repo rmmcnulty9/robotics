@@ -21,6 +21,15 @@ int main(int argv, char **argc)
 	RobotPose robotPose(robot, coefFile);
 	pose we;
 	bool turn = false;
+		for(int i=0; i<4; i++){
+
+			  robotPose.updatePosition();
+		  robotPose.getPositionWE(we);
+		  std::cout << we.x << ",\t" << we.y << ",\t" << we.theta * (180/M_PI) << std::endl;
+	robot->Move(RI_TURN_LEFT_20DEG, RI_FASTEST);
+		}
+		    
+	/*
 	for(int i=0; i<20; i++){
 		  // Update the robot's sensor information
 		  robotPose.updatePosition();
@@ -37,10 +46,7 @@ int main(int argv, char **argc)
 			break;
 		  }	 
 	}
-	robot->Move(RI_TURN_LEFT_20DEG, RI_FASTEST);
-	 robot->Move(RI_TURN_LEFT_20DEG, RI_FASTEST);
-		    robot->Move(RI_TURN_LEFT_20DEG, RI_FASTEST);
-		    robot->Move(RI_TURN_LEFT_20DEG, RI_FASTEST);
+
 
 	
 	for(int i=0; i<20; i++){
@@ -78,7 +84,7 @@ int main(int argv, char **argc)
 			std::cout << "Wall!\n";
 			break;
 		  }	 
-	}
+	}*/
 	delete(robot);
 	return 0;
 }
