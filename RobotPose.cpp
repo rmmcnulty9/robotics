@@ -40,13 +40,13 @@ RobotPose::RobotPose(RobotInterface *r, char* coef_file){
   //printf("x2 y2: %f %f\n", x_2, y_2);
   
   //Create all six FIR filters  
-  RobotPose::createFilter(coef_file, x_ns);
-  RobotPose::createFilter(coef_file, y_ns);
-  RobotPose::createFilter(coef_file, theta_ns);
+  x_ns = RobotPose::createFilter(coef_file, x_ns);
+  y_ns = RobotPose::createFilter(coef_file, y_ns);
+  theta_ns = RobotPose::createFilter(coef_file, theta_ns);
   
-  RobotPose::createFilter(coef_file, left_we);
-  RobotPose::createFilter(coef_file, right_we);
-  RobotPose::createFilter(coef_file, rear_we);
+  left_we = RobotPose::createFilter(coef_file, left_we);
+  right_we = RobotPose::createFilter(coef_file, right_we);
+  rear_we = RobotPose::createFilter(coef_file, rear_we);
 }
 RobotPose::~RobotPose(){
 }
