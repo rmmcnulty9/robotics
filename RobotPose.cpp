@@ -2,6 +2,7 @@
 #include <iostream>
 #include <string>
 #include <math.h>
+#include <cstdio>
 #include "RobotPose.h"
 #include "shared_constants.h"
 
@@ -10,8 +11,32 @@ RobotPose::RobotPose(RobotInterface *r, char* coef_file){
   robot = r;
 	robot->update();
 	resetCoord();
-  //Create all six FIR filters
+	
+  int x = robot->X();
+  int y = robot->Y();
+	
+  robot->Move(RI_MOVE_FORWARD, RI_FASTEST);
+  updateWE();
+  updateNS();
+  x = robot->X() - x;
+  y = robot->Y() - y;
   
+  // find angle between vector (x, y) and (0, 1)
+  // robot is initially facing along the positive y axis
+  // theta = (x, y) * (0, 1) / (len( (x, y) ) * len( (0, 1) ))
+  pose_ns.theta_orig = y / (sqrt(x * x + y * y));
+  
+  double len = sqrt(x * x + y * y);
+  double x_1 = (double)x / len;
+  double y_1 = (double)y / len;
+  printf("x1 y1: %f %f\n", x_1, y_1);
+  
+  double x_2 = -sin(pose_ns.theta_orig);
+  double y_2 = cos(pose_ns.theta_orig);
+  
+  printf("x2 y2: %f %f\n", x_2, y_2);
+  
+  //Create all six FIR filters  
   RobotPose::createFilter(coef_file, x_ns);
   RobotPose::createFilter(coef_file, y_ns);
   RobotPose::createFilter(coef_file, theta_ns);
@@ -21,7 +46,7 @@ RobotPose::RobotPose(RobotInterface *r, char* coef_file){
   RobotPose::createFilter(coef_file, rear_we);
 }
 
- void RobotPose::resetCoord(){
+void RobotPose::resetCoord() {
 	pose_start.x = robot->X();
 	pose_start.y = robot->Y();
 	pose_start.theta = robot->Theta();
