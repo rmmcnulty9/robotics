@@ -152,22 +152,22 @@ filter *RobotPose::createFilter(char *coef_file, filter *f)
 //incorporates new sample into filter data array
  
 
-float RobotPose::firFilter(filter& f, float val)
+float RobotPose::firFilter(filter* f, float val)
 {
   float sum =0;
   int i,j;
 
   // assign  new value to "next" slot 
-  f.samples[f.next_sample] = val;
+  f->samples[f->next_sample] = val;
 
   // calculate a  weighted sum
   //   i tracks the next coeficeint
   //   j tracks the samples w/wrap-around 
-  for( i=0,j=f.next_sample; i<f.TAPS; i++) {
-    sum += f.coefficients[i]*f.samples[j++];
-    if(j == f.TAPS)  j=0;
+  for( i=0,j=f->next_sample; i<f->TAPS; i++) {
+    sum += f->coefficients[i]*f->samples[j++];
+    if(j == f->TAPS)  j=0;
   }
-  if(++(f.next_sample) == f.TAPS) f.next_sample = 0;
+  if(++(f->next_sample) == f->TAPS) f->next_sample = 0;
   return(sum);
 }
 
