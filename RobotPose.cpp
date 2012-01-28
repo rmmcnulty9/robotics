@@ -60,8 +60,8 @@ bool RobotPose::updateWE(){
 	int left  = robot->getWheelEncoder(RI_WHEEL_LEFT);
 	int right = robot->getWheelEncoder(RI_WHEEL_RIGHT);
 	int rear  = robot->getWheelEncoder(RI_WHEEL_REAR);
-	float dy = ((left * sin(150 * M_PI/180)) + (right * sin(30 * M_PI/180)))/2;
-	float dx = ((left * cos(150 * M_PI/180)) + (right * cos(30 * M_PI/180)))/2;
+	float dy = ((left * sin(150 * M_PI/180 + pose_we.theta)) + (right * sin(30 * M_PI/180 + pose_we.theta)))/2;
+	float dx = ((left * cos(150 * M_PI/180 + pose_we.theta)) + (right * cos(30 * M_PI/180 + pose_we.theta)))/2;
 	float dtheta = rear/(robot_radius*M_PI);
 	pose_we.x += dx*we_to_cm;
 	pose_we.y += dy*we_to_cm;
