@@ -25,17 +25,19 @@ RobotPose::RobotPose(RobotInterface *r, char* coef_file){
   // find angle between vector (x, y) and (0, 1)
   // robot is initially facing along the positive y axis
   // theta = (x, y) * (0, 1) / (len( (x, y) ) * len( (0, 1) ))
-  pose_ns.theta_orig = y / (sqrt(x * x + y * y));
+  pose_ns.theta_orig = acos((double)y / (sqrt((double)(x * x + y * y))));
   
-  double len = sqrt(x * x + y * y);
-  double x_1 = (double)x / len;
-  double y_1 = (double)y / len;
-  printf("x1 y1: %f %f\n", x_1, y_1);
+  //double len = sqrt((double)(x * x + y * y));
+  //double x_1 = (double)x / len;
+  //double y_1 = (double)y / len;
+  //printf("len: %f\n", len);
+  //printf("theta_orig: %f\n", pose_ns.theta_orig);
+  //printf("x1 y1: %f %f\n", x_1, y_1);
   
-  double x_2 = -sin(pose_ns.theta_orig);
-  double y_2 = cos(pose_ns.theta_orig);
+  //double x_2 = -sin(pose_ns.theta_orig);
+  //double y_2 = cos(pose_ns.theta_orig);
   
-  printf("x2 y2: %f %f\n", x_2, y_2);
+  //printf("x2 y2: %f %f\n", x_2, y_2);
   
   //Create all six FIR filters  
   RobotPose::createFilter(coef_file, x_ns);
