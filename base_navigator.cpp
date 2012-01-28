@@ -21,14 +21,14 @@ int main(int argv, char **argc)
 	RobotPose robotPose(robot, coefFile);
 	pose we;
 	bool turn = false;
-	for(int i=0; i<18; i++){
+	for(int i=0; i<16; i++){
 		  // Update the robot's sensor information
 		  robotPose.updatePosition();
 		  robotPose.getPositionWE(we);
-		  std::cout << we.x << ",\t" << we.y << ",\t" << we.theta << std::endl;
+		  std::cout << we.x << ",\t" << we.y << ",\t" << we.theta * (180/M_PI) << std::endl;
 		  // Move forward unless there's something in front of the robot
 		  if(!robot->IR_Detected()){
-			  robot->Move(RI_TURN_LEFT_20DEG, RI_FASTEST);
+			  robot->Move(RI_TURN_RIGHT_20DEG, RI_FASTEST);
 			  //robot->Move(RI_MOVE_FORWARD, RI_FASTEST);
 		  }
 		  else{
