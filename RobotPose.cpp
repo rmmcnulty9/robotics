@@ -87,11 +87,6 @@ bool RobotPose::updateWE(){
 	int left  = robot->getWheelEncoder(RI_WHEEL_LEFT);
 	int right = robot->getWheelEncoder(RI_WHEEL_RIGHT);
 	int rear  = robot->getWheelEncoder(RI_WHEEL_REAR);
-	std::cout << "[" << left << ",\t\t" << right << ",\t\t" << rear << "]\n";
-	left = firFilter(left_we, left);
-	right = firFilter(left_we, right);
-	rear = firFilter(left_we, rear);
-	std::cout << "{" << left << ",\t" << right << ",\t" << rear << "}\n";
 	float dy = ((left * sin(150 * M_PI/180 + pose_we.theta)) + (right * sin(30 * M_PI/180 + pose_we.theta)))/2;
 	float dx = ((left * cos(150 * M_PI/180 + pose_we.theta)) + (right * cos(30 * M_PI/180 + pose_we.theta)))/2;
 	float dtheta = rear/(robot_radius*M_PI);
@@ -102,17 +97,21 @@ bool RobotPose::updateWE(){
 }
 
 bool RobotPose::updateNS(){
-  	int x = robot->X();
-	int y = robot->Y();
-	int theta = robot->Theta();
+  	double x = robot->X();
+	double y = robot->Y();
+	double theta = robot->Theta();
 	int room = robot->RoomID();
   /*
    * Conversion
    */
-   
+	double x_2 = x * cos(pose_ns.theta_orig) - y * sin(pose_ns.theta_orig);
+	double y_2 = x * sin(pose_ns.theta_orig) + y * cos(pose_ns.theta_orig);
    /*
     * Set the NS pose
     */
+  pose_ns.x = x_2 * ns_to_cm;
+  pose_ns.y = y_2 * ns_to_cm;    
+  pose_ns.theta += pose_ns.theta_orig;
   return true;
 }
 
@@ -121,34 +120,34 @@ bool RobotPose::updateNS(){
  
 filter *RobotPose::createFilter(char *coef_file, filter *f)
 {
-	int i;
-	f = (filter *)malloc(sizeof(filter));
-	//printf("%d\n", sizeof(filter));
-	f->TAPS = 0;
-	f->next_sample = 0;
-	FILE *fp = fopen(coef_file,"r+");
-	if(fp==NULL){
-		printf("Coefficients could not be loaded from %s\n", coef_file);
-		exit(-1);
-	}
+  int i;
+  f = (filter *)malloc(sizeof(filter));
+  //printf("%d\n", sizeof(filter));
+  f->TAPS = 0;
+  f->next_sample = 0;
+  FILE *fp = fopen(coef_file,"r+");
+  if(fp==NULL){
+    printf("Coefficients could not be loaded from %s\n", coef_file);
+    exit(-1);
+  }
   
-	//Read in coef & count, for TAPS
-	for (i = 0; i < 30; i++){
-		f->samples[i] = 0;
-		if(1!=fscanf(fp,"%e ", &f->coefficients[i])){
-			fclose(fp);
-			break;
-		}
-		// printf("%f\n", f->coefficients[i]);
-		f->TAPS++;
-	}
+  //Read in coef & count, for TAPS
+  for (i = 0; i < 30; i++){
+    f->samples[i] = 0;
+    if(1!=fscanf(fp,"%e ", &f->coefficients[i])){
+      fclose(fp);
+      break;
+    }
+   // printf("%f\n", f->coefficients[i]);
+    f->TAPS++;
+  }
   
-	//  printf("Coefficients:\n");
-	//  for (i = 0; i < f->TAPS; i++) {
-	//    printf("%d: %f\n", i, f->coefficients[i]);
-	//  }
+//  printf("Coefficients:\n");
+//  for (i = 0; i < f->TAPS; i++) {
+//    printf("%d: %f\n", i, f->coefficients[i]);
+//  }
   
-	return f;
+  return f;
 }
 
 // firFilter 
@@ -159,20 +158,20 @@ filter *RobotPose::createFilter(char *coef_file, filter *f)
 
 float RobotPose::firFilter(filter* f, float val)
 {
-	float sum =0;
-	int i,j;
+  float sum =0;
+  int i,j;
 
-	// assign  new value to "next" slot 
-	f->samples[f->next_sample] = val;
+  // assign  new value to "next" slot 
+  f->samples[f->next_sample] = val;
 
-	// calculate a  weighted sum
-	//   i tracks the next coeficeint
-	//   j tracks the samples w/wrap-around 
-	for( i=0,j=f->next_sample; i<f->TAPS; i++) {
-		sum += f->coefficients[i]*f->samples[j++];
-		if(j == f->TAPS)  j=0;
-	}
-	if(++(f->next_sample) == f->TAPS) f->next_sample = 0;
-	return(sum);
+  // calculate a  weighted sum
+  //   i tracks the next coeficeint
+  //   j tracks the samples w/wrap-around 
+  for( i=0,j=f->next_sample; i<f->TAPS; i++) {
+          sum += f->coefficients[i]*f->samples[j++];
+          if(j == f->TAPS)  j=0;
+  }
+  if(++(f->next_sample) == f->TAPS) f->next_sample = 0;
+  return(sum);
 }
 
