@@ -10,13 +10,21 @@
 
 RobotPose::RobotPose(RobotInterface *r, char* coef_file){
   robot = r;
+    //Create all six FIR filters  
+  x_ns = RobotPose::createFilter(coef_file);
+  y_ns = RobotPose::createFilter(coef_file);
+  theta_ns = RobotPose::createFilter(coef_file);
+  
+  left_we = RobotPose::createFilter(coef_file);
+  right_we = RobotPose::createFilter(coef_file);
+  rear_we = RobotPose::createFilter(coef_file);
+  
 	robot->update();
 	resetCoord();
 	
   int x = robot->X();
   int y = robot->Y();
 	
-  robot->Move(RI_MOVE_FORWARD, RI_FASTEST);
   updateWE();
   updateNS();
   x = robot->X() - x;
@@ -42,14 +50,7 @@ RobotPose::RobotPose(RobotInterface *r, char* coef_file){
   
   //printf("x2 y2: %f %f\n", x_2, y_2);
   
-  //Create all six FIR filters  
-  x_ns = RobotPose::createFilter(coef_file, x_ns);
-  y_ns = RobotPose::createFilter(coef_file, y_ns);
-  theta_ns = RobotPose::createFilter(coef_file, theta_ns);
-  
-  left_we = RobotPose::createFilter(coef_file, left_we);
-  right_we = RobotPose::createFilter(coef_file, right_we);
-  rear_we = RobotPose::createFilter(coef_file, rear_we);
+
 }
 RobotPose::~RobotPose(){
 }
@@ -133,10 +134,11 @@ bool RobotPose::updateNS(){
 // firFilterCreate()
 // creates, allocates,  and initializes a new firFilter
  
-filter *RobotPose::createFilter(char *coef_file, filter *f)
+filter *RobotPose::createFilter(char *coef_file)
 {
+	std::cout << "Here\n";
 	int i;
-	f = (filter *)malloc(sizeof(filter));
+	filter* f = (filter *)malloc(sizeof(filter));
 	//printf("%d\n", sizeof(filter));
 	f->TAPS = 0;
 	f->next_sample = 0;
@@ -157,11 +159,12 @@ filter *RobotPose::createFilter(char *coef_file, filter *f)
 		f->TAPS++;
 	}
   
-	//  printf("Coefficients:\n");
-	//  for (i = 0; i < f->TAPS; i++) {
-	//    printf("%d: %f\n", i, f->coefficients[i]);
-	//  }
-  
+	  printf("Coefficients:\n");
+	  for (i = 0; i < f->TAPS; i++) {
+	    printf("%d: %f\n", i, f->coefficients[i]);
+	  }
+  	std::cout << "Test:" << f->next_sample << "\n";
+
 	return f;
 }
 
