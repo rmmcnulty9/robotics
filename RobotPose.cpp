@@ -22,6 +22,9 @@ RobotPose::RobotPose(RobotInterface *r, char* coef_file){
   x = robot->X() - x;
   y = robot->Y() - y;
   
+  //Isn't this theta_orig robot->Theta()? - why calculate it?
+  //Also shouldn't these be going thru the FIR filters?
+  
   // find angle between vector (x, y) and (0, 1)
   // robot is initially facing along the positive y axis
   // theta = (x, y) * (0, 1) / (len( (x, y) ) * len( (0, 1) ))
@@ -89,8 +92,8 @@ bool RobotPose::updateWE(){
 	int rear  = robot->getWheelEncoder(RI_WHEEL_REAR);
 	std::cout << "[" << left << ",\t\t" << right << ",\t\t" << rear << "]\n";
 	left = firFilter(left_we, left);
-	right = firFilter(left_we, right);
-	rear = firFilter(left_we, rear);
+	right = firFilter(right_we, right);
+	rear = firFilter(rear_we, rear);
 	std::cout << "{" << left << ",\t" << right << ",\t" << rear << "}\n";
 	float dy = ((left * sin(150 * M_PI/180 + pose_we.theta)) + (right * sin(30 * M_PI/180 + pose_we.theta)))/2;
 	float dx = ((left * cos(150 * M_PI/180 + pose_we.theta)) + (right * cos(30 * M_PI/180 + pose_we.theta)))/2;
@@ -102,12 +105,19 @@ bool RobotPose::updateWE(){
 }
 
 bool RobotPose::updateNS(){
-  	double x = robot->X();
+  double x = robot->X();
 	double y = robot->Y();
 	double theta = robot->Theta();
 	int room = robot->RoomID();
+  
+  /*
+   * Check for a new room - if different change the way we so conversion
+   * */
+  
   /*
    * Conversion
+   * I think this only rotates about the z-axis. 
+   * We will be to translate to (subtract the original x & y from x_2 and y_2)
    */
 	double x_2 = x * cos(pose_ns.theta_orig) - y * sin(pose_ns.theta_orig);
 	double y_2 = x * sin(pose_ns.theta_orig) + y * cos(pose_ns.theta_orig);
