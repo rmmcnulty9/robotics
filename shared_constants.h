@@ -13,5 +13,5 @@ typedef struct {
 
 const float we_to_cm = 1/2.0;
 const float ns_to_cm = 1/300.0;
-const float robot_radius = 4.0;
+const float robot_radius = 16.0;
 #endif
