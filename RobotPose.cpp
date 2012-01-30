@@ -19,16 +19,18 @@ RobotPose::RobotPose(RobotInterface *r, char* coef_file){
   right_we = RobotPose::createFilter(coef_file);
   rear_we = RobotPose::createFilter(coef_file);
   
-	robot->update();
-	resetCoord();
+  robot->update();
+  resetCoord();
 	
-  int x = robot->X();
+  /*int x = robot->X();
   int y = robot->Y();
-	
+  
+  robot->Move(RI_MOVE_FORWARD, RI_FASTEST);
+  
   updateWE();
   updateNS();
   x = robot->X() - x;
-  y = robot->Y() - y;
+  y = robot->Y() - y;*/
   
   //Isn't this theta_orig robot->Theta()? - why calculate it?
   //Also shouldn't these be going thru the FIR filters?
@@ -36,7 +38,7 @@ RobotPose::RobotPose(RobotInterface *r, char* coef_file){
   // find angle between vector (x, y) and (0, 1)
   // robot is initially facing along the positive y axis
   // theta = (x, y) * (0, 1) / (len( (x, y) ) * len( (0, 1) ))
-  pose_ns.theta_orig = acos((double)y / (sqrt((double)(x * x + y * y))));
+  //theta_ns_trans = acos((double)y / (sqrt((double)(x * x + y * y))));
   
   //double len = sqrt((double)(x * x + y * y));
   //double x_1 = (double)x / len;
@@ -106,10 +108,11 @@ bool RobotPose::updateWE(){
 }
 
 bool RobotPose::updateNS(){
-  double x = robot->X();
-	double y = robot->Y();
-	double theta = robot->Theta();
+  double x = robot->X() - pose_start.x;
+	double y = robot->Y() - pose_start.y;
+	double theta = robot->Theta() - pose_start.theta;
 	int room = robot->RoomID();
+	
   
   /*
    * Check for a new room - if different change the way we so conversion
@@ -120,14 +123,15 @@ bool RobotPose::updateNS(){
    * I think this only rotates about the z-axis. 
    * We will be to translate to (subtract the original x & y from x_2 and y_2)
    */
-	double x_2 = x * cos(pose_ns.theta_orig) - y * sin(pose_ns.theta_orig);
-	double y_2 = x * sin(pose_ns.theta_orig) + y * cos(pose_ns.theta_orig);
+  
+	double x_2 = x * cos(pose_start.theta) - y * sin(pose_start.theta);
+	double y_2 = x * sin(pose_start.theta) + y * cos(pose_start.theta);
    /*
     * Set the NS pose
     */
   pose_ns.x = x_2 * ns_to_cm;
-  pose_ns.y = y_2 * ns_to_cm;    
-  pose_ns.theta += pose_ns.theta_orig;
+  pose_ns.y = y_2 * ns_to_cm;
+  pose_ns.theta = theta;
   return true;
 }
 
