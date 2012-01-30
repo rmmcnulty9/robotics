@@ -103,7 +103,7 @@ bool RobotPose::updateWE(){
 	float dtheta = rear/(robot_radius*M_PI);
 	pose_we.x += dx*we_to_cm;
 	pose_we.y += dy*we_to_cm;
-	pose_we.theta += dtheta*we_to_cm;
+	pose_we.theta += dtheta;
 	return true;
 }
 
