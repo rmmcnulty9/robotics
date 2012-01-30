@@ -4,17 +4,88 @@
 #include <robot_if++.h>
 #include <iostream>
 #include <string>
+#include "shared_constants.h"
+#include "RobotPose.cpp"
 
 
-int main(int argc, char **argv)
+int main(int argv, char **argc)
 {
 	// Make sure we have a valid command line argument
-    if(argv <= 1) {
-        std::cout << "Usage: robot_test <address of robot> <fir_coef_files>" << std::endl;
-        exit(-1);
-    }
-    RobotPose robot()
+	if(argv <= 2) {
+		std::cout << "Usage: robot_test <address of robot> <fir_coef_files>" << std::endl;
+		exit(-1);
+	}
+    
+	RobotInterface *robot = new RobotInterface(argc[1],0);
+	char *coefFile = argc[2];
+	RobotPose robotPose(robot, coefFile);
+	pose we;
+	bool turn = false;
+		for(int i=0; i<4; i++){
 
+			  robotPose.updatePosition();
+		  robotPose.getPositionWE(we);
+		  std::cout << we.x << ",\t" << we.y << ",\t" << we.theta * (180/M_PI) << std::endl;
+	robot->Move(RI_TURN_LEFT_20DEG, RI_FASTEST);
+		}
+		    
+	/*
+	for(int i=0; i<20; i++){
+		  // Update the robot's sensor information
+		  robotPose.updatePosition();
+		  robotPose.getPositionWE(we);
+		  std::cout << we.x << ",\t" << we.y << ",\t" << we.theta * (180/M_PI) << std::endl;
+		  // Move forward unless there's something in front of the robot
+
+		   if(!robot->IR_Detected()){
+			  //robot->Move(RI_TURN_LEFT_20DEG, RI_FASTEST);
+			  robot->Move(RI_MOVE_FORWARD, RI_FASTEST);
+		  }
+		  else{
+			std::cout << "Wall!\n";
+			break;
+		  }	 
+	}
+
+
+	
+	for(int i=0; i<20; i++){
+		  // Update the robot's sensor information
+		  robotPose.updatePosition();
+		  robotPose.getPositionWE(we);
+		  std::cout << we.x << ",\t" << we.y << ",\t" << we.theta * (180/M_PI) << std::endl;
+		  // Move forward unless there's something in front of the robot
+		 if(!robot->IR_Detected()){
+			  //robot->Move(RI_TURN_LEFT_20DEG, RI_FASTEST);
+			  robot->Move(RI_MOVE_FORWARD, RI_FASTEST);
+		  }
+		  else{
+			std::cout << "Wall!\n";
+			break;
+		  }	 
+	}
+		robot->Move(RI_TURN_RIGHT_20DEG, RI_FASTEST);
+	 robot->Move(RI_TURN_RIGHT_20DEG, RI_FASTEST);
+		    robot->Move(RI_TURN_RIGHT_20DEG, RI_FASTEST);
+		    robot->Move(RI_TURN_RIGHT_20DEG, RI_FASTEST);
+
+	
+	for(int i=0; i<20; i++){
+		  // Update the robot's sensor information
+		  robotPose.updatePosition();
+		  robotPose.getPositionWE(we);
+		  std::cout << we.x << ",\t" << we.y << ",\t" << we.theta * (180/M_PI) << std::endl;
+		  // Move forward unless there's something in front of the robot
+		 if(!robot->IR_Detected()){
+			  //robot->Move(RI_TURN_LEFT_20DEG, RI_FASTEST);
+			  robot->Move(RI_MOVE_FORWARD, RI_FASTEST);
+		  }
+		  else{
+			std::cout << "Wall!\n";
+			break;
+		  }	 
+	}*/
+	delete(robot);
 	return 0;
 }
 
