@@ -20,21 +20,21 @@ int main(int argv, char **argc)
 	char *coefFile = argc[2];
 	RobotPose robotPose(robot, coefFile);
 	pose we;
-	bool turn = false;
-		for(int i=0; i<4; i++){
-
-			  robotPose.updatePosition();
-		  robotPose.getPositionWE(we);
-		  std::cout << we.x << ",\t" << we.y << ",\t" << we.theta * (180/M_PI) << std::endl;
-	robot->Move(RI_TURN_LEFT_20DEG, RI_FASTEST);
-		}
-		    
 	/*
+	for(int i=0; i<4; i++){
+
+		robotPose.updatePosition();
+		robotPose.getPositionWE(we);
+		std::cout << we.x << ",\t" << we.y << ",\t" << we.theta * (180/M_PI) << std::endl;
+		robot->Move(RI_TURN_LEFT_20DEG, RI_FASTEST);
+	}*/
+		    
+	
 	for(int i=0; i<20; i++){
 		  // Update the robot's sensor information
 		  robotPose.updatePosition();
 		  robotPose.getPositionWE(we);
-		  std::cout << we.x << ",\t" << we.y << ",\t" << we.theta * (180/M_PI) << std::endl;
+		  //std::cout << we.x << ",\t" << we.y << ",\t" << we.theta * (180/M_PI) << std::endl;
 		  // Move forward unless there's something in front of the robot
 
 		   if(!robot->IR_Detected()){
@@ -53,7 +53,7 @@ int main(int argv, char **argc)
 		  // Update the robot's sensor information
 		  robotPose.updatePosition();
 		  robotPose.getPositionWE(we);
-		  std::cout << we.x << ",\t" << we.y << ",\t" << we.theta * (180/M_PI) << std::endl;
+		  //std::cout << we.x << ",\t" << we.y << ",\t" << we.theta * (180/M_PI) << std::endl;
 		  // Move forward unless there's something in front of the robot
 		 if(!robot->IR_Detected()){
 			  //robot->Move(RI_TURN_LEFT_20DEG, RI_FASTEST);
@@ -74,7 +74,7 @@ int main(int argv, char **argc)
 		  // Update the robot's sensor information
 		  robotPose.updatePosition();
 		  robotPose.getPositionWE(we);
-		  std::cout << we.x << ",\t" << we.y << ",\t" << we.theta * (180/M_PI) << std::endl;
+		  //std::cout << we.x << ",\t" << we.y << ",\t" << we.theta * (180/M_PI) << std::endl;
 		  // Move forward unless there's something in front of the robot
 		 if(!robot->IR_Detected()){
 			  //robot->Move(RI_TURN_LEFT_20DEG, RI_FASTEST);
@@ -84,7 +84,7 @@ int main(int argv, char **argc)
 			std::cout << "Wall!\n";
 			break;
 		  }	 
-	}*/
+	}
 	delete(robot);
 	return 0;
 }

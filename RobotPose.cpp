@@ -93,11 +93,11 @@ bool RobotPose::updateWE(){
 	int left  = robot->getWheelEncoder(RI_WHEEL_LEFT);
 	int right = robot->getWheelEncoder(RI_WHEEL_RIGHT);
 	int rear  = robot->getWheelEncoder(RI_WHEEL_REAR);
-	std::cout << "[" << left << ",\t\t" << right << ",\t\t" << rear << "]\n";
+	//std::cout << "[" << left << ",\t\t" << right << ",\t\t" << rear << "]\n";
 	left = firFilter(left_we, left);
 	right = firFilter(right_we, right);
 	rear = firFilter(rear_we, rear);
-	std::cout << "{" << left << ",\t" << right << ",\t" << rear << "}\n";
+	//std::cout << "{" << left << ",\t" << right << ",\t" << rear << "}\n";
 	float dy = ((left * sin(150 * M_PI/180 + pose_we.theta)) + (right * sin(30 * M_PI/180 + pose_we.theta)))/2;
 	float dx = ((left * cos(150 * M_PI/180 + pose_we.theta)) + (right * cos(30 * M_PI/180 + pose_we.theta)))/2;
 	float dtheta = rear/(robot_radius*M_PI);
@@ -108,7 +108,7 @@ bool RobotPose::updateWE(){
 }
 
 bool RobotPose::updateNS(){
-  double x = robot->X() - pose_start.x;
+	double x = robot->X() - pose_start.x;
 	double y = robot->Y() - pose_start.y;
 	double theta = robot->Theta() - pose_start.theta;
 	int room = robot->RoomID();
@@ -132,6 +132,7 @@ bool RobotPose::updateNS(){
   pose_ns.x = x_2 * ns_to_cm;
   pose_ns.y = y_2 * ns_to_cm;
   pose_ns.theta = theta;
+  std::cout << pose_ns.x << "," << pose_ns.y << "," << pose_ns.theta << "\n";
   return true;
 }
 
@@ -140,7 +141,6 @@ bool RobotPose::updateNS(){
  
 filter *RobotPose::createFilter(char *coef_file)
 {
-	std::cout << "Here\n";
 	int i;
 	filter* f = (filter *)malloc(sizeof(filter));
 	//printf("%d\n", sizeof(filter));
