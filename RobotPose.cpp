@@ -22,7 +22,7 @@ RobotPose::RobotPose(RobotInterface *r, char* coef_file){
   robot->update();
   resetCoord();
 	
-  int x = robot->X();
+  /*int x = robot->X();
   int y = robot->Y();
   
   robot->Move(RI_MOVE_FORWARD, RI_FASTEST);
@@ -41,7 +41,7 @@ RobotPose::RobotPose(RobotInterface *r, char* coef_file){
   theta_ns_trans = acos((double)y / (sqrt((double)(x * x + y * y))));
   
   updateWE();
-  updateNS();
+  updateNS();*/
   
   //double len = sqrt((double)(x * x + y * y));
   //double x_1 = (double)x / len;
@@ -127,14 +127,15 @@ bool RobotPose::updateNS(){
    * We will be to translate to (subtract the original x & y from x_2 and y_2)
    */
   
-	double x_2 = x * cos(theta_ns_trans) - y * sin(theta_ns_trans);
-	double y_2 = x * sin(theta_ns_trans) + y * cos(theta_ns_trans);
+	double x_2 = x * cos(-pose_start.theta) - y * sin(-pose_start.theta);
+	double y_2 = x * sin(-pose_start.theta) + y * cos(-pose_start.theta);
    /*
     * Set the NS pose
     */
   pose_ns.x = x_2 * ns_to_cm;
   pose_ns.y = y_2 * ns_to_cm;
   pose_ns.theta = theta;
+  //printf("Room: %d ", room);
   std::cout << pose_ns.x << "," << pose_ns.y << "," << pose_ns.theta << "\n";
   return true;
 }
