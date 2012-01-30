@@ -26,6 +26,7 @@ RobotPose::RobotPose(RobotInterface *r, char* coef_file){
   int y = robot->Y();
   
   robot->Move(RI_MOVE_FORWARD, RI_FASTEST);
+  robot->update();
   
   x = robot->X() - x;
   y = robot->Y() - y;
@@ -36,6 +37,7 @@ RobotPose::RobotPose(RobotInterface *r, char* coef_file){
   // find angle between vector (x, y) and (0, 1)
   // robot is initially facing along the positive y axis
   // theta = (x, y) * (0, 1) / (len( (x, y) ) * len( (0, 1) ))
+  printf("%d %d %f\n", x, y, sqrt((double)(x * x + y * y)));
   theta_ns_trans = acos((double)y / (sqrt((double)(x * x + y * y))));
   
   updateWE();
