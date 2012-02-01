@@ -64,7 +64,7 @@ void RobotPose::resetCoord() {
 	pose_start.x = robot->X();
 	pose_start.y = robot->Y();
 	pose_start.theta = robot->Theta();
-	
+	std::cout << "Start NS: " << pose_start.x << "," << pose_start.y << "," << pose_start.theta * (180/M_PI) << "\n";
 	pose_ns.x = 0;
 	pose_ns.y = 0;
 	pose_ns.theta = 0;
@@ -136,7 +136,7 @@ bool RobotPose::updateNS(){
   pose_ns.y = y_2 * ns_to_cm;
   pose_ns.theta = theta;
   //printf("Room: %d ", room);
-  std::cout << pose_ns.x << "," << pose_ns.y << "," << pose_ns.theta << "\n";
+  std::cout << pose_ns.x << "," << pose_ns.y << "," << pose_ns.theta * (180/M_PI)<< "\n";
   return true;
 }
 
