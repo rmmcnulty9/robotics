@@ -136,7 +136,7 @@ bool RobotPose::updateNS(){
   pose_ns.y = y_2 * ns_to_cm;
   pose_ns.theta = theta;
   //printf("Room: %d ", room);
-  std::cout << pose_ns.x << "," << pose_ns.y << "," << pose_ns.theta * (180/M_PI)<< "\n";
+  std::cout << pose_ns.x << ",\t" << pose_ns.y << ",\t" << pose_ns.theta * (180/M_PI)<< ", Room: " << room_cur << "\n";
   return true;
 }
 
