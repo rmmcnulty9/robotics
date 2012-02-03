@@ -62,9 +62,14 @@ RobotPose::~RobotPose(){
 }
 
 void RobotPose::resetCoord() {
-	pose_start.x = robot->X();
-	pose_start.y = robot->Y();
+	double temp_x  = robot->X();
+	double temp_y  = robot->Y();
 	pose_start.theta = robot->Theta();
+	
+	pose_start.x = temp_x * cos(-pose_start.theta) - temp_y * sin(-pose_start.theta);
+	pose_start.y = temp_x * sin(-pose_start.theta) + temp_y * cos(-pose_start.theta);
+	
+	
 	std::cout << "Start NS: " << pose_start.x << "," << pose_start.y << "," << pose_start.theta * (180/M_PI) << "\n";
 	pose_ns.x = 0;
 	pose_ns.y = 0;
@@ -112,11 +117,18 @@ bool RobotPose::updateWE(){
 }
 
 bool RobotPose::updateNS(){
-	double x = robot->X() - pose_start.x;
-	double y = robot->Y() - pose_start.y;
+	double x = robot->X();
+	double y = robot->Y();
+  	
+	double x_2 = x * cos(-pose_start.theta) - y * sin(-pose_start.theta);
+	double y_2 = x * sin(-pose_start.theta) + y * cos(-pose_start.theta);	
+
+	
+	x_2 = x_2 - pose_start.x;
+	y_2 = pose_start.y - y_2;
 	double theta = robot->Theta() - pose_start.theta;
 	int room = robot->RoomID();
-	
+
   
   /*
    * Check for a new room - if different change the way we so conversion
@@ -127,12 +139,14 @@ bool RobotPose::updateNS(){
    * I think this only rotates about the z-axis. 
    * We will be to translate to (subtract the original x & y from x_2 and y_2)
    */
-  
-	double x_2 = x * cos(-pose_start.theta) - y * sin(-pose_start.theta);
-	double y_2 = x * sin(-pose_start.theta) + y * cos(-pose_start.theta);
+
+
    /*
     * Set the NS pose
     */
+   	x_2 = firFilter(x_ns, x_2);
+	y_2 = firFilter(y_ns, y_2);
+	//theta = firFilter(theta_ns, theta);
   pose_ns.x = x_2 * ns_to_cm;
   pose_ns.y = y_2 * ns_to_cm;
   pose_ns.theta = theta;

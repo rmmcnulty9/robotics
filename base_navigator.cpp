@@ -28,8 +28,20 @@ int main(int argv, char **argc)
 		std::cout << we.x << ",\t" << we.y << ",\t" << we.theta * (180/M_PI) << std::endl;
 		robot->Move(RI_TURN_LEFT_20DEG, RI_FASTEST);
 	}*/
-		    
-	
+			robotPose.updatePosition();
+		robotPose.updatePosition();
+		robotPose.updatePosition();
+		robotPose.updatePosition();
+		robotPose.updatePosition();
+		robotPose.updatePosition();
+		robotPose.updatePosition();
+
+	std::cout << "Turning\n";
+	for(int i=0; i<4; i++){
+		robotPose.updatePosition();
+		robot->Move(RI_TURN_LEFT_20DEG, RI_FASTEST);
+	}	    
+	std::cout << "Moving\n";	
 	for(int i=0; i<20; i++){
 		  // Update the robot's sensor information
 		  robotPose.updatePosition();
@@ -46,9 +58,14 @@ int main(int argv, char **argc)
 			break;
 		  }	 
 	}
+	std::cout << "Turning\n";
+	for(int i=0; i<8; i++){
+		robotPose.updatePosition();
+		robot->Move(RI_TURN_LEFT_20DEG, RI_FASTEST);
+	}
 
 
-	
+	std::cout << "Moving\n";
 	for(int i=0; i<20; i++){
 		  // Update the robot's sensor information
 		  robotPose.updatePosition();
@@ -63,6 +80,16 @@ int main(int argv, char **argc)
 			std::cout << "Wall!\n";
 			break;
 		  }	 
+	}
+	std::cout << "Turning\n";
+	for(int i=0; i<8; i++){
+		robotPose.updatePosition();
+		robot->Move(RI_TURN_LEFT_20DEG, RI_FASTEST);
+	}
+	std::cout << "Turning\n";
+	for(int i=0; i<4; i++){
+		robotPose.updatePosition();
+		robot->Move(RI_TURN_RIGHT_20DEG, RI_FASTEST);
 	}
 
 	delete(robot);
