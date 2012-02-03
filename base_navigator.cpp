@@ -36,12 +36,12 @@ int main(int argv, char **argc)
 		robotPose.updatePosition();
 		robotPose.updatePosition();
 
-	std::cout << "Turning\n";
+	//std::cout << "Turning\n";
 	for(int i=0; i<4; i++){
 		robotPose.updatePosition();
 		robot->Move(RI_TURN_LEFT_20DEG, RI_FASTEST);
 	}	    
-	std::cout << "Moving\n";	
+	//std::cout << "Moving\n";	
 	for(int i=0; i<20; i++){
 		  // Update the robot's sensor information
 		  robotPose.updatePosition();
@@ -58,14 +58,14 @@ int main(int argv, char **argc)
 			break;
 		  }	 
 	}
-	std::cout << "Turning\n";
+	//std::cout << "Turning\n";
 	for(int i=0; i<8; i++){
 		robotPose.updatePosition();
 		robot->Move(RI_TURN_LEFT_20DEG, RI_FASTEST);
 	}
 
 
-	std::cout << "Moving\n";
+	//std::cout << "Moving\n";
 	for(int i=0; i<20; i++){
 		  // Update the robot's sensor information
 		  robotPose.updatePosition();
@@ -81,12 +81,12 @@ int main(int argv, char **argc)
 			break;
 		  }	 
 	}
-	std::cout << "Turning\n";
+	//std::cout << "Turning\n";
 	for(int i=0; i<8; i++){
 		robotPose.updatePosition();
 		robot->Move(RI_TURN_LEFT_20DEG, RI_FASTEST);
 	}
-	std::cout << "Turning\n";
+	//std::cout << "Turning\n";
 	for(int i=0; i<4; i++){
 		robotPose.updatePosition();
 		robot->Move(RI_TURN_RIGHT_20DEG, RI_FASTEST);

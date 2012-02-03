@@ -11,7 +11,7 @@
 
 RobotPose::RobotPose(RobotInterface *r, char* coef_file){
   robot = r;
-    //Create all six FIR filters  
+    //Create all six FIR filters
   x_ns = RobotPose::createFilter(coef_file);
   y_ns = RobotPose::createFilter(coef_file);
   theta_ns = RobotPose::createFilter(coef_file);
@@ -22,27 +22,22 @@ RobotPose::RobotPose(RobotInterface *r, char* coef_file){
   
   robot->update();
   resetCoord();
-	
+
   /*int x = robot->X();
-  int y = robot->Y();
-  
-  robot->Move(RI_MOVE_FORWARD, RI_FASTEST);
-  robot->update();
-  
-  x = robot->X() - x;
-  y = robot->Y() - y;
-  
-  //Isn't this theta_orig robot->Theta()? - why calculate it?
-  //Also shouldn't these be going thru the FIR filters?
-  
-  // find angle between vector (x, y) and (0, 1)
-  // robot is initially facing along the positive y axis
-  // theta = (x, y) * (0, 1) / (len( (x, y) ) * len( (0, 1) ))
-  printf("%d %d %f\n", x, y, sqrt((double)(x * x + y * y)));
-  theta_ns_trans = acos((double)y / (sqrt((double)(x * x + y * y))));
-  
-  updateWE();
-  updateNS();*/
+int y = robot->Y();
+robot->Move(RI_MOVE_FORWARD, RI_FASTEST);
+robot->update();
+x = robot->X() - x;
+y = robot->Y() - y;
+//Isn't this theta_orig robot->Theta()? - why calculate it?
+//Also shouldn't these be going thru the FIR filters?
+// find angle between vector (x, y) and (0, 1)
+// robot is initially facing along the positive y axis
+// theta = (x, y) * (0, 1) / (len( (x, y) ) * len( (0, 1) ))
+printf("%d %d %f\n", x, y, sqrt((double)(x * x + y * y)));
+theta_ns_trans = acos((double)y / (sqrt((double)(x * x + y * y))));
+updateWE();
+updateNS();*/
   
   //double len = sqrt((double)(x * x + y * y));
   //double x_1 = (double)x / len;
@@ -62,137 +57,123 @@ RobotPose::~RobotPose(){
 }
 
 void RobotPose::resetCoord() {
-	double temp_x  = robot->X();
-	double temp_y  = robot->Y();
-	pose_start.theta = robot->Theta();
-	
-	pose_start.x = temp_x * cos(-pose_start.theta) - temp_y * sin(-pose_start.theta);
-	pose_start.y = temp_x * sin(-pose_start.theta) + temp_y * cos(-pose_start.theta);
-	
-	
-	std::cout << "Start NS: " << pose_start.x << "," << pose_start.y << "," << pose_start.theta * (180/M_PI) << "\n";
-	pose_ns.x = 0;
-	pose_ns.y = 0;
-	pose_ns.theta = 0;
-	
-	pose_we.x = 0;
-	pose_we.y = 0;
-	pose_we.theta = 0;
+pose_start.x = robot->X();
+pose_start.y = robot->Y();
+pose_start.theta = robot->Theta();
+std::cout << "Start NS: " << pose_start.x << "," << pose_start.y << "," << pose_start.theta * (180/M_PI) << "\n";
+pose_ns.x = 0;
+pose_ns.y = 0;
+pose_ns.theta = 0;
 
-	room_start = robot->RoomID();
-	room_cur = room_start;
+pose_we.x = 0;
+pose_we.y = 0;
+pose_we.theta = 0;
+
+room_start = robot->RoomID();
+room_cur = room_start;
 }
 
 void RobotPose::updatePosition(){
-	robot->update();
-	updateWE();
-	updateNS();
+robot->update();
+updateWE();
+updateNS();
 }
 bool RobotPose::getPositionWE(pose& we){
-	we.x = pose_we.x;
-	we.y = pose_we.y;
-	we.theta = pose_we.theta;
-	return true;
+we.x = pose_we.x;
+we.y = pose_we.y;
+we.theta = pose_we.theta;
+return true;
 }
 bool RobotPose::getPositionNS(pose& ns){
-	return true;
+return true;
 }
 
 bool RobotPose::updateWE(){
-	int left  = robot->getWheelEncoder(RI_WHEEL_LEFT);
-	int right = robot->getWheelEncoder(RI_WHEEL_RIGHT);
-	int rear  = robot->getWheelEncoder(RI_WHEEL_REAR);
-	//std::cout << "[" << left << ",\t\t" << right << ",\t\t" << rear << "]\n";
-	left = firFilter(left_we, left);
-	right = firFilter(right_we, right);
-	rear = firFilter(rear_we, rear);
-	//std::cout << "{" << left << ",\t" << right << ",\t" << rear << "}\n";
-	float dy = ((left * sin(150 * M_PI/180 + pose_we.theta)) + (right * sin(30 * M_PI/180 + pose_we.theta)))/2;
-	float dx = ((left * cos(150 * M_PI/180 + pose_we.theta)) + (right * cos(30 * M_PI/180 + pose_we.theta)))/2;
-	float dtheta = rear/(robot_radius*M_PI);
-	pose_we.x += dx*we_to_cm;
-	pose_we.y += dy*we_to_cm;
-	pose_we.theta += dtheta;
-	return true;
+int left = robot->getWheelEncoder(RI_WHEEL_LEFT);
+int right = robot->getWheelEncoder(RI_WHEEL_RIGHT);
+int rear = robot->getWheelEncoder(RI_WHEEL_REAR);
+//std::cout << "[" << left << ",\t\t" << right << ",\t\t" << rear << "]\n";
+left = firFilter(left_we, left);
+right = firFilter(right_we, right);
+rear = firFilter(rear_we, rear);
+//std::cout << "{" << left << ",\t" << right << ",\t" << rear << "}\n";
+float dy = ((left * sin(150 * M_PI/180 + pose_we.theta)) + (right * sin(30 * M_PI/180 + pose_we.theta)))/2;
+float dx = ((left * cos(150 * M_PI/180 + pose_we.theta)) + (right * cos(30 * M_PI/180 + pose_we.theta)))/2;
+float dtheta = rear/(robot_radius*M_PI);
+pose_we.x += dx*we_to_cm;
+pose_we.y += dy*we_to_cm;
+pose_we.theta += dtheta;
+return true;
 }
 
 bool RobotPose::updateNS(){
-	double x = robot->X();
-	double y = robot->Y();
-  	
-	double x_2 = x * cos(-pose_start.theta) - y * sin(-pose_start.theta);
-	double y_2 = x * sin(-pose_start.theta) + y * cos(-pose_start.theta);	
-
-	
-	x_2 = x_2 - pose_start.x;
-	y_2 = pose_start.y - y_2;
-	double theta = robot->Theta() - pose_start.theta;
-	int room = robot->RoomID();
+double x = robot->X() - pose_start.x;
+double y = robot->Y() - pose_start.y;
+double theta = robot->Theta() - pose_start.theta;
+int room = robot->RoomID();
 
   
   /*
-   * Check for a new room - if different change the way we so conversion
-   * */
+* Check for a new room - if different change the way we so conversion
+* */
   
   /*
-   * Conversion
-   * I think this only rotates about the z-axis. 
-   * We will be to translate to (subtract the original x & y from x_2 and y_2)
-   */
-
-
+* Conversion
+* I think this only rotates about the z-axis.
+* We will be to translate to (subtract the original x & y from x_2 and y_2)
+*/
+  
+double x_2 = x * cos(-pose_start.theta) - y * sin(-pose_start.theta);
+double y_2 = x * sin(-pose_start.theta) + y * cos(-pose_start.theta);
    /*
-    * Set the NS pose
-    */
-   	x_2 = firFilter(x_ns, x_2);
-	y_2 = firFilter(y_ns, y_2);
-	//theta = firFilter(theta_ns, theta);
+* Set the NS pose
+*/
   pose_ns.x = x_2 * ns_to_cm;
   pose_ns.y = y_2 * ns_to_cm;
   pose_ns.theta = theta;
   //printf("Room: %d ", room);
-  std::cout << std::setw(6) << pose_ns.x << ",\t" << std::setw(6)<< pose_ns.y << ",\t" 
+  std::cout << std::setw(6) << pose_ns.x << ",\t" << std::setw(6)<< pose_ns.y << ",\t"
     << std::setw(6)<< pose_ns.theta * (180/M_PI)<< ",\t Room: " << room_cur << ", Nav Strength:" << robot->NavStrengthRaw() << "\n";
   return true;
 }
 
 // firFilterCreate()
-// creates, allocates,  and initializes a new firFilter
+// creates, allocates, and initializes a new firFilter
  
 filter *RobotPose::createFilter(char *coef_file)
 {
-	int i;
-	filter* f = (filter *)malloc(sizeof(filter));
-	//printf("%d\n", sizeof(filter));
-	f->TAPS = 0;
-	f->next_sample = 0;
-	FILE *fp = fopen(coef_file,"r+");
-	if(fp==NULL){
-		printf("Coefficients could not be loaded from %s\n", coef_file);
-		exit(-1);
-	}
+int i;
+filter* f = (filter *)malloc(sizeof(filter));
+//printf("%d\n", sizeof(filter));
+f->TAPS = 0;
+f->next_sample = 0;
+FILE *fp = fopen(coef_file,"r+");
+if(fp==NULL){
+printf("Coefficients could not be loaded from %s\n", coef_file);
+exit(-1);
+}
   
-	//Read in coef & count, for TAPS
-	for (i = 0; i < 30; i++){
-		f->samples[i] = 0;
-		if(1!=fscanf(fp,"%e ", &f->coefficients[i])){
-			fclose(fp);
-			break;
-		}
-		// printf("%f\n", f->coefficients[i]);
-		f->TAPS++;
-	}
+//Read in coef & count, for TAPS
+for (i = 0; i < 30; i++){
+f->samples[i] = 0;
+if(1!=fscanf(fp,"%e ", &f->coefficients[i])){
+fclose(fp);
+break;
+}
+// printf("%f\n", f->coefficients[i]);
+f->TAPS++;
+}
   
-	  printf("Coefficients:\n");
-	  for (i = 0; i < f->TAPS; i++) {
-	    printf("%d: %f\n", i, f->coefficients[i]);
-	  }
-  	std::cout << "Test:" << f->next_sample << "\n";
+printf("Coefficients:\n");
+for (i = 0; i < f->TAPS; i++) {
+printf("%d: %f\n", i, f->coefficients[i]);
+}
+   std::cout << "Test:" << f->next_sample << "\n";
 
-	return f;
+return f;
 }
 
-// firFilter 
+// firFilter
 //inputs take a filter (f) and the next sample (val)
 //returns the next filtered sample
 //incorporates new sample into filter data array
@@ -200,20 +181,19 @@ filter *RobotPose::createFilter(char *coef_file)
 
 float RobotPose::firFilter(filter* f, float val)
 {
-	float sum =0;
-	int i,j;
+float sum =0;
+int i,j;
 
-	// assign  new value to "next" slot 
-	f->samples[f->next_sample] = val;
+// assign new value to "next" slot
+f->samples[f->next_sample] = val;
 
-	// calculate a  weighted sum
-	//   i tracks the next coeficeint
-	//   j tracks the samples w/wrap-around 
-	for( i=0,j=f->next_sample; i<f->TAPS; i++) {
-		sum += f->coefficients[i]*f->samples[j++];
-		if(j == f->TAPS)  j=0;
-	}
-	if(++(f->next_sample) == f->TAPS) f->next_sample = 0;
-	return(sum);
+// calculate a weighted sum
+// i tracks the next coeficeint
+// j tracks the samples w/wrap-around
+for( i=0,j=f->next_sample; i<f->TAPS; i++) {
+sum += f->coefficients[i]*f->samples[j++];
+if(j == f->TAPS) j=0;
 }
-
+if(++(f->next_sample) == f->TAPS) f->next_sample = 0;
+return(sum);
+}
