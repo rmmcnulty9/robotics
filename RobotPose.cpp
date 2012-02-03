@@ -1,5 +1,6 @@
 #include <robot_if++.h>
 #include <iostream>
+#include <iomanip>
 #include <stdio.h>
 #include <string>
 #include <math.h>
@@ -136,7 +137,8 @@ bool RobotPose::updateNS(){
   pose_ns.y = y_2 * ns_to_cm;
   pose_ns.theta = theta;
   //printf("Room: %d ", room);
-  std::cout << pose_ns.x << ",\t" << pose_ns.y << ",\t" << pose_ns.theta * (180/M_PI)<< ", Room: " << room_cur << "\n";
+  std::cout << std::setw(6) << pose_ns.x << ",\t" << std::setw(6)<< pose_ns.y << ",\t" 
+    << std::setw(6)<< pose_ns.theta * (180/M_PI)<< ",\t Room: " << room_cur << ", Nav Strength:" << robot->NavStrengthRaw() << "\n";
   return true;
 }
 
