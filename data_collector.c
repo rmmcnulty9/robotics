@@ -49,7 +49,8 @@ int main(int argc, char **argv) {
                   
                 // Move forward unless there's something in front of the robot
                 if(!ri_IR_Detected(&ri)){
-                  ri_move(&ri, RI_MOVE_FORWARD, RI_FASTEST);
+                 //ri_move(&ri, RI_MOVE_FORWARD, RI_FASTEST);
+                  //ri_move(&ri, RI_TURN_LEFT,RI_FASTEST);
                 }else{
                   break;
                 }

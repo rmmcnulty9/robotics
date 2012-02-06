@@ -57,9 +57,20 @@ RobotPose::~RobotPose(){
 }
 
 void RobotPose::resetCoord() {
+  //Average some readings for start pose?
 pose_start.x = robot->X();
 pose_start.y = robot->Y();
-pose_start.theta = robot->Theta();
+
+/*
+ * Read in constant for current room for the start pose
+ * Room 2 = 1.3554
+ * Room 3 = 
+ * Room 4 = 
+ * Room 5 = 
+ * */
+
+// Will always start in Room 2
+pose_start.theta = 1.3554;
 std::cout << "Start NS: " << pose_start.x << "," << pose_start.y << "," << pose_start.theta * (180/M_PI) << "\n";
 pose_ns.x = 0;
 pose_ns.y = 0;
@@ -125,15 +136,19 @@ int room = robot->RoomID();
   
 double x_2 = x * cos(-pose_start.theta) - y * sin(-pose_start.theta);
 double y_2 = x * sin(-pose_start.theta) + y * cos(-pose_start.theta);
-   /*
+
+/*
 * Set the NS pose
 */
+
+ printf("%f %f\n", x_2, y_2);
+
   pose_ns.x = x_2 * ns_to_cm;
   pose_ns.y = y_2 * ns_to_cm;
   pose_ns.theta = theta;
   //printf("Room: %d ", room);
-  std::cout << std::setw(6) << pose_ns.x << ",\t" << std::setw(6)<< pose_ns.y << ",\t"
-    << std::setw(6)<< pose_ns.theta * (180/M_PI)<< ",\t Room: " << room_cur << ", Nav Strength:" << robot->NavStrengthRaw() << "\n";
+ // std::cout << std::setw(6) << pose_ns.x << ",\t" << std::setw(6)<< pose_ns.y << ",\t"
+ //   << std::setw(6)<< pose_ns.theta * (180/M_PI)<< ",\t Room: " << room_cur << ", Nav Strength:" << robot->NavStrengthRaw() << "\n";
   return true;
 }
 
@@ -164,11 +179,11 @@ break;
 f->TAPS++;
 }
   
-printf("Coefficients:\n");
-for (i = 0; i < f->TAPS; i++) {
-printf("%d: %f\n", i, f->coefficients[i]);
-}
-   std::cout << "Test:" << f->next_sample << "\n";
+//printf("Coefficients:\n");
+//for (i = 0; i < f->TAPS; i++) {
+//printf("%d: %f\n", i, f->coefficients[i]);
+//}
+  // std::cout << "Test:" << f->next_sample << "\n";
 
 return f;
 }

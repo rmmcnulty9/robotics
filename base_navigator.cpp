@@ -37,11 +37,11 @@ int main(int argv, char **argc)
 		robotPose.updatePosition();
 
 	//std::cout << "Turning\n";
-	for(int i=0; i<4; i++){
+/*	for(int i=0; i<4; i++){
 		robotPose.updatePosition();
 		robot->Move(RI_TURN_LEFT_20DEG, RI_FASTEST);
 	}	    
-	//std::cout << "Moving\n";	
+	*///std::cout << "Moving\n";	
 	for(int i=0; i<20; i++){
 		  // Update the robot's sensor information
 		  robotPose.updatePosition();
@@ -59,7 +59,7 @@ int main(int argv, char **argc)
 		  }	 
 	}
 	//std::cout << "Turning\n";
-	for(int i=0; i<8; i++){
+	for(int i=0; i<4; i++){
 		robotPose.updatePosition();
 		robot->Move(RI_TURN_LEFT_20DEG, RI_FASTEST);
 	}
@@ -82,7 +82,7 @@ int main(int argv, char **argc)
 		  }	 
 	}
 	//std::cout << "Turning\n";
-	for(int i=0; i<8; i++){
+	/*for(int i=0; i<8; i++){
 		robotPose.updatePosition();
 		robot->Move(RI_TURN_LEFT_20DEG, RI_FASTEST);
 	}
@@ -91,7 +91,7 @@ int main(int argv, char **argc)
 		robotPose.updatePosition();
 		robot->Move(RI_TURN_RIGHT_20DEG, RI_FASTEST);
 	}
-
+*/
 	delete(robot);
 	return 0;
 }

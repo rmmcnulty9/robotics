@@ -1,57 +1,60 @@
 %% Script for doing some basic plotting for FIR filters
 
-load test_data/straight3m_1.txt;
+% load test_data/straight3m_1.txt;
+% raw = straight3m_1;
+
+load test_data/turning_left.txt;
+raw = turning_left;
 
 load o.txt;
+len_o = length(o(:,1));
 
-plot(straight3m_1(:,1),'b.-')
+plot(raw(:,1),'b.-')
 hold on
-plot(o(:,1),'g.-')
+plot(o(5:len_o,1),'g.-')
 xlabel('Steps')
 ylabel('NS x')
 legend('Raw','Filtered')
 
 figure
-plot(straight3m_1(:,2),'b.-')
+plot(raw(:,2),'b.-')
 hold on
-plot(o(:,2),'g.-')
+plot(o(5:len_o,2),'g.-')
 xlabel('Steps')
 ylabel('NS y')
 legend('Raw','Filtered')
 
 figure
-plot(straight3m_1(:,3),'b.-')
+plot(raw(:,3),'b.-')
 hold on
-plot(o(:,3),'g.-')
+plot(o(5:len_o,3),'g.-')
 xlabel('Steps')
 ylabel('NS Theta')
 legend('Raw','Filtered')
 
 figure
-plot(straight3m_1(:,4),'b.-')
+plot(raw(:,4),'b.-')
 hold on
-plot(o(:,4),'g.-')
+plot(o(5:len_o,4),'g.-')
 xlabel('Steps')
 ylabel('WE Delta Left')
 legend('Raw','Filtered')
 
 figure
-plot(straight3m_1(:,5),'b.-')
+plot(raw(:,5),'b.-')
 hold on
-plot(o(:,5),'g.-')
+plot(o(5:len_o,5),'g.-')
 xlabel('Steps')
 ylabel('WE Delta Right')
 legend('Raw','Filtered')
 
 %figure
-%plot(straight3m_1(:,6),'b.-')
+%plot(raw(:,6),'b.-')
 %hold on
 %plot(o(:,6),'g.-')
 %xlabel('Steps')
 %ylabel('WE Delta Rear')
 %legend('Raw','Filtered')
 
-'Press any key to close all Figures'
-pause
-close all
+
 %% Maybe plot the WE totals also?
