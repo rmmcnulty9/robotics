@@ -16,13 +16,13 @@ extern "C" {
 RobotPose::RobotPose(RobotInterface *r, char* coef_file){
   robot = r;
     //Create all six FIR filters
-  x_ns = RobotPose::createFilter(coef_file);
-  y_ns = RobotPose::createFilter(coef_file);
-  theta_ns = RobotPose::createFilter(coef_file);
+  x_ns = RobotPose::createFilter(coef_file,robot->X());
+  y_ns = RobotPose::createFilter(coef_file,robot->Y());
+  theta_ns = RobotPose::createFilter(coef_file,robot->Theta());
   
-  left_we = RobotPose::createFilter(coef_file);
-  right_we = RobotPose::createFilter(coef_file);
-  rear_we = RobotPose::createFilter(coef_file);
+  left_we = RobotPose::createFilter(coef_file,0.0);
+  right_we = RobotPose::createFilter(coef_file,0.0);
+  rear_we = RobotPose::createFilter(coef_file,0.0);
   
   robot->update();
   /*
@@ -91,15 +91,14 @@ void RobotPose::resetCoord() {
 
 // Will always start in Room 2
 pose_start.theta = 1.3554;
-pose_start.x = robot->X();
-pose_start.y = robot->Y();
+pose_start.x = firFilter(x_ns,robot->X());
+pose_start.y = firFilter(y_ns,robot->Y());
 
-
-
-std::cout << "Start NS: " << pose_start.x << "," << pose_start.y << "," << (robot->Theta()-pose_start.theta) * (180/M_PI) << "\n";
 pose_ns.x = 0;
 pose_ns.y = 0;
-pose_ns.theta = (robot->Theta()-pose_start.theta);
+pose_ns.theta = firFilter(theta_ns,(robot->Theta()-pose_start.theta));
+
+std::cout << "Start NS: " << pose_start.x << "," << pose_start.y << "," << pose_ns.theta * (180/M_PI) << "\n";
 
 pose_we.x = 0;
 pose_we.y = 0;
@@ -193,21 +192,16 @@ return true;
 
 //TODO This should also probably be merged with updatePosition()
 bool RobotPose::updateNS(){
-double x = robot->X() - pose_start.x;
-double y = robot->Y() - pose_start.y;
-double theta = robot->Theta() - pose_start.theta;
+double x = firFilter(x_ns,(robot->X() - pose_start.x));
+double y = firFilter(y_ns,(robot->Y() - pose_start.y));
+double theta = firFilter(theta_ns,(robot->Theta() - pose_start.theta));
 int room = robot->RoomID();
+
 
   
   /*
 * Check for a new room - if different change the way we so conversion
 * */
-  
-  /*
-* Conversion
-* I think this only rotates about the z-axis.
-* We will be to translate to (subtract the original x & y from x_2 and y_2)
-*/
   
 double x_2 = x * cos(-pose_start.theta) - y * sin(-pose_start.theta);
 double y_2 = x * sin(-pose_start.theta) + y * cos(-pose_start.theta);
@@ -230,7 +224,7 @@ double y_2 = x * sin(-pose_start.theta) + y * cos(-pose_start.theta);
 // firFilterCreate()
 // creates, allocates, and initializes a new firFilter
  
-filter *RobotPose::createFilter(char *coef_file)
+filter *RobotPose::createFilter(char *coef_file, float initval)
 {
 int i;
 filter* f = (filter *)malloc(sizeof(filter));
@@ -245,7 +239,8 @@ exit(-1);
   
 //Read in coef & count, for TAPS
 for (i = 0; i < 30; i++){
-f->samples[i] = 0;
+//f->samples[i] = 0;
+f->samples[i] = initval;
 if(1!=fscanf(fp,"%e ", &f->coefficients[i])){
 fclose(fp);
 break;

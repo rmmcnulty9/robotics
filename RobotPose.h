@@ -30,7 +30,7 @@ class RobotPose {
   private:
   bool updateWE();
   bool updateNS();
-  filter *createFilter(char *coef);
+  filter *createFilter(char *coef, float initval);
   float firFilter(filter* f, float val);
   
   RobotInterface *robot;
