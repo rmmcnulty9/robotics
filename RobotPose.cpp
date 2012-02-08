@@ -7,8 +7,11 @@
 #include <cstdio>
 #include "RobotPose.h"
 #include "shared_constants.h"
-#include "Kalman/kalmanFilterDef.h"
 
+extern "C" {
+  
+#include "Kalman/kalmanFilterDef.h"
+}
 
 RobotPose::RobotPose(RobotInterface *r, char* coef_file){
   robot = r;
@@ -78,10 +81,6 @@ RobotPose::~RobotPose(){
 }
 
 void RobotPose::resetCoord() {
-  //Average some readings for start pose?
-pose_start.x = robot->X();
-pose_start.y = robot->Y();
-
 /*
  * Read in constant for current room for the start pose
  * Room 2 = 1.3554
@@ -92,10 +91,15 @@ pose_start.y = robot->Y();
 
 // Will always start in Room 2
 pose_start.theta = 1.3554;
-std::cout << "Start NS: " << pose_start.x << "," << pose_start.y << "," << pose_start.theta * (180/M_PI) << "\n";
+pose_start.x = robot->X();
+pose_start.y = robot->Y();
+
+
+
+std::cout << "Start NS: " << pose_start.x << "," << pose_start.y << "," << (robot->Theta()-pose_start.theta) * (180/M_PI) << "\n";
 pose_ns.x = 0;
 pose_ns.y = 0;
-pose_ns.theta = 0;
+pose_ns.theta = (robot->Theta()-pose_start.theta);
 
 pose_we.x = 0;
 pose_we.y = 0;
@@ -110,8 +114,8 @@ robot->update();
 
 updateWE();
 updateNS();
-printRaw();
-//printTransformed();
+//printRaw();
+printTransformed();
 }
 
 void RobotPose::printRaw(){
@@ -214,8 +218,8 @@ double y_2 = x * sin(-pose_start.theta) + y * cos(-pose_start.theta);
 
  //printf("%f %f\n", x_2, y_2);
 
-  pose_ns.x = x_2 * ns_to_cm;
-  pose_ns.y = y_2 * ns_to_cm;
+  pose_ns.x = -x_2 * ns_to_cm;
+  pose_ns.y = -y_2 * ns_to_cm;
   pose_ns.theta = theta;
   //printf("Room: %d ", room);
  // std::cout << std::setw(6) << pose_ns.x << ",\t" << std::setw(6)<< pose_ns.y << ",\t"

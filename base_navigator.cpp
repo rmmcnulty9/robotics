@@ -28,12 +28,7 @@ int main(int argv, char **argc)
 		std::cout << we.x << ",\t" << we.y << ",\t" << we.theta * (180/M_PI) << std::endl;
 		robot->Move(RI_TURN_LEFT_20DEG, RI_FASTEST);
 	}*/
-		robotPose.updatePosition();
-		robotPose.updatePosition();
-		robotPose.updatePosition();
-		robotPose.updatePosition();
-		robotPose.updatePosition();
-		robotPose.updatePosition();
+  
 		robotPose.updatePosition();
 
 	//std::cout << "Turning\n";
