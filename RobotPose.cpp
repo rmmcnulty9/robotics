@@ -107,23 +107,31 @@ room_cur = room_start;
 //TODO This should probably be private
 void RobotPose::updatePosition(){
 robot->update();
-                int d_left = robot->getWheelEncoder(RI_WHEEL_LEFT);
-               int  d_right = robot->getWheelEncoder(RI_WHEEL_RIGHT);
-               int  d_rear = robot->getWheelEncoder(RI_WHEEL_REAR);
-               int  t_left = robot->getWheelEncoderTotals(RI_WHEEL_LEFT);
-              int   t_right = robot->getWheelEncoderTotals(RI_WHEEL_RIGHT);
-              int   t_rear = robot->getWheelEncoderTotals(RI_WHEEL_REAR);
-               
-              int  x = robot->X();
-             int   y = robot->Y();
-              float	  theta = robot->Theta();
-               
-               printf("%d %d %f %d %d %d %d %d %d\n", x, y, theta, d_left, d_right, d_rear, t_left, t_right, t_rear);
+
               
 
 
 updateWE();
 updateNS();
+}
+
+void RobotPose::printRaw(){
+	int d_left = robot->getWheelEncoder(RI_WHEEL_LEFT);
+	int d_right = robot->getWheelEncoder(RI_WHEEL_RIGHT);
+	int d_rear = robot->getWheelEncoder(RI_WHEEL_REAR);
+	int t_left = robot->getWheelEncoderTotals(RI_WHEEL_LEFT);
+	int t_right = robot->getWheelEncoderTotals(RI_WHEEL_RIGHT);
+	int t_rear = robot->getWheelEncoderTotals(RI_WHEEL_REAR);
+               
+ 	int x = robot->X();
+	int y = robot->Y();
+	float theta = robot->Theta();
+               
+	printf("%d %d %f %d %d %d %d %d %d\n", x, y, theta, d_left, d_right, d_rear, t_left, t_right, t_rear);
+}
+void RobotPose::printTransformed(){
+	//Prints wheel encoder and then north star transformed data
+	printf("%f %f %f %f %f %f\n",pose_we.x, pose_we.y, pose_we.theta, pose_ns.x, pose_ns.y, pose_ns.theta);
 }
 
 bool RobotPose::getPosition(pose& bot){
