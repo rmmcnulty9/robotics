@@ -42,7 +42,7 @@ RobotPose::RobotPose(RobotInterface *r, char* coef_file){
 	Velocity[2] = 0;
 	int deltat = 1;
 	//void initKalmanFilter(kalmanFilter *kf, float * initialPose, float *Velocity, int deltat) 
-	initKalmanFilter(&kf, initialPose, Velocity, deltat);
+	//initKalmanFilter(&kf, initialPose, Velocity, deltat);
 
   /*int x = robot->X();
 int y = robot->Y();
@@ -124,7 +124,7 @@ NSdata[2] = pose_ns.theta;
 WEdata[0] = pose_we.x;
 WEdata[1] = pose_we.y;
 WEdata[2] = pose_we.theta;
-rovioKalmanFilter(&kf,NSdata, WEdata, track);
+//rovioKalmanFilter(&kf,NSdata, WEdata, track);
 
 //return the filtered robot pose
 bot.x = track[0];
