@@ -108,11 +108,10 @@ room_cur = room_start;
 void RobotPose::updatePosition(){
 robot->update();
 
-              
-
-
 updateWE();
 updateNS();
+printRaw();
+//printTransformed();
 }
 
 void RobotPose::printRaw(){
@@ -131,7 +130,7 @@ void RobotPose::printRaw(){
 }
 void RobotPose::printTransformed(){
 	//Prints wheel encoder and then north star transformed data
-	printf("%f %f %f %f %f %f\n",pose_we.x, pose_we.y, pose_we.theta, pose_ns.x, pose_ns.y, pose_ns.theta);
+	printf("%f %f %f %f %f %f\n",pose_we.x, pose_we.y, pose_we.theta*(180/M_PI), pose_ns.x, pose_ns.y, pose_ns.theta*(180/M_PI));
 }
 
 bool RobotPose::getPosition(pose& bot){
