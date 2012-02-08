@@ -2,7 +2,8 @@
 #ifndef __ROBOT_POSE__
 #define __ROBOT_POSE__
 
-# include "shared_constants.h"
+#include "shared_constants.h"
+#include "Kalman/kalmanFilterDef.h"
 
 typedef struct {
   float coefficients[30]; //WARNING SHOULD NOT HAVE MORE THAN 30 TAPS/COEF!!!
@@ -22,6 +23,7 @@ class RobotPose {
   void updatePosition();
   bool getPositionWE(pose& we);
   bool getPositionNS(pose& ns);
+  bool getPosition(pose& robot);
   
   private:
   bool updateWE();
@@ -33,18 +35,22 @@ class RobotPose {
   pose pose_start;
   pose pose_we;
   pose pose_ns;
+  //pose pose_robot;
 
   int room_start;
   int room_cur;
   double theta_ns_trans;
   
-  //Filters
+  //FIR Filters
   filter *left_we;
   filter *right_we;
   filter *rear_we;
   filter *x_ns;
   filter *y_ns;
   filter *theta_ns;
+  
+  // Kalman Filter
+  kalmanFilter kf;
 
 };
 

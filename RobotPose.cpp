@@ -7,6 +7,7 @@
 #include <cstdio>
 #include "RobotPose.h"
 #include "shared_constants.h"
+#include "Kalman/kalmanFilterDef.h"
 
 
 RobotPose::RobotPose(RobotInterface *r, char* coef_file){
@@ -21,7 +22,27 @@ RobotPose::RobotPose(RobotInterface *r, char* coef_file){
   rear_we = RobotPose::createFilter(coef_file);
   
   robot->update();
+  /*
+   * Resets the pose values & initializes start_pose
+   * */
   resetCoord();
+
+  /*
+   * Initialize Kalman filter
+   * */
+
+	float initialPose[3];
+	initialPose[0] = 0;
+	initialPose[1] = 0;
+	initialPose[2] = 0;
+	
+	float Velocity[3];
+	Velocity[0] = 0;
+	Velocity[1] = 0;
+	Velocity[2] = 0;
+	int deltat = 1;
+	//void initKalmanFilter(kalmanFilter *kf, float * initialPose, float *Velocity, int deltat) 
+	initKalmanFilter(&kf, initialPose, Velocity, deltat);
 
   /*int x = robot->X();
 int y = robot->Y();
@@ -83,12 +104,37 @@ pose_we.theta = 0;
 room_start = robot->RoomID();
 room_cur = room_start;
 }
-
+//TODO This should probably be private
 void RobotPose::updatePosition(){
 robot->update();
 updateWE();
 updateNS();
 }
+
+bool RobotPose::getPosition(pose& bot){
+//Update the position
+//updatePosition();
+
+//Pass through Kalman filter
+float NSdata[3], WEdata[3], track[9];
+NSdata[0] = pose_ns.x;
+NSdata[1] = pose_ns.y;
+NSdata[2] = pose_ns.theta;
+
+WEdata[0] = pose_we.x;
+WEdata[1] = pose_we.y;
+WEdata[2] = pose_we.theta;
+rovioKalmanFilter(&kf,NSdata, WEdata, track);
+
+//return the filtered robot pose
+bot.x = track[0];
+bot.y = track[1];
+bot.theta = track[2];
+
+return true;
+}
+
+//TODO We should call updatePosition() here
 bool RobotPose::getPositionWE(pose& we){
 we.x = pose_we.x;
 we.y = pose_we.y;
@@ -96,9 +142,11 @@ we.theta = pose_we.theta;
 return true;
 }
 bool RobotPose::getPositionNS(pose& ns){
+//TODO We should call updatePosition() here & make it private
 return true;
 }
 
+//TODO This should probably just be moved into updatePosition()
 bool RobotPose::updateWE(){
 int left = robot->getWheelEncoder(RI_WHEEL_LEFT);
 int right = robot->getWheelEncoder(RI_WHEEL_RIGHT);
@@ -117,6 +165,7 @@ pose_we.theta += dtheta;
 return true;
 }
 
+//TODO This should also probably be merged with updatePosition()
 bool RobotPose::updateNS(){
 double x = robot->X() - pose_start.x;
 double y = robot->Y() - pose_start.y;
