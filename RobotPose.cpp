@@ -107,6 +107,21 @@ room_cur = room_start;
 //TODO This should probably be private
 void RobotPose::updatePosition(){
 robot->update();
+                int d_left = robot->getWheelEncoder(RI_WHEEL_LEFT);
+               int  d_right = robot->getWheelEncoder(RI_WHEEL_RIGHT);
+               int  d_rear = robot->getWheelEncoder(RI_WHEEL_REAR);
+               int  t_left = robot->getWheelEncoderTotals(RI_WHEEL_LEFT);
+              int   t_right = robot->getWheelEncoderTotals(RI_WHEEL_RIGHT);
+              int   t_rear = robot->getWheelEncoderTotals(RI_WHEEL_REAR);
+               
+              int  x = robot->X();
+             int   y = robot->Y();
+              float	  theta = robot->Theta();
+               
+               printf("%d %d %f %d %d %d %d %d %d\n", x, y, theta, d_left, d_right, d_rear, t_left, t_right, t_rear);
+              
+
+
 updateWE();
 updateNS();
 }
@@ -190,7 +205,7 @@ double y_2 = x * sin(-pose_start.theta) + y * cos(-pose_start.theta);
 * Set the NS pose
 */
 
- printf("%f %f\n", x_2, y_2);
+ //printf("%f %f\n", x_2, y_2);
 
   pose_ns.x = x_2 * ns_to_cm;
   pose_ns.y = y_2 * ns_to_cm;
