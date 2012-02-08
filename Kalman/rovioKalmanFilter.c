@@ -1,6 +1,6 @@
 /* Kalman Redundant Sensors, C Version */
 
-#include <clapack.h>
+#include "/usr/include/atlas/clapack.h"
 #include "rovioKalmanFilter.h"
 #include "kalmanFilterDef.h"
 #include <stdio.h>

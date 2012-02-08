@@ -85,9 +85,9 @@ pose_start.y = robot->Y();
 /*
  * Read in constant for current room for the start pose
  * Room 2 = 1.3554
- * Room 3 = 
- * Room 4 = 
- * Room 5 = 
+ * Room 3 = -0.0019661
+ * Room 4 =  1.5953
+ * Room 5 = 0.041115
  * */
 
 // Will always start in Room 2
