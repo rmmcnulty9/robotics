@@ -37,7 +37,7 @@ int main(int argv, char **argc)
 		robot->Move(RI_TURN_LEFT_20DEG, RI_FASTEST);
 	}	    
 	*///std::cout << "Moving\n";	
-	for(int i=0; i<6000; i++){
+	for(int i=0; i<60; i++){
 		  // Update the robot's sensor information
 		  robotPose.updatePosition();
 

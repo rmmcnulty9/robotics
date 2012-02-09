@@ -35,24 +35,13 @@ filter *firFilterCreate(char *coef_file, float init_val)
   
   //Read in coef & count, for TAPS
   for (i = 0; i < 30; i++){
-   // if(i==0){
-      f->samples[i] = init_val;
-   // }else{
-   //   f->samples[i] = 0;
-   // }
-    
+    f->samples[i] = 0;
     if(1!=fscanf(fp,"%e ", &f->coefficients[i])){
       fclose(fp);
       break;
     }
-   // printf("%f\n", f->coefficients[i]);
     f->TAPS++;
   }
-  
-//  printf("Coefficients:\n");
-//  for (i = 0; i < f->TAPS; i++) {
-//    printf("%d: %f\n", i, f->coefficients[i]);
-//  }
   
   return f;
 }

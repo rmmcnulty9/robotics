@@ -1,7 +1,7 @@
 %% Script for doing some basic plotting for FIR filters
 
-% load test_data/straight3m_1.txt;
-% raw = straight3m_1;
+ %load test_data/straight3m_1.txt;
+ %raw = straight3m_1;
 
 load test_data/turning_left.txt;
 raw = turning_left;

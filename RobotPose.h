@@ -23,8 +23,6 @@ class RobotPose {
   void updatePosition();
   void printRaw();
   void printTransformed();
-  bool getPositionWE(pose& we);
-  bool getPositionNS(pose& ns);
   bool getPosition(pose& robot);
   
   private:

@@ -9,22 +9,20 @@
 #include "shared_constants.h"
 
 extern "C" {
-  
 #include "Kalman/kalmanFilterDef.h"
 }
 
 RobotPose::RobotPose(RobotInterface *r, char* coef_file){
   robot = r;
     //Create all six FIR filters
-  x_ns = RobotPose::createFilter(coef_file,robot->X());
-  y_ns = RobotPose::createFilter(coef_file,robot->Y());
-  theta_ns = RobotPose::createFilter(coef_file,robot->Theta());
+  x_ns = RobotPose::createFilter(coef_file,0.0);
+  y_ns = RobotPose::createFilter(coef_file,0.0);
+  theta_ns = RobotPose::createFilter(coef_file,0.0);
   
   left_we = RobotPose::createFilter(coef_file,0.0);
   right_we = RobotPose::createFilter(coef_file,0.0);
   rear_we = RobotPose::createFilter(coef_file,0.0);
-  
-  robot->update();
+
   /*
    * Resets the pose values & initializes start_pose
    * */
@@ -47,22 +45,24 @@ RobotPose::RobotPose(RobotInterface *r, char* coef_file){
 	//void initKalmanFilter(kalmanFilter *kf, float * initialPose, float *Velocity, int deltat) 
 	//initKalmanFilter(&kf, initialPose, Velocity, deltat);
 
-  /*int x = robot->X();
-int y = robot->Y();
-robot->Move(RI_MOVE_FORWARD, RI_FASTEST);
-robot->update();
-x = robot->X() - x;
-y = robot->Y() - y;
-//Isn't this theta_orig robot->Theta()? - why calculate it?
-//Also shouldn't these be going thru the FIR filters?
-// find angle between vector (x, y) and (0, 1)
-// robot is initially facing along the positive y axis
-// theta = (x, y) * (0, 1) / (len( (x, y) ) * len( (0, 1) ))
-printf("%d %d %f\n", x, y, sqrt((double)(x * x + y * y)));
-theta_ns_trans = acos((double)y / (sqrt((double)(x * x + y * y))));
-updateWE();
-updateNS();*/
+  /*  Is this need anymore - ryan
+   * 
+   * int x = robot->X();
+   * int y = robot->Y();
+   * robot->Move(RI_MOVE_FORWARD, RI_FASTEST);
+   * robot->update();
+   * x = robot->X() - x;
+   * y = robot->Y() - y;
+   * // theta = (x, y) * (0, 1) / (len( (x, y) ) * len( (0, 1) ))
+   * printf("%d %d %f\n", x, y, sqrt((double)(x * x + y * y)));
+   * theta_ns_trans = acos((double)y / (sqrt((double)(x * x + y * y))));
+   * updateWE();
+   * updateNS();
+* */
   
+  /*
+   * Is this needed - ryan
+   * */
   //double len = sqrt((double)(x * x + y * y));
   //double x_1 = (double)x / len;
   //double y_1 = (double)y / len;
@@ -91,12 +91,20 @@ void RobotPose::resetCoord() {
 
 // Will always start in Room 2
 pose_start.theta = 1.3554;
-pose_start.x = firFilter(x_ns,robot->X());
-pose_start.y = firFilter(y_ns,robot->Y());
+/*
+ * Before starting cycle thru the samples in the FIR filters for NS
+ * */
+ int i=0;
+ for(;i<30;i++){
+  robot->update();
+  pose_start.x = firFilter(x_ns,robot->X());
+  pose_start.y = firFilter(y_ns,robot->Y());
+  pose_ns.theta = firFilter(theta_ns,(robot->Theta()-pose_start.theta));
+}
 
 pose_ns.x = 0;
 pose_ns.y = 0;
-pose_ns.theta = firFilter(theta_ns,(robot->Theta()-pose_start.theta));
+
 
 std::cout << "Start NS: " << pose_start.x << "," << pose_start.y << "," << pose_ns.theta * (180/M_PI) << "\n";
 
@@ -106,15 +114,6 @@ pose_we.theta = 0;
 
 room_start = robot->RoomID();
 room_cur = room_start;
-}
-//TODO This should probably be private
-void RobotPose::updatePosition(){
-robot->update();
-
-updateWE();
-updateNS();
-//printRaw();
-printTransformed();
 }
 
 void RobotPose::printRaw(){
@@ -159,16 +158,14 @@ bot.theta = track[2];
 return true;
 }
 
-//TODO We should call updatePosition() here
-bool RobotPose::getPositionWE(pose& we){
-we.x = pose_we.x;
-we.y = pose_we.y;
-we.theta = pose_we.theta;
-return true;
-}
-bool RobotPose::getPositionNS(pose& ns){
-//TODO We should call updatePosition() here & make it private
-return true;
+//TODO This should probably be private
+void RobotPose::updatePosition(){
+robot->update();
+
+updateWE();
+updateNS();
+//printRaw();
+printTransformed();
 }
 
 //TODO This should probably just be moved into updatePosition()
@@ -192,19 +189,47 @@ return true;
 
 //TODO This should also probably be merged with updatePosition()
 bool RobotPose::updateNS(){
-double x = firFilter(x_ns,(robot->X() - pose_start.x));
-double y = firFilter(y_ns,(robot->Y() - pose_start.y));
-double theta = firFilter(theta_ns,(robot->Theta() - pose_start.theta));
-int room = robot->RoomID();
-
-
-  
-  /*
-* Check for a new room - if different change the way we so conversion
+ 
+/*
+* Check for a new room - if different change the way we do conversion:
+* 
+* Read in constant for current room for the start pose
+* Room 2 = 1.3554
+* Room 3 = -0.0019661
+* Room 4 =  1.5953
+* Room 5 = 0.041115
+* 
 * */
+int room = robot->RoomID();
+double x, y, theta, x_2, y_2; 
+
+  if(room != room_cur){
+    switch(room){
+      case 2: pose_start.theta = 1.3554; break;
+      case 3: pose_start.theta = -0.0019661; break;
+      case 4: pose_start.theta = 1.5953; break;
+      case 5: pose_start.theta = 0.041115; break;
+      default: printf("Error changing rooms!!!\n"); exit(-1); 
+    }
+    
+    //Set the new pose_start to current reading
+    pose_start.x = robot->X();
+    pose_start.y = robot->Y();
+    
+    //Simple send the last value back in to FIR for this room change cycle
+    x = firFilter(x_ns,(robot->X() - pose_start.x));
+    y = firFilter(y_ns,(robot->Y() - pose_start.y));
+    theta = firFilter(theta_ns,(robot->Theta() - pose_start.theta));
+    
+  }else{
+    x = firFilter(x_ns,(robot->X() - pose_start.x));
+    y = firFilter(y_ns,(robot->Y() - pose_start.y));
+    theta = firFilter(theta_ns,(robot->Theta() - pose_start.theta));
+  }
   
-double x_2 = x * cos(-pose_start.theta) - y * sin(-pose_start.theta);
-double y_2 = x * sin(-pose_start.theta) + y * cos(-pose_start.theta);
+  
+x_2 = x * cos(-pose_start.theta) - y * sin(-pose_start.theta);
+y_2 = x * sin(-pose_start.theta) + y * cos(-pose_start.theta);
 
 /*
 * Set the NS pose
