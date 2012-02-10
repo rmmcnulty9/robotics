@@ -20,13 +20,13 @@ class RobotPose {
   ~RobotPose();
   
   void resetCoord();
-  void updatePosition();
+  void updatePosition(bool turning);
   void printRaw();
   void printTransformed();
   bool getPosition(pose& robot);
   
   private:
-  bool updateWE();
+  bool updateWE(bool turning);
   bool updateNS();
   filter *createFilter(char *coef, float initval);
   float firFilter(filter* f, float val);

@@ -20,23 +20,10 @@ int main(int argv, char **argc)
 	char *coefFile = argc[2];
 	RobotPose robotPose(robot, coefFile);
 	pose we;
-	/*
-	for(int i=0; i<4; i++){
-
-		robotPose.updatePosition();
-		robotPose.getPositionWE(we);
-		std::cout << we.x << ",\t" << we.y << ",\t" << we.theta * (180/M_PI) << std::endl;
-		robot->Move(RI_TURN_LEFT_20DEG, RI_FASTEST);
-	}*/
+	
   
 		robotPose.updatePosition();
-
-	//std::cout << "Turning\n";
-/*	for(int i=0; i<4; i++){
-		robotPose.updatePosition();
-		robot->Move(RI_TURN_LEFT_20DEG, RI_FASTEST);
-	}	    
-	*///std::cout << "Moving\n";	
+ /*   printf("Moving forward\n");
 	for(int i=0; i<60; i++){
 		  // Update the robot's sensor information
 		  robotPose.updatePosition();
@@ -44,7 +31,6 @@ int main(int argv, char **argc)
 		  // Move forward unless there's something in front of the robot
 
 		   if(!robot->IR_Detected()){
-			  //robot->Move(RI_TURN_LEFT_20DEG, RI_FASTEST);
 			  robot->Move(RI_MOVE_FORWARD, RI_FASTEST);
 		  }
 		  else{
@@ -52,7 +38,7 @@ int main(int argv, char **argc)
         break;
 		  }	 
 	}
-  
+  */
 	//std::cout << "Turning\n";
 	for(int i=0; i<4; i++){
 		robotPose.updatePosition();
@@ -60,30 +46,18 @@ int main(int argv, char **argc)
 	}
 
 
-	//std::cout << "Moving\n";
+	/*std::cout << "Moving\n";
 	for(int i=0; i<60; i++){
 		  // Update the robot's sensor information
 		  robotPose.updatePosition();
-		  //std::cout << we.x << ",\t" << we.y << ",\t" << we.theta * (180/M_PI) << std::endl;
 		  // Move forward unless there's something in front of the robot
 		 if(!robot->IR_Detected()){
 			  //robot->Move(RI_TURN_LEFT_20DEG, RI_FASTEST);
 			  robot->Move(RI_MOVE_FORWARD, RI_FASTEST);
 		  }
 		  else{
-			//std::cout << "Wall!\n";
 			break;
 		  }	 
-	}
-	//std::cout << "Turning\n";
-	/*for(int i=0; i<8; i++){
-		robotPose.updatePosition();
-		robot->Move(RI_TURN_LEFT_20DEG, RI_FASTEST);
-	}
-	//std::cout << "Turning\n";
-	for(int i=0; i<4; i++){
-		robotPose.updatePosition();
-		robot->Move(RI_TURN_RIGHT_20DEG, RI_FASTEST);
 	}
 */
 	delete(robot);

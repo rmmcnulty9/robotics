@@ -90,21 +90,16 @@ void RobotPose::resetCoord() {
  * */
 
 // Will always start in Room 2
-//pose_start.theta = 1.3554; //2
-pose_start.theta = -0.0019661; //3
+pose_start.theta = 1.3554; //2
+//pose_start.theta = -0.0019661; //3
 //pose_start.theta = 1.5953; //4
 //pose_start.theta = 0.041115; //5
-/*
- * Before starting cycle thru the samples in the FIR filters for NS
- * */
- int i=0;
- for(;i<30;i++){
-  robot->update();
-  pose_start.x = firFilter(x_ns,robot->X());
-  pose_start.y = firFilter(y_ns,robot->Y());
-  pose_ns.theta = firFilter(theta_ns,robot->Theta())-pose_start.theta;
-}
 
+robot->update();
+pose_start.x =robot->X();
+pose_start.y = robot->Y();
+ 
+pose_ns.theta = robot->Theta()-pose_start.theta;
 pose_ns.x = 0;
 pose_ns.y = 0;
 
@@ -162,17 +157,19 @@ return true;
 }
 
 //TODO This should probably be private
-void RobotPose::updatePosition(){
+void RobotPose::updatePosition(bool turning=false){
 robot->update();
 
-updateWE();
+updateWE(turning);
 updateNS();
 //printRaw();
 printTransformed();
 }
 
 //TODO This should probably just be moved into updatePosition()
-bool RobotPose::updateWE(){
+bool RobotPose::updateWE(bool turning){
+  double dx_2, dy_2;
+  
 int left = robot->getWheelEncoder(RI_WHEEL_LEFT);
 int right = robot->getWheelEncoder(RI_WHEEL_RIGHT);
 int rear = robot->getWheelEncoder(RI_WHEEL_REAR);
@@ -181,12 +178,18 @@ left = firFilter(left_we, left);
 right = firFilter(right_we, right);
 rear = firFilter(rear_we, rear);
 //std::cout << "{" << left << ",\t" << right << ",\t" << rear << "}\n";
-float dy = ((left * sin(150 * M_PI/180 + pose_we.theta)) + (right * sin(30 * M_PI/180 + pose_we.theta)))/2;
-float dx = ((left * cos(150 * M_PI/180 + pose_we.theta)) + (right * cos(30 * M_PI/180 + pose_we.theta)))/2;
+float dy = ((left * sin(150 * M_PI/180)) + (right * sin(30 * M_PI/180)))/2;
+float dx = ((left * cos(150 * M_PI/180)) + (right * cos(30 * M_PI/180)))/2;
 float dtheta = rear/(robot_diameter_cm*M_PI);
-pose_we.x += dx*we_to_cm;
-pose_we.y += dy*we_to_cm;
-pose_we.theta += dtheta;
+
+pose_we.theta -= dtheta;
+
+if(!turning){
+dx_2 = dx * cos(pose_we.theta) - dy * sin(pose_we.theta);
+dy_2 = dx * sin(pose_we.theta) + dy * cos(pose_we.theta);
+pose_we.x += dx_2*we_to_cm;
+pose_we.y += dy_2*we_to_cm;
+}
 return true;
 }
 
@@ -226,14 +229,14 @@ double x, y, theta, x_2, y_2;
     
   }else{
     */
-    x = (firFilter(x_ns,robot->X())- pose_start.x);
-    y = (firFilter(y_ns,robot->Y())- pose_start.y);
-    theta = firFilter(theta_ns,robot->Theta()) - pose_start.theta;
+    x = (robot->X()- pose_start.x);
+    y = (robot->Y()- pose_start.y);
+    theta = (robot->Theta() - pose_start.theta);
   //}
   
   
-x_2 = x * cos(-pose_start.theta) - y * sin(-pose_start.theta);
-y_2 = x * sin(-pose_start.theta) + y * cos(-pose_start.theta);
+  x_2 = x * cos(-pose_start.theta) - y * sin(-pose_start.theta);
+  y_2 = x * sin(-pose_start.theta) + y * cos(-pose_start.theta);
 
 /*
 * Set the NS pose
@@ -241,9 +244,9 @@ y_2 = x * sin(-pose_start.theta) + y * cos(-pose_start.theta);
 
  //printf("%f %f\n", x_2, y_2);
 
-  pose_ns.x = -x_2 * ns_to_cm;
-  pose_ns.y = -y_2 * ns_to_cm;
-  pose_ns.theta = theta;
+  pose_ns.x = firFilter(x_ns,-x_2 * ns_to_cm);
+  pose_ns.y = firFilter(y_ns,-y_2 * ns_to_cm);
+  pose_ns.theta = firFilter(theta_ns, theta);
   //printf("Room: %d ", room);
  // std::cout << std::setw(6) << pose_ns.x << ",\t" << std::setw(6)<< pose_ns.y << ",\t"
  //   << std::setw(6)<< pose_ns.theta * (180/M_PI)<< ",\t Room: " << room_cur << ", Nav Strength:" << robot->NavStrengthRaw() << "\n";
