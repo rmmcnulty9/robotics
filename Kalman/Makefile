@@ -1,7 +1,7 @@
 all: rovioKalmanFilter_test
 
 CFLAGS=-Wall -ggdb
-LIBS=-lgslcblas -L/usr/lib64/atlas -lclapack
+LIBS=-lgslcblas -L/usr/lib64/atlas/ -I /usr/include/atlas/ -lclapack
 
 rovioKalmanFilter_test: rovioKalmanFilter.o roviokalmanFilter_test.c
 	gcc ${CFLAGS}  -c roviokalmanFilter_test.c

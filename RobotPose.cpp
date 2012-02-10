@@ -90,7 +90,10 @@ void RobotPose::resetCoord() {
  * */
 
 // Will always start in Room 2
-pose_start.theta = 1.3554;
+//pose_start.theta = 1.3554; //2
+pose_start.theta = -0.0019661; //3
+//pose_start.theta = 1.5953; //4
+//pose_start.theta = 0.041115; //5
 /*
  * Before starting cycle thru the samples in the FIR filters for NS
  * */
@@ -99,14 +102,14 @@ pose_start.theta = 1.3554;
   robot->update();
   pose_start.x = firFilter(x_ns,robot->X());
   pose_start.y = firFilter(y_ns,robot->Y());
-  pose_ns.theta = firFilter(theta_ns,(robot->Theta()-pose_start.theta));
+  pose_ns.theta = firFilter(theta_ns,robot->Theta())-pose_start.theta;
 }
 
 pose_ns.x = 0;
 pose_ns.y = 0;
 
 
-std::cout << "Start NS: " << pose_start.x << "," << pose_start.y << "," << pose_ns.theta * (180/M_PI) << "\n";
+//std::cout << "Start NS: " << pose_start.x << "," << pose_start.y << "," << pose_ns.theta * (180/M_PI) << "\n";
 
 pose_we.x = 0;
 pose_we.y = 0;
@@ -180,7 +183,7 @@ rear = firFilter(rear_we, rear);
 //std::cout << "{" << left << ",\t" << right << ",\t" << rear << "}\n";
 float dy = ((left * sin(150 * M_PI/180 + pose_we.theta)) + (right * sin(30 * M_PI/180 + pose_we.theta)))/2;
 float dx = ((left * cos(150 * M_PI/180 + pose_we.theta)) + (right * cos(30 * M_PI/180 + pose_we.theta)))/2;
-float dtheta = rear/(robot_radius*M_PI);
+float dtheta = rear/(robot_diameter_cm*M_PI);
 pose_we.x += dx*we_to_cm;
 pose_we.y += dy*we_to_cm;
 pose_we.theta += dtheta;
@@ -202,7 +205,7 @@ bool RobotPose::updateNS(){
 * */
 int room = robot->RoomID();
 double x, y, theta, x_2, y_2; 
-
+/* 
   if(room != room_cur){
     switch(room){
       case 2: pose_start.theta = 1.3554; break;
@@ -222,10 +225,11 @@ double x, y, theta, x_2, y_2;
     theta = firFilter(theta_ns,(robot->Theta() - pose_start.theta));
     
   }else{
-    x = firFilter(x_ns,(robot->X() - pose_start.x));
-    y = firFilter(y_ns,(robot->Y() - pose_start.y));
-    theta = firFilter(theta_ns,(robot->Theta() - pose_start.theta));
-  }
+    */
+    x = (firFilter(x_ns,robot->X())- pose_start.x);
+    y = (firFilter(y_ns,robot->Y())- pose_start.y);
+    theta = firFilter(theta_ns,robot->Theta()) - pose_start.theta;
+  //}
   
   
 x_2 = x * cos(-pose_start.theta) - y * sin(-pose_start.theta);
