@@ -174,13 +174,16 @@ int left = robot->getWheelEncoder(RI_WHEEL_LEFT);
 int right = robot->getWheelEncoder(RI_WHEEL_RIGHT);
 int rear = robot->getWheelEncoder(RI_WHEEL_REAR);
 //std::cout << "[" << left << ",\t\t" << right << ",\t\t" << rear << "]\n";
+if(!turning){
 left = firFilter(left_we, left);
 right = firFilter(right_we, right);
+}
 rear = firFilter(rear_we, rear);
 //std::cout << "{" << left << ",\t" << right << ",\t" << rear << "}\n";
 float dy = ((left * sin(150 * M_PI/180)) + (right * sin(30 * M_PI/180)))/2;
 float dx = ((left * cos(150 * M_PI/180)) + (right * cos(30 * M_PI/180)))/2;
-float dtheta = rear/(robot_diameter_cm*M_PI);
+//float dtheta = (rear*we_to_cm)/(robot_diameter_cm*M_PI);
+float dtheta = (2*rear*we_to_cm)/(robot_diameter_cm);
 
 pose_we.theta -= dtheta;
 
