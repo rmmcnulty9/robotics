@@ -114,6 +114,21 @@ room_start = robot->RoomID();
 room_cur = room_start;
 }
 
+void RobotPose::moveTo(double x, double y) {
+  getPosition(pose_kalman);
+}
+
+void RobotPose::turnTo(double theta) {
+  getPosition(pose_kalman);
+  printf("kalman theta: %f\n", pose_kalman.theta * 180 / M_PI);
+  while (pose_kalman.theta < theta - 0.3 || pose_kalman.theta > theta + 0.3) {
+    robot->Move(RI_TURN_LEFT, RI_FASTEST);
+    updatePosition(true);
+    getPosition(pose_kalman);
+    printf("kalman theta: %f\n", pose_kalman.theta * 180 / M_PI);
+  }
+}
+
 void RobotPose::printRaw(){
 	int d_left = robot->getWheelEncoder(RI_WHEEL_LEFT);
 	int d_right = robot->getWheelEncoder(RI_WHEEL_RIGHT);
@@ -209,6 +224,7 @@ bool RobotPose::updateNS(){
 * Room 5 = 0.041115
 * 
 * */
+static double total_theta;
 int room = robot->RoomID();
 double x, y, theta, x_2, y_2; 
 /* 

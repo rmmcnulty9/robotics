@@ -23,8 +23,11 @@ int main(int argv, char **argc)
 	RobotPose robotPose(robot, coefFile);
 	pose we;
 	
-  
-		robotPose.updatePosition();
+	robotPose.turnTo(1.57);
+	
+	return 0;
+	
+	robotPose.updatePosition();
    // printf("Moving forward\n");
 	for(int i=0; i<60; i++){
 		  // Update the robot's sensor information

@@ -24,6 +24,8 @@ class RobotPose {
   
   void resetCoord();
   void updatePosition(bool turning);
+  void moveTo(double x, double y);
+  void turnTo(double theta);
   void printRaw();
   void printTransformed();
   bool getPosition(pose& robot);
@@ -54,7 +56,7 @@ class RobotPose {
   
   // Kalman Filter
   kalmanFilter kf;
-
+  pose pose_kalman;
 };
 
 
