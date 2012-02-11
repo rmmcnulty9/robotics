@@ -12,16 +12,16 @@ extern "C" {
 #include "Kalman/kalmanFilterDef.h"
 }
 
-RobotPose::RobotPose(RobotInterface *r, char* coef_file){
+RobotPose::RobotPose(RobotInterface *r){
   robot = r;
     //Create all six FIR filters
-  x_ns = RobotPose::createFilter(coef_file,0.0);
-  y_ns = RobotPose::createFilter(coef_file,0.0);
-  theta_ns = RobotPose::createFilter(coef_file,0.0);
+  x_ns = RobotPose::createFilter((char*)"fir_coefs/s_72",0.0);
+  y_ns = RobotPose::createFilter((char*)"fir_coefs/s_72",0.0);
+  theta_ns = RobotPose::createFilter((char*)"fir_coefs/s_75",0.0);
   
-  left_we = RobotPose::createFilter(coef_file,0.0);
-  right_we = RobotPose::createFilter(coef_file,0.0);
-  rear_we = RobotPose::createFilter(coef_file,0.0);
+  left_we = RobotPose::createFilter((char*)"fir_coefs/s_72",0.0);
+  right_we = RobotPose::createFilter((char*)"fir_coefs/s_72",0.0);
+  rear_we = RobotPose::createFilter((char*)"fir_coefs/s_72",0.0);
 
   /*
    * Resets the pose values & initializes start_pose

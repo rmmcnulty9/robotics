@@ -13,14 +13,14 @@ extern "C" {
 int main(int argv, char **argc)
 {
 	// Make sure we have a valid command line argument
-	if(argv <= 2) {
-		std::cout << "Usage: robot_test <address of robot> <fir_coef_files>" << std::endl;
+	if(argv <= 1) {
+		std::cout << "Usage: robot_test <address of robot> " << std::endl;
 		exit(-1);
 	}
     
 	RobotInterface *robot = new RobotInterface(argc[1],0);
-	char *coefFile = argc[2];
-	RobotPose robotPose(robot, coefFile);
+	//char *coefFile = argc[2];
+	RobotPose robotPose(robot);
 	pose we;
 	
 	robotPose.turnTo(1.57);

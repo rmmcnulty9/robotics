@@ -19,7 +19,7 @@ typedef struct {
 class RobotPose {
   
   public:
-  RobotPose(RobotInterface *r, char* coef_file);
+  RobotPose(RobotInterface *r);
   ~RobotPose();
   
   void resetCoord();
