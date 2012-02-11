@@ -6,7 +6,9 @@
 #include <string>
 #include "shared_constants.h"
 #include "RobotPose.cpp"
-
+extern "C" {
+#include "Kalman/kalmanFilterDef.h"
+}
 
 int main(int argv, char **argc)
 {

@@ -7,7 +7,7 @@ rovioKalmanFilter_test: rovioKalmanFilter.o roviokalmanFilter_test.c
 	gcc ${CFLAGS}  -c roviokalmanFilter_test.c
 	gcc ${CFLAGS} -o rovioKalmanFilter_test roviokalmanFilter_test.o rovioKalmanFilter.o ${LIBS}
 
-rovioKalmanFIlter.o: rovioKalmanFilter.c
+rovioKalmanFilter.o: rovioKalmanFilter.c
 	gcc ${CFLAGS} -c rovioKalmanFilter.c
 
 clean:

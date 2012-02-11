@@ -3,8 +3,11 @@
 #define __ROBOT_POSE__
 
 #include "shared_constants.h"
+extern "C" {
+#include <clapack.h>
+#include "Kalman/rovioKalmanFilter.h"
 #include "Kalman/kalmanFilterDef.h"
-
+}
 typedef struct {
   float coefficients[30]; //WARNING SHOULD NOT HAVE MORE THAN 30 TAPS/COEF!!!
   int next_sample;
