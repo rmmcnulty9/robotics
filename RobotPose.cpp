@@ -224,7 +224,10 @@ bool RobotPose::updateNS(){
 * Room 5 = 0.041115
 * 
 * */
-static double total_theta;
+static double prev_theta = robot->Theta() - pose_start.theta; 
+static double total_theta = robot->Theta() - pose_start.theta;
+double delta_theta;
+static int jump_ctr = 0;
 int room = robot->RoomID();
 double x, y, theta, x_2, y_2; 
 /* 
@@ -251,6 +254,17 @@ double x, y, theta, x_2, y_2;
     x = (robot->X()- pose_start.x);
     y = (robot->Y()- pose_start.y);
     theta = (robot->Theta() - pose_start.theta);
+    
+    delta_theta = theta-prev_theta;
+      
+      if(abs(delta_theta)>(3*M_PI_2) && prev_theta>0 && theta<0) {
+	jump_ctr+=1;
+      }
+      else if(abs(delta_theta)>(3*M_PI_2) && theta>0 && prev_theta<0) {
+	jump_ctr-=1;
+      }
+      
+	prev_theta=theta;
   //}
   
   
@@ -265,7 +279,7 @@ double x, y, theta, x_2, y_2;
 
   pose_ns.x = firFilter(x_ns,-x_2 * ns_to_cm);
   pose_ns.y = firFilter(y_ns,-y_2 * ns_to_cm);
-  pose_ns.theta = firFilter(theta_ns, theta);
+  pose_ns.theta = firFilter(theta_ns, theta+(jump_ctr*2*M_PI)) - (jump_ctr*2*M_PI);
   //printf("Room: %d ", room);
  // std::cout << std::setw(6) << pose_ns.x << ",\t" << std::setw(6)<< pose_ns.y << ",\t"
  //   << std::setw(6)<< pose_ns.theta * (180/M_PI)<< ",\t Room: " << room_cur << ", Nav Strength:" << robot->NavStrengthRaw() << "\n";
