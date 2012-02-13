@@ -74,7 +74,7 @@ robot->update();
 pose_start.x =robot->X();
 pose_start.y = robot->Y();
  
-pose_ns.theta = robot->Theta()-pose_start.theta;
+pose_ns.theta = (robot->Theta()-pose_start.theta)+M_PI_2;
 pose_ns.x = 0;
 pose_ns.y = 0;
 
@@ -83,7 +83,7 @@ pose_ns.y = 0;
 
 pose_we.x = 0;
 pose_we.y = 0;
-pose_we.theta = 0;
+pose_we.theta = M_PI_2;
 
 room_start = robot->RoomID();
 room_cur = room_start;
@@ -92,13 +92,14 @@ room_cur = room_start;
 void RobotPose::moveTo(double x, double y) {
   getPosition(pose_kalman);
   //Turn to
-  double theta = atan((y-pose_kalman.y)/(x-pose_kalman.x))+M_PI_2;
-if(x>=0.0){
-theta-=M_PI;
+  double theta = acos((x-pose_kalman.x)/sqrt((x-pose_kalman.x)*(x-pose_kalman.x)+(y-pose_kalman.y)*(y-pose_kalman.y)));
+if(y<=0.0){
+theta = -theta;
 }
   
 printf(" %f %f theta %f\n",x, y, theta * 180/M_PI);
-  
+RobotPose::turnTo(theta);  
+
   //Move to
   
   //pidX.updatePID()
@@ -107,15 +108,34 @@ printf(" %f %f theta %f\n",x, y, theta * 180/M_PI);
   //Actually move!
 }
 
-void RobotPose::turnTo(double theta) {
-  getPosition(pose_kalman);
-  printf("kalman theta: %f\n", pose_kalman.theta * 180 / M_PI);
-  while (pose_kalman.theta < theta - 0.3 || pose_kalman.theta > theta + 0.3) {
-    robot->Move(RI_TURN_LEFT, RI_FASTEST);
-    updatePosition(true);
-    getPosition(pose_kalman);
-    printf("kalman theta: %f\n", pose_kalman.theta * 180 / M_PI);
-  }
+void RobotPose::turnTo(double goal_theta) {
+double error_theta1 = goal_theta-pose_kalman.theta;
+double error_theta2 = pose_kalman.theta-goal_theta;
+
+if(error_theta1<0.0) error_theta1+=(2*M_PI);
+if(error_theta2<0.0) error_theta2+=(2*M_PI);
+
+double error_theta = error_theta1<error_theta2?error_theta1:error_theta2;
+
+if(error_theta>=-.1745 && error_theta<= .1745){
+ printf("Theta too small\n");
+ return;
+}
+  
+//Call PID for Theta
+//Determine speed
+if(error_theta==error_theta1){
+	printf("Turning Left\n");
+// 	robot->Move(RI_TURN_LEFT, 5);
+}else if(error_theta==error_theta2){
+	printf("Turning Right\n");
+//	robot->Move(RI_TURN_RIGHT,5);
+}
+updatePosition(true);
+getPosition(pose_kalman);
+printf("Recursing: at %f %f %f not %f\n",pose_ns.theta*(180/M_PI), pose_we.theta*(180/M_PI), pose_kalman.theta*(180/M_PI), goal_theta*(180/M_PI));
+//turnTo(goal_theta);
+
 }
 
 void RobotPose::printRaw(){
@@ -138,8 +158,18 @@ void RobotPose::printTransformed(){
 }
 
 bool RobotPose::getPosition(pose& bot){
-//Update the position
-//updatePosition();
+
+return true;
+}
+
+//TODO This should probably be private
+void RobotPose::updatePosition(bool turning=false){
+robot->update();
+
+updateWE(turning);
+updateNS();
+//printRaw();
+//printTransformed();
 
 //Pass through Kalman filter
 float NSdata[3], WEdata[3], track[9];
@@ -153,21 +183,10 @@ WEdata[2] = pose_we.theta;
 rovioKalmanFilter(&kf,NSdata, WEdata, track);
 
 //return the filtered robot pose
-bot.x = track[0];
-bot.y = track[1];
-bot.theta = track[2];
+pose_kalman.x = track[0];
+pose_kalman.y = track[1];
+pose_kalman.theta = track[2];
 
-return true;
-}
-
-//TODO This should probably be private
-void RobotPose::updatePosition(bool turning=false){
-robot->update();
-
-updateWE(turning);
-updateNS();
-//printRaw();
-printTransformed();
 }
 
 //TODO This should probably just be moved into updatePosition()
