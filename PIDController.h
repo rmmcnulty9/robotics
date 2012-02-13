@@ -4,12 +4,16 @@
 
 #include "shared_constants.h"
 
-typedef struct {
-  float coefficients[30]; //WARNING SHOULD NOT HAVE MORE THAN 30 TAPS/COEF!!!
-  int next_sample;
-  float samples[30];
-  int TAPS;
-} filter;
+typedef struct
+{
+  double dState;      	// Last position input
+  double iState;      	// Integrator state
+  double iMax, iMin;  	
+  // Maximum and minimum allowable integrator state
+  double	iGain,    	// integral gain
+        	pGain,    	// proportional gain
+         	dGain;     	// derivative gain
+} SPid;
 
 
 class PIDController {
