@@ -15,15 +15,17 @@ PIDController::PIDController(double iMaxStart, double iMinStart, double iGainSta
 
 double PIDController::UpdatePID(double error, double position)
 {
-  double pTerm,
- dTerm, iTerm;
+  double pTerm, dTerm, iTerm;
+   // calculate the proportional term
   pTerm = pGain * error;   
-  // calculate the proportional term
+
 // calculate the integral state with appropriate limiting
   iState += error;
   if (iState > iMax) iState = iMax;
   else if (iState < iMin) iState = iMin;
-  iTerm = iGain * iState;  // calculate the integral term
+  
+   // calculate the integral term
+  iTerm = iGain * iState; 
   dTerm = dGain * (position - dState);
   dState = position;
   return pTerm + iTerm - dTerm;
