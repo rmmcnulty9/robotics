@@ -6,7 +6,7 @@
 #include <math.h>
 #include <cstdio>
 #include "RobotPose.h"
-#include "PIDController.h"
+//#include "PIDController.h"
 #include "shared_constants.h"
 
 extern "C" {
@@ -16,13 +16,13 @@ extern "C" {
 RobotPose::RobotPose(RobotInterface *r){
   robot = r;
     //Create all six FIR filters
-  x_ns = RobotPose::createFilter((char*)"fir_coefs/s_72",0.0);
-  y_ns = RobotPose::createFilter((char*)"fir_coefs/s_72",0.0);
-  theta_ns = RobotPose::createFilter((char*)"fir_coefs/s_75",0.0);
+  x_ns = RobotPose::createFilter((char*)"fir_coef/s_72",0.0);
+  y_ns = RobotPose::createFilter((char*)"fir_coef/s_72",0.0);
+  theta_ns = RobotPose::createFilter((char*)"fir_coef/s_75",0.0);
   
-  left_we = RobotPose::createFilter((char*)"fir_coefs/s_72",0.0);
-  right_we = RobotPose::createFilter((char*)"fir_coefs/s_72",0.0);
-  rear_we = RobotPose::createFilter((char*)"fir_coefs/s_72",0.0);
+  left_we = RobotPose::createFilter((char*)"fir_coef/s_72",0.0);
+  right_we = RobotPose::createFilter((char*)"fir_coef/s_72",0.0);
+  rear_we = RobotPose::createFilter((char*)"fir_coef/s_72",0.0);
 
   /*
    * Resets the pose values & initializes start_pose
@@ -46,9 +46,9 @@ RobotPose::RobotPose(RobotInterface *r){
 	//void initKalmanFilter(kalmanFilter *kf, float * initialPose, float *Velocity, int deltat) 
 	initKalmanFilter(&kf, initialPose, Velocity, deltat);
 
-	PIDController pidX();
-	PIDController pidY();
-	PIDController pidTheta();
+//	PIDController pidX();
+//	PIDController pidY();
+//	PIDController pidTheta();
 
 }
 
@@ -92,8 +92,12 @@ room_cur = room_start;
 void RobotPose::moveTo(double x, double y) {
   getPosition(pose_kalman);
   //Turn to
-  theta = atan((y-pose_kalman.y)/(x-pose_kalman.x))
-  printf("theta %f\n", theta);
+  double theta = atan((y-pose_kalman.y)/(x-pose_kalman.x))+M_PI_2;
+if(x>=0.0){
+theta-=M_PI;
+}
+  
+printf(" %f %f theta %f\n",x, y, theta * 180/M_PI);
   
   //Move to
   

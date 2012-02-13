@@ -24,7 +24,15 @@ int main(int argv, char **argc)
 	RobotPose robotPose(robot);
 	pose we;
 	
-	robotPose.turnTo(1.57);
+	//robotPose.turnTo(1.57);
+	robotPose.moveTo(0,100);
+	robotPose.moveTo(-1, -100);
+	robotPose.moveTo(1,-100);
+	
+	robotPose.moveTo(-100,100);	//45 deg
+	robotPose.moveTo(-100,-100);	//135 deg
+	robotPose.moveTo(100,100);	//-45 deg
+	robotPose.moveTo(100,-100);	//-135 deg
 	
 	return 0;
 	

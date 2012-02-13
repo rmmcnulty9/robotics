@@ -11,7 +11,7 @@ class PIDController {
   PIDController(double iMaxStart, double iMinStart, double iGainStart, double pGainStart, double dGainStart);
   ~PIDController();
   
-  updatePID();
+  double UpdatePID(double error, double position);
   
 private:
   
@@ -23,5 +23,5 @@ private:
   double	iGain,    	// integral gain
         	pGain,    	// proportional gain
          	dGain;     	// derivative gain
- }
+ };
 #endif

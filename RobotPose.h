@@ -3,7 +3,8 @@
 #define __ROBOT_POSE__
 
 #include "shared_constants.h"
-#include "PIDController.h"
+//#include "PIDController.h"
+
 extern "C" {
 #include <clapack.h>
 #include "Kalman/rovioKalmanFilter.h"
@@ -60,7 +61,8 @@ class RobotPose {
   pose pose_kalman;
   
   //PID Controllers
-  PIDController *pidX, *pidY, *pidTheta;
+  //printf("x2 y2: %f %f\n", x_2, y_2);
+ // PIDController::PIDController *pidX, *pidY, *pidTheta;
 };
 
 
