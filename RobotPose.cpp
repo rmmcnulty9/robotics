@@ -6,6 +6,7 @@
 #include <math.h>
 #include <cstdio>
 #include "RobotPose.h"
+#include "PIDController.h"
 #include "shared_constants.h"
 
 extern "C" {
@@ -45,13 +46,12 @@ RobotPose::RobotPose(RobotInterface *r){
 	//void initKalmanFilter(kalmanFilter *kf, float * initialPose, float *Velocity, int deltat) 
 	initKalmanFilter(&kf, initialPose, Velocity, deltat);
 
-	/*
- 	* 
- 	*
- 	*
- 	* */  
+	PIDController pidX();
+	PIDController pidY();
+	PIDController pidTheta();
 
 }
+
 RobotPose::~RobotPose(){
 }
 
@@ -91,11 +91,16 @@ room_cur = room_start;
 
 void RobotPose::moveTo(double x, double y) {
   getPosition(pose_kalman);
-/*
- * pid x&y
- * turn to
- * move to routine
- **/
+  //Turn to
+  theta = atan((y-pose_kalman.y)/(x-pose_kalman.x))
+  printf("theta %f\n", theta);
+  
+  //Move to
+  
+  //pidX.updatePID()
+  //pidY.updatePID()
+
+  //Actually move!
 }
 
 void RobotPose::turnTo(double theta) {
