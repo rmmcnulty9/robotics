@@ -45,36 +45,11 @@ RobotPose::RobotPose(RobotInterface *r){
 	//void initKalmanFilter(kalmanFilter *kf, float * initialPose, float *Velocity, int deltat) 
 	initKalmanFilter(&kf, initialPose, Velocity, deltat);
 
-  /*  Is this need anymore - ryan
-   * 
-   * int x = robot->X();
-   * int y = robot->Y();
-   * robot->Move(RI_MOVE_FORWARD, RI_FASTEST);
-   * robot->update();
-   * x = robot->X() - x;
-   * y = robot->Y() - y;
-   * // theta = (x, y) * (0, 1) / (len( (x, y) ) * len( (0, 1) ))
-   * printf("%d %d %f\n", x, y, sqrt((double)(x * x + y * y)));
-   * theta_ns_trans = acos((double)y / (sqrt((double)(x * x + y * y))));
-   * updateWE();
-   * updateNS();
-* */
-  
-  /*
-   * Is this needed - ryan
-   * */
-  //double len = sqrt((double)(x * x + y * y));
-  //double x_1 = (double)x / len;
-  //double y_1 = (double)y / len;
-  //printf("len: %f\n", len);
-  //printf("theta_orig: %f\n", pose_ns.theta_orig);
-  //printf("x1 y1: %f %f\n", x_1, y_1);
-  
-  //double x_2 = -sin(pose_ns.theta_orig);
-  //double y_2 = cos(pose_ns.theta_orig);
-  
-  //printf("x2 y2: %f %f\n", x_2, y_2);
-  
+	/*
+ 	* 
+ 	*
+ 	*
+ 	* */  
 
 }
 RobotPose::~RobotPose(){
@@ -116,6 +91,11 @@ room_cur = room_start;
 
 void RobotPose::moveTo(double x, double y) {
   getPosition(pose_kalman);
+/*
+ * pid x&y
+ * turn to
+ * move to routine
+ **/
 }
 
 void RobotPose::turnTo(double theta) {
