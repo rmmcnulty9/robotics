@@ -1,23 +1,32 @@
 #include "PIDController.h"
 
-PIDController::PIDController(){
 
+
+PIDController::PIDController(double iMaxStart, double iMinStart, double iGainStart, double pGainStart, double dGainStart){
+  iMax = iMaxStart;
+  iMin = iMinStart;
+  iGain = iGainStart;
+  pGain = pGainStart;
+  dGain = dGainStart;
+  
+  dState = 0;
+  iState = 0;
 }
 
-double PIDController::UpdatePID(SPid * pid, double error, double position)
+double PIDController::UpdatePID(double error, double position)
 {
-  double pTerm,
- dTerm, iTerm;
-  pTerm = pid->pGain * error;   
-  // calculate the proportional term
+  double pTerm, dTerm, iTerm;
+   // calculate the proportional term
+  pTerm = pGain * error;   
+
 // calculate the integral state with appropriate limiting
-  pid->iState += error;
-  if (pid->iState > pid->iMax) pid->iState = pid->iMax;
-  else if (pid->iState 
-<
- pid->iMin) pid->iState = pid->iMin;
-  iTerm = pid->iGain * iState;  // calculate the integral term
-  dTerm = pid->dGain * (position - pid->dState);
-  pid->dState = position;
+  iState += error;
+  if (iState > iMax) iState = iMax;
+  else if (iState < iMin) iState = iMin;
+  
+   // calculate the integral term
+  iTerm = iGain * iState; 
+  dTerm = dGain * (position - dState);
+  dState = position;
   return pTerm + iTerm - dTerm;
 }
