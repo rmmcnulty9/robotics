@@ -15,15 +15,17 @@ data_collector: data_collector.c
 rovioKalmanFilter.o: Kalman/rovioKalmanFilter.c
 	gcc ${CFLAGS} -c Kalman/rovioKalmanFilter.c
 
+PIDController: PIDController.cpp
+	g++ ${CFLAGS} -c PIDController.cpp
+
 RobotPose: RobotPose.cpp
 	g++ ${CFLAGS} -c RobotPose.cpp
-	#g++ ${CFLAGS} -o RobotPose RobotPose.o ${CPP_LIB_FLAGS} ${LIB_LINK}
 
 simulator: simulator.c
 	gcc ${CFLAGS} -c simulator.c
 	gcc ${CFLAGS} -o simulator simulator.o ${LIB_FLAGS} ${LIB_LINK}
 
-base_navigator: base_navigator.cpp RobotPose.o rovioKalmanFilter.o
+base_navigator: base_navigator.cpp RobotPose.o rovioKalmanFilter.o PIDController.o
 	g++ ${CFLAGS} -c base_navigator.cpp
 	g++ ${CFLAGS} -o base_navigator base_navigator.o rovioKalmanFilter.o ${CPP_LIB_FLAGS} ${LIB_KALMAN}
 
@@ -32,4 +34,5 @@ clean:
 	rm -rf data_collector
 	rm -rf simulator
 	rm -rf RobotPose
+	rm -rf PIDController
 	rm -rf base_navigator
