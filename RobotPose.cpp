@@ -200,7 +200,15 @@ float dx = ((left * cos(150 * M_PI/180)) + (right * cos(30 * M_PI/180)))/2;
 //float dtheta = (rear*we_to_cm)/(robot_diameter_cm*M_PI);
 float dtheta = (2*rear*we_to_cm)/(robot_diameter_cm);
 
+
 pose_we.theta -= dtheta;
+
+
+if(pose_we.theta>M_PI){
+ pose_we.theta-=(2*M_PI);
+}else if(pose_we.theta<M_PI){
+  pose_we.theta+=(2*M_PI);
+}
 
 if(!turning){
 dx_2 = dx * cos(pose_we.theta) - dy * sin(pose_we.theta);
