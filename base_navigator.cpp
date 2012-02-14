@@ -26,19 +26,27 @@ int main(int argv, char **argc)
 	
 	//robotPose.turnTo(1.57);
 //	robotPose.moveTo(100,0);
+/*
+int i=0;
+for(;i<40;i++){
+robot->update();
+printf("%f\n", robot->Theta()*(180/M_PI));
+}
+*/
+
 //	robotPose.moveTo(-100, -1);
-//	robotPose.moveTo(-100,1);
+//	robotPose.moveTo(0,-100);
 	
-robotPose.moveTo(-100,100);	//45 deg
-robotPose.moveTo(-100,-100);	//135 deg
-robotPose.moveTo(100,100);	//-45 deg
-robotPose.moveTo(100,-100);	//-135 deg
+//robotPose.moveTo(-100,100);	//45 deg
+//robotPose.moveTo(-100,-100);	//135 deg
+//robotPose.moveTo(100,100);	//-45 deg
+//robotPose.moveTo(100,-100);	//-135 deg
 	
-	return 0;
+//	return 0;
 	
 	robotPose.updatePosition();
    // printf("Moving forward\n");
-	for(int i=0; i<60; i++){
+/*	for(int i=0; i<60; i++){
 		  // Update the robot's sensor information
 		  robotPose.updatePosition();
 
@@ -52,13 +60,13 @@ robotPose.moveTo(100,-100);	//-135 deg
         break;
 		  }	 
 	}
-  
+  */
 	//std::cout << "Turning\n";
 	for(int i=0; i<4; i++){
 		robotPose.updatePosition(true);
 		robot->Move(RI_TURN_LEFT_20DEG, RI_FASTEST);
 	}
-
+return 0;
 
 	//std::cout << "Moving\n";
 	for(int i=0; i<60; i++){

@@ -36,7 +36,7 @@ RobotPose::RobotPose(RobotInterface *r){
 	float initialPose[3];
 	initialPose[0] = 0;
 	initialPose[1] = 0;
-	initialPose[2] = 0;
+	initialPose[2] = M_PI_2;
 	
 	float Velocity[3];
 	Velocity[0] = 0;
@@ -65,16 +65,18 @@ void RobotPose::resetCoord() {
  * */
 
 // Will always start in Room 2
-pose_start.theta = 1.3554; //2
-//pose_start.theta = -0.0019661; //3
-//pose_start.theta = 1.5953; //4
-//pose_start.theta = 0.041115; //5
+pose_start.theta = 1.3554-M_PI_2; //2
+//pose_start.theta = -0.0019661-M_PI_2; //3
+//pose_start.theta = 1.5953-M_PI_2; //4
+//pose_start.theta = 0.041115-M_PI_2; //5
 
 robot->update();
 pose_start.x =robot->X();
 pose_start.y = robot->Y();
- 
-pose_ns.theta = (robot->Theta()-pose_start.theta)+M_PI_2;
+int i=0;
+for(;i<30;i++){
+pose_ns.theta = firFilter(theta_ns,(robot->Theta()-pose_start.theta));
+}
 pose_ns.x = 0;
 pose_ns.y = 0;
 
@@ -90,7 +92,7 @@ room_cur = room_start;
 }
 
 void RobotPose::moveTo(double x, double y) {
-  getPosition(pose_kalman);
+  updatePosition(false);
   //Turn to
   double theta = acos((x-pose_kalman.x)/sqrt((x-pose_kalman.x)*(x-pose_kalman.x)+(y-pose_kalman.y)*(y-pose_kalman.y)));
 if(y<=0.0){
@@ -125,16 +127,22 @@ if(error_theta>=-.1745 && error_theta<= .1745){
 //Call PID for Theta
 //Determine speed
 if(error_theta==error_theta1){
-	printf("Turning Left\n");
-// 	robot->Move(RI_TURN_LEFT, 5);
+	printf("Turning Left %f %f\n", error_theta1*(180/M_PI), error_theta2*(180/M_PI));
+ 	robot->Move(RI_TURN_LEFT, 5);
 }else if(error_theta==error_theta2){
-	printf("Turning Right\n");
-//	robot->Move(RI_TURN_RIGHT,5);
+	printf("Turning Right %f %f\n", error_theta1*(180/M_PI), error_theta2*(180/M_PI));
+	robot->Move(RI_TURN_RIGHT,5);
 }
-updatePosition(true);
-getPosition(pose_kalman);
+//To clean up NS data as turning
+int i=0;
+for(;i<25;i++){
+//	robot->update();
+	updatePosition(true);
+}
+//updatePosition(true);
+//updatePosition(true);
 printf("Recursing: at %f %f %f not %f\n",pose_ns.theta*(180/M_PI), pose_we.theta*(180/M_PI), pose_kalman.theta*(180/M_PI), goal_theta*(180/M_PI));
-//turnTo(goal_theta);
+turnTo(goal_theta);
 
 }
 
@@ -205,16 +213,16 @@ rear = firFilter(rear_we, rear);
 //std::cout << "{" << left << ",\t" << right << ",\t" << rear << "}\n";
 float dy = ((left * sin(150 * M_PI/180)) + (right * sin(30 * M_PI/180)))/2;
 float dx = ((left * cos(150 * M_PI/180)) + (right * cos(30 * M_PI/180)))/2;
-//float dtheta = (rear*we_to_cm)/(robot_diameter_cm*M_PI);
+
 float dtheta = (2*rear*we_to_cm)/(robot_diameter_cm);
 
 
 pose_we.theta -= dtheta;
 
-
+//Normalizing the theta between PI and -PI
 if(pose_we.theta>M_PI){
  pose_we.theta-=(2*M_PI);
-}else if(pose_we.theta<M_PI){
+}else if(pose_we.theta<-M_PI){
   pose_we.theta+=(2*M_PI);
 }
 
@@ -292,10 +300,13 @@ double x, y, theta, x_2, y_2;
 */
 
  //printf("%f %f\n", x_2, y_2);
+pose_ns.x = -x_2 * ns_to_cm;
+pose_ns.y = -y_2 * ns_to_cm;
+pose_ns.theta = theta;
 
-  pose_ns.x = firFilter(x_ns,-x_2 * ns_to_cm);
-  pose_ns.y = firFilter(y_ns,-y_2 * ns_to_cm);
-  pose_ns.theta = firFilter(theta_ns, theta+(jump_ctr*2*M_PI)) - (jump_ctr*2*M_PI);
+  pose_ns.x = firFilter(x_ns,pose_ns.x);
+  pose_ns.y = firFilter(y_ns,pose_ns.y);
+  pose_ns.theta = firFilter(theta_ns, pose_ns.theta+(jump_ctr*2*M_PI)) - (jump_ctr*2*M_PI);
   //printf("Room: %d ", room);
  // std::cout << std::setw(6) << pose_ns.x << ",\t" << std::setw(6)<< pose_ns.y << ",\t"
  //   << std::setw(6)<< pose_ns.theta * (180/M_PI)<< ",\t Room: " << room_cur << ", Nav Strength:" << robot->NavStrengthRaw() << "\n";
