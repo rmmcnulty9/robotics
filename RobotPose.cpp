@@ -92,22 +92,35 @@ room_cur = room_start;
 }
 
 void RobotPose::moveTo(double x, double y) {
-  updatePosition(false);
-  //Turn to
+   //updatePosition(false);
+    //Turn to
+    //double theta = atan((y-pose_kalman.y)/(x-pose_kalman.x)); 
   double theta = acos((x-pose_kalman.x)/sqrt((x-pose_kalman.x)*(x-pose_kalman.x)+(y-pose_kalman.y)*(y-pose_kalman.y)));
-if(y<=0.0){
-theta = -theta;
-}
-  
-printf(" %f %f theta %f\n",x, y, theta * 180/M_PI);
-RobotPose::turnTo(theta);  
+  if(y<=0.0){
+  theta = -theta;
+  }
+    
 
-  //Move to
-  
-  //pidX.updatePID()
-  //pidY.updatePID()
+  printf(" %f %f theta %f \t %f %f\n",x, y, theta * 180/M_PI, pose_kalman.x, pose_kalman.y);
+  turnTo(theta);  
 
-  //Actually move!
+  double error_distance_x = pose_kalman.x - x;
+  double error_distance_y = pose_kalman.y - y;
+  double error_distance = sqrt(error_distance_x * error_distance_x + error_distance_y * error_distance_y);
+
+  if (error_distance > 10.0) {
+    robot->Move(RI_MOVE_FORWARD, RI_FASTEST);
+    
+    for(int i = 0; i < 25; i++){
+	  robot->update();
+	  //updatePosition(true);
+    }
+    updatePosition(false);
+    moveTo(x, y);
+  }
+  else {
+    printf("arrived!\n");
+  }
 }
 
 void RobotPose::turnTo(double goal_theta) {
@@ -119,7 +132,7 @@ if(error_theta2<0.0) error_theta2+=(2*M_PI);
 
 double error_theta = error_theta1<error_theta2?error_theta1:error_theta2;
 
-if(error_theta>=-(5*(M_PI/180)) && error_theta<= (5*(M_PI/180))){
+if(error_theta>=(-25.0*(M_PI/180)) && error_theta<= (25.0*(M_PI/180))){
  printf("Theta too small\n");
  return;
 }
