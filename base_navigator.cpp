@@ -25,7 +25,7 @@ int main(int argv, char **argc)
 	pose we;
 	
 	//robotPose.turnTo(1.57);
-	//robotPose.moveTo(100,0);
+//	robotPose.moveTo(100,0);
 /*
 int i=0;
 for(;i<40;i++){

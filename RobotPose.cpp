@@ -174,8 +174,9 @@ return true;
 void RobotPose::updatePosition(bool turning=false){
 robot->update();
 
-updateWE(turning);
 updateNS();
+pose_we.theta = pose_ns.theta;
+updateWE(turning);
 //printRaw();
 //printTransformed();
 
@@ -214,17 +215,17 @@ rear = firFilter(rear_we, rear);
 float dy = ((left * sin(150 * M_PI/180)) + (right * sin(30 * M_PI/180)))/2;
 float dx = ((left * cos(150 * M_PI/180)) + (right * cos(30 * M_PI/180)))/2;
 
-float dtheta = (2*rear*we_to_cm)/(robot_diameter_cm);
+//float dtheta = (2*rear*we_to_cm)/(robot_diameter_cm);
 float dtheta = (rear*we_to_rad);
 
-pose_we.theta -= dtheta;
+//pose_we.theta += dtheta;
 
 //Normalizing the theta between PI and -PI
-if(pose_we.theta>M_PI){
+/*if(pose_we.theta>M_PI){
  pose_we.theta-=(2*M_PI);
 }else if(pose_we.theta<-M_PI){
   pose_we.theta+=(2*M_PI);
-}
+}*/
 
 if(!turning){
 dx_2 = dx * cos(pose_we.theta) - dy * sin(pose_we.theta);
