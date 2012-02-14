@@ -119,7 +119,7 @@ if(error_theta2<0.0) error_theta2+=(2*M_PI);
 
 double error_theta = error_theta1<error_theta2?error_theta1:error_theta2;
 
-if(error_theta>=-.1745 && error_theta<= .1745){
+if(error_theta>=-(5*(M_PI/180)) && error_theta<= (5*(M_PI/180))){
  printf("Theta too small\n");
  return;
 }
@@ -127,10 +127,10 @@ if(error_theta>=-.1745 && error_theta<= .1745){
 //Call PID for Theta
 //Determine speed
 if(error_theta==error_theta1){
-	printf("Turning Left %f %f\n", error_theta1*(180/M_PI), error_theta2*(180/M_PI));
+	printf("Turning Left \n", error_theta1*(180/M_PI), error_theta2*(180/M_PI));
  	robot->Move(RI_TURN_LEFT, 5);
 }else if(error_theta==error_theta2){
-	printf("Turning Right %f %f\n", error_theta1*(180/M_PI), error_theta2*(180/M_PI));
+	printf("Turning Right \n", error_theta1*(180/M_PI), error_theta2*(180/M_PI));
 	robot->Move(RI_TURN_RIGHT,5);
 }
 //To clean up NS data as turning
@@ -215,7 +215,7 @@ float dy = ((left * sin(150 * M_PI/180)) + (right * sin(30 * M_PI/180)))/2;
 float dx = ((left * cos(150 * M_PI/180)) + (right * cos(30 * M_PI/180)))/2;
 
 float dtheta = (2*rear*we_to_cm)/(robot_diameter_cm);
-
+float dtheta = (rear*we_to_rad);
 
 pose_we.theta -= dtheta;
 

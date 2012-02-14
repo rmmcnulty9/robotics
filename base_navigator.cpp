@@ -25,7 +25,7 @@ int main(int argv, char **argc)
 	pose we;
 	
 	//robotPose.turnTo(1.57);
-//	robotPose.moveTo(100,0);
+	//robotPose.moveTo(100,0);
 /*
 int i=0;
 for(;i<40;i++){
@@ -35,14 +35,14 @@ printf("%f\n", robot->Theta()*(180/M_PI));
 */
 
 //	robotPose.moveTo(-100, -1);
-//	robotPose.moveTo(0,-100);
+	robotPose.moveTo(0,-100);
 	
 //robotPose.moveTo(-100,100);	//45 deg
 //robotPose.moveTo(-100,-100);	//135 deg
 //robotPose.moveTo(100,100);	//-45 deg
 //robotPose.moveTo(100,-100);	//-135 deg
 	
-//	return 0;
+	return 0;
 	
 	robotPose.updatePosition();
    // printf("Moving forward\n");
@@ -62,10 +62,13 @@ printf("%f\n", robot->Theta()*(180/M_PI));
 	}
   */
 	//std::cout << "Turning\n";
+	robot->reset_state();
+	
 	for(int i=0; i<4; i++){
 		robotPose.updatePosition(true);
 		robot->Move(RI_TURN_LEFT_20DEG, RI_FASTEST);
 	}
+	printf("%d\n",robot->getWheelEncoderTotals(RI_WHEEL_REAR));
 return 0;
 
 	//std::cout << "Moving\n";
