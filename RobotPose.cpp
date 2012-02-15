@@ -116,6 +116,10 @@ void RobotPose::moveTo(double x, double y) {
   double error_distance_y = pose_kalman.y - y;
   double error_distance = sqrt(error_distance_x * error_distance_x + error_distance_y * error_distance_y);
 
+  double PID_xres = PID_x->UpdatePID(error_distance_x, pose_kalman.x);
+  double PID_yres = PID_y->UpdatePID(error_distance_y, pose_kalman.y);
+  printf("PID x: %f\tPID y: %f\n", PID_xres, PID_yres);
+  
   if (error_distance > 10.0) {
     robot->Move(RI_MOVE_FORWARD, RI_FASTEST);
     
@@ -146,7 +150,11 @@ if(error_theta>=(-25.0*(M_PI/180)) && error_theta<= (25.0*(M_PI/180))){
 }
   
 //Call PID for Theta
+double PID_res = PID_theta->UpdatePID(error_theta, pose_kalman.theta);
 //Determine speed
+printf("Theta PID: %f\n", PID_res);
+
+
 if(error_theta==error_theta1){
 	printf("Turning Left \n", error_theta1*(180/M_PI), error_theta2*(180/M_PI));
  	robot->Move(RI_TURN_LEFT, 5);
