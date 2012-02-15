@@ -216,6 +216,7 @@ rear = firFilter(rear_we, rear);
 float dy = ((left * sin(150.0 * M_PI/180.0)) + (right * sin(30.0 * M_PI/180.0)) + (rear * sin(90.0 * M_PI/180.0)))/3.0;
 float dx = ((left * cos(150.0 * M_PI/180.0)) + (right * cos(30.0 * M_PI/180.0)))/2.0;
 
+printf("dx, dy: %f, %f\n", dx, dy);
 //float dtheta = (2*rear*we_to_cm)/(robot_diameter_cm);
 float dtheta = (rear*we_to_rad);
 
