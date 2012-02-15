@@ -105,7 +105,7 @@ void RobotPose::moveTo(double x, double y) {
     //double theta = atan((y-pose_kalman.y)/(x-pose_kalman.x)); 
   double goal_theta = acos((x-pose_kalman.x)/sqrt((x-pose_kalman.x)*(x-pose_kalman.x)+(y-pose_kalman.y)*(y-pose_kalman.y)));
 
-  if(y<=0.0){
+  if(y<=0.0) {
   goal_theta = -goal_theta;
   }
    
@@ -131,9 +131,8 @@ void RobotPose::moveTo(double x, double y) {
 }
 
 void RobotPose::turnTo(double goal_theta) {
-int i=0;
-for(;i<25;i++)
-	robot->update();
+//for(int i = 0; i < 25 ; i++)
+	//robot->update();
 
 updatePosition(true);
 double error_theta1 = goal_theta-pose_kalman.theta;
@@ -334,6 +333,8 @@ exit(-1);
   //}
   
   pose_ns.theta = theta;
+  
+
 
 
 /*
@@ -347,7 +348,14 @@ exit(-1);
   // apply FIR filter
   pose_ns.x = firFilter(x_ns,x);
   pose_ns.y = firFilter(y_ns,y);
-  pose_ns.theta = firFilter(theta_ns, theta+(jump_ctr*2*M_PI)) - (jump_ctr*2*M_PI);
+  //pose_ns.theta = firFilter(theta_ns, theta+(jump_ctr*2*M_PI)) - (jump_ctr*2*M_PI);
+  
+  double avg_theta = 0.0;
+  for (int i = 0; i < 3; i++) {
+    robot->update();
+    avg_theta += robot->Theta();
+  }
+  pose_ns.theta = avg_theta / 3.0;
   //printf("Room: %d ", room);
  // std::cout << std::setw(6) << pose_ns.x << ",\t" << std::setw(6)<< pose_ns.y << ",\t"
  //   << std::setw(6)<< pose_ns.theta * (180/M_PI)<< ",\t Room: " << room_cur << ", Nav Strength:" << robot->NavStrengthRaw() << "\n";
