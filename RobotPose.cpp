@@ -13,16 +13,17 @@ extern "C" {
 #include "Kalman/kalmanFilterDef.h"
 }
 
+
 RobotPose::RobotPose(RobotInterface *r){
 	robot = r;
 	//Create all six FIR filters
-	x_ns = RobotPose::createFilter((char*)"fir_coef/s_72",0.0);
-	y_ns = RobotPose::createFilter((char*)"fir_coef/s_72",0.0);
-	theta_ns = RobotPose::createFilter((char*)"fir_coef/s_75",0.0);
+	fir_x_ns = RobotPose::createFilter(coef_filename,0.0);
+	fir_y_ns = RobotPose::createFilter(coef_filename,0.0);
+	fir_theta_ns = RobotPose::createFilter(coef_filename,0.0);
   
-	left_we = RobotPose::createFilter((char*)"fir_coef/s_72",0.0);
-	right_we = RobotPose::createFilter((char*)"fir_coef/s_72",0.0);
-	rear_we = RobotPose::createFilter((char*)"fir_coef/s_72",0.0);
+	fir_left_we = RobotPose::createFilter(coef_filename,0.0);
+	fir_right_we = RobotPose::createFilter(coef_filename,0.0);
+	fir_rear_we = RobotPose::createFilter(coef_filename,0.0);
 
 	/*
 	* Resets the pose values & initializes start_pose
@@ -64,10 +65,10 @@ void RobotPose::resetCoord() {
 	 * */
 
 	// Will always start in Room 2
-	pose_start.theta = 1.3554-M_PI; //2
-	//pose_start.theta = -0.0019661-M_PI_2; //3
-	//pose_start.theta = 1.5953-M_PI_2; //4
-	//pose_start.theta = 0.041115-M_PI_2; //5
+	pose_start.theta = ROOM2;
+	//pose_start.theta = ROOM3
+	//pose_start.theta = ROOM4
+	//pose_start.theta = ROOM5
 
 	robot->update();
 
@@ -79,7 +80,7 @@ void RobotPose::resetCoord() {
 
 	
 	for(int i=0;i<30;i++){
-		pose_ns.theta = firFilter(theta_ns,(robot->Theta()-pose_start.theta));
+		pose_ns.theta = firFilter(fir_theta_ns,(robot->Theta()-pose_start.theta));
 	}
 	pose_ns.x = 0.0;
 	pose_ns.y = 0.0;
@@ -243,10 +244,10 @@ void RobotPose::updatePosition(bool turning=false){
 	int rear = robot->getWheelEncoder(RI_WHEEL_REAR);
 
 	if(!turning){
-		left = firFilter(left_we, left);
-		right = firFilter(right_we, right);
+		left = firFilter(fir_left_we, left);
+		right = firFilter(fir_right_we, right);
 	}
-	rear = firFilter(rear_we, rear);
+	rear = firFilter(fir_rear_we, rear);
 
 	float dy = ((left * sin(150.0 * M_PI/180.0)) + (right * sin(30.0 * M_PI/180.0)) + (rear * sin(90.0 * M_PI/180.0)))/3.0;
 	float dx = ((left * cos(150.0 * M_PI/180.0)) + (right * cos(30.0 * M_PI/180.0)))/2.0;
@@ -297,10 +298,10 @@ bool RobotPose::updateNS(){
 		//exit(-1);
 	//}
 		switch(room){
-			case 2: pose_start.theta = 1.3554 - M_PI; break;
-			case 3: pose_start.theta = -0.0019661 - M_PI; break;
-			case 4: pose_start.theta = 1.5953 - M_PI; break;
-			case 5: pose_start.theta = 0.041115 - M_PI; break;
+			case 2: pose_start.theta = ROOM2; break;
+			case 3: pose_start.theta = ROOM3; break;
+			case 4: pose_start.theta = ROOM4; break;
+			case 5: pose_start.theta = ROOM5; break;
 			default: printf("Error changing rooms!!!\n"); exit(-1); 
 		}
     
@@ -360,8 +361,8 @@ bool RobotPose::updateNS(){
 
 
 	// apply FIR filter
-	pose_ns.x = firFilter(x_ns,x);
-	pose_ns.y = firFilter(y_ns,y);
+	pose_ns.x = firFilter(fir_x_ns,x);
+	pose_ns.y = firFilter(fir_y_ns,y);
   //pose_ns.theta = firFilter(theta_ns, theta+(jump_ctr*2*M_PI)) - (jump_ctr*2*M_PI);
   
 	/*double avg_theta = 0.0;
@@ -380,7 +381,7 @@ bool RobotPose::updateNS(){
 // firFilterCreate()
 // creates, allocates, and initializes a new firFilter
  
-filter *RobotPose::createFilter(char *coef_file, float initval)
+filter *RobotPose::createFilter(const char *coef_file, float initval)
 {
 	int i;
 	filter* f = (filter *)malloc(sizeof(filter));

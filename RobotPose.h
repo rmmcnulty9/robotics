@@ -25,7 +25,6 @@ class RobotPose {
   ~RobotPose();
   
   void resetCoord();
-  void updatePosition(bool turning);
   void moveTo(double x, double y);
   void turnTo(double theta);
   void printRaw();
@@ -34,7 +33,8 @@ class RobotPose {
   private:
   bool updateWE(bool turning);
   bool updateNS();
-  filter *createFilter(char *coef, float initval);
+  void updatePosition(bool turning);
+  filter *createFilter(const char *coef, float initval);
   float firFilter(filter* f, float val);
   
   RobotInterface *robot;
@@ -49,21 +49,19 @@ class RobotPose {
   int room_cur;
   double theta_ns_trans;
   
+
   //FIR Filters
-  filter *left_we;
-  filter *right_we;
-  filter *rear_we;
-  filter *x_ns;
-  filter *y_ns;
-  filter *theta_ns;
+  filter *fir_left_we;
+  filter *fir_right_we;
+  filter *fir_rear_we;
+  filter *fir_x_ns;
+  filter *fir_y_ns;
+  filter *fir_theta_ns;
   
   // Kalman Filter
   kalmanFilter kf;
   pose pose_kalman;
   
-  //PID Controllers
-  //printf("x2 y2: %f %f\n", x_2, y_2);
- // PIDController::PIDController *pidX, *pidY, *pidTheta;
 };
 
 
