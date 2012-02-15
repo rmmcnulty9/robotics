@@ -226,8 +226,8 @@ right = firFilter(right_we, right);
 }
 rear = firFilter(rear_we, rear);
 //std::cout << "{" << left << ",\t" << right << ",\t" << rear << "}\n";
-float dy = ((left * sin(150 * M_PI/180)) + (right * sin(30 * M_PI/180)))/2;
-float dx = ((left * cos(150 * M_PI/180)) + (right * cos(30 * M_PI/180)))/2;
+float dy = ((left * sin(150.0 * M_PI/180.0)) + (right * sin(30.0 * M_PI/180.0)) + (rear * sin(90.0 * M_PI/180.0)))/3.0;
+float dx = ((left * cos(150.0 * M_PI/180.0)) + (right * cos(30.0 * M_PI/180.0)))/2.0;
 
 //float dtheta = (2*rear*we_to_cm)/(robot_diameter_cm);
 float dtheta = (rear*we_to_rad);
@@ -244,6 +244,7 @@ float dtheta = (rear*we_to_rad);
 if(!turning){
 dx_2 = dx * cos(pose_we.theta) - dy * sin(pose_we.theta);
 dy_2 = dx * sin(pose_we.theta) + dy * cos(pose_we.theta);
+printf("dx2, dy2: %f, %f\n", dx_2, dy_2);
 pose_we.x += dx_2*we_to_cm;
 pose_we.y += dy_2*we_to_cm;
 }
