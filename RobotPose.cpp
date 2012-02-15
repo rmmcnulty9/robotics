@@ -250,7 +250,7 @@ rear = firFilter(rear_we, rear);
 //std::cout << "{" << left << ",\t" << right << ",\t" << rear << "}\n";
 float dy = ((left * sin(150.0 * M_PI/180.0)) + (right * sin(30.0 * M_PI/180.0)) + (rear * sin(90.0 * M_PI/180.0)))/3.0;
 float dx = ((left * cos(150.0 * M_PI/180.0)) + (right * cos(30.0 * M_PI/180.0)))/2.0;
-
+dx = 0.0; // I don't think we are supposed to move in this direction.
 //printf("dx, dy: %f, %f\n", dx, dy);
 //float dtheta = (2*rear*we_to_cm)/(robot_diameter_cm);
 float dtheta = (rear*we_to_rad);
@@ -330,9 +330,9 @@ exit(-1);
     y = y_2 - pose_start.y;
   
     // scale
-    x = x * ns_to_cm;
-    y = y * ns_to_cm;
-    
+    x = x * ns_x_to_cm;
+    y = y * ns_y_to_cm;
+    //printf("y: %f\n", y);
     
     // transform theta
     theta = (theta - pose_start.theta);
