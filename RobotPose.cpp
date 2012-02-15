@@ -66,7 +66,7 @@ void RobotPose::resetCoord() {
  * */
 
 // Will always start in Room 2
-pose_start.theta = 1.3554-M_PI_2; //2
+pose_start.theta = 1.3554-M_PI; //2
 //pose_start.theta = -0.0019661-M_PI_2; //3
 //pose_start.theta = 1.5953-M_PI_2; //4
 //pose_start.theta = 0.041115-M_PI_2; //5
@@ -110,6 +110,10 @@ void RobotPose::moveTo(double x, double y) {
   }
    
   printf(" %f %f goal_theta %f \t %f %f\n",x, y, goal_theta * 180/M_PI, pose_kalman.x, pose_kalman.y);
+  
+    printf("kalman %f %f %f \t north star %f %f %f \t wheel encoder %f %f %f\n", pose_kalman.x, pose_kalman.y, pose_kalman.theta*180/M_PI,
+	pose_ns.x, pose_ns.y, pose_ns.theta*180/M_PI, pose_we.x, pose_we.y, pose_we.theta*180/M_PI);
+    
   turnTo(goal_theta);  
 
   double error_distance_x = pose_kalman.x - x;
@@ -234,7 +238,7 @@ rear = firFilter(rear_we, rear);
 float dy = ((left * sin(150.0 * M_PI/180.0)) + (right * sin(30.0 * M_PI/180.0)) + (rear * sin(90.0 * M_PI/180.0)))/3.0;
 float dx = ((left * cos(150.0 * M_PI/180.0)) + (right * cos(30.0 * M_PI/180.0)))/2.0;
 
-printf("dx, dy: %f, %f\n", dx, dy);
+//printf("dx, dy: %f, %f\n", dx, dy);
 //float dtheta = (2*rear*we_to_cm)/(robot_diameter_cm);
 float dtheta = (rear*we_to_rad);
 
@@ -250,7 +254,7 @@ float dtheta = (rear*we_to_rad);
 if(!turning){
 dx_2 = dx * cos(pose_we.theta - M_PI_2) - dy * sin(pose_we.theta - M_PI_2);
 dy_2 = dx * sin(pose_we.theta - M_PI_2) + dy * cos(pose_we.theta - M_PI_2);
-printf("dx2, dy2: %f, %f\n", dx_2, dy_2);
+//printf("dx2, dy2: %f, %f\n", dx_2, dy_2);
 pose_we.x += dx_2*we_to_cm;
 pose_we.y += dy_2*we_to_cm;
 }
@@ -313,8 +317,8 @@ exit(-1);
     y = y_2 - pose_start.y;
   
     // scale
-    x = -x * ns_to_cm;
-    y = -y * ns_to_cm;
+    x = x * ns_to_cm;
+    y = y * ns_to_cm;
     
     
     // transform theta
