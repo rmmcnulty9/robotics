@@ -1,6 +1,8 @@
 /*
  * Some shared Constants/Structs across this Rob
  * */
+#include <math.h>
+
  #ifndef __CONSTANTS__
  #define __CONSTANTS__
 typedef struct {

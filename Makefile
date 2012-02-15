@@ -6,7 +6,7 @@ CPP_LIB_FLAGS=${LIB_FLAGS} -lrobot_if++
 LIB_LINK=-lhighgui -lcv -lcxcore -lm 
 LIB_KALMAN = ${LIB_LINK} -lgslcblas -L/usr/lib64/atlas/ -lclapack
 
-all: data_collector simulator RobotPose base_navigator
+all: data_collector simulator RobotPose base_navigator 
 
 data_collector: data_collector.c
 	gcc ${CFLAGS} -c data_collector.c
