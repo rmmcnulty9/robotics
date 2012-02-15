@@ -78,7 +78,7 @@ void RobotPose::resetCoord() {
 	pose_start.y = x * sin(-pose_start.theta) + y * cos(-pose_start.theta);
 
 	
-	for(int i=0;;i<30;i++){
+	for(int i=0;i<30;i++){
 		pose_ns.theta = firFilter(theta_ns,(robot->Theta()-pose_start.theta));
 	}
 	pose_ns.x = 0.0;

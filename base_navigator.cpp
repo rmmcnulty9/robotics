@@ -32,7 +32,7 @@ int main(int argv, char **argc)
 	robotPose.moveTo(-443.0,76.0); // x=-139.5-35 = -174.5  y=167-137=30
 	//Base 4 to Base 0
 	robotPose.moveTo(0.0,0.0); // x=0  y=0
-
+	delete(robot);
 	return 0;
 
 	//robotPose.turnTo(1.57);
@@ -46,51 +46,6 @@ int main(int argv, char **argc)
 //robotPose.moveTo(100,100);	//-45 deg
 //robotPose.moveTo(100,-100);	//-135 deg
 	
-	return 0;
-	
-	robotPose.updatePosition();
 
-   // printf("Moving forward\n");
-/*	for(int i=0; i<60; i++){
-		  // Update the robot's sensor information
-		  robotPose.updatePosition();
-
-		  // Move forward unless there's something in front of the robot
-
-		   if(!robot->IR_Detected()){
-			  robot->Move(RI_MOVE_FORWARD, RI_FASTEST);
-		  }
-		  else{
-			//std::cout << "Wall!\n";
-        break;
-		  }	 
-	}
-  */
-	//std::cout << "Turning\n";
-	robot->reset_state();
-	
-	for(int i=0; i<4; i++){
-		robotPose.updatePosition(true);
-		robot->Move(RI_TURN_LEFT_20DEG, RI_FASTEST);
-	}
-	printf("%d\n",robot->getWheelEncoderTotals(RI_WHEEL_REAR));
-return 0;
-
-	//std::cout << "Moving\n";
-	for(int i=0; i<60; i++){
-		  // Update the robot's sensor information
-		  robotPose.updatePosition();
-		  // Move forward unless there's something in front of the robot
-		 if(!robot->IR_Detected()){
-			  //robot->Move(RI_TURN_LEFT_20DEG, RI_FASTEST);
-			  robot->Move(RI_MOVE_FORWARD, RI_FASTEST);
-		  }
-		  else{
-			break;
-		  }	 
-	}
-
-	delete(robot);
-	return 0;
 }
 
