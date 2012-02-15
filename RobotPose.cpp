@@ -110,7 +110,7 @@ void RobotPose::moveTo(double x, double y) {
     
 
   printf(" %f %f theta %f \t %f %f %f \t %f %f %f \t %f %f %f\n",x, y, theta * 180/M_PI, pose_kalman.x, pose_kalman.y, pose_kalman.theta*180/M_PI,
-	pose_ns.x, pose_ns.y, pose_ns.theta, pose_we.x, pose_we.y, pose_we.theta);
+	pose_ns.x, pose_ns.y, pose_ns.theta*180/M_PI, pose_we.x, pose_we.y, pose_we.theta*180/M_PI);
   turnTo(theta);  
 
   double error_distance_x = pose_kalman.x - x;
