@@ -201,50 +201,48 @@ void RobotPose::printTransformed(){
 //TODO This should probably be private
 void RobotPose::updatePosition(bool turning=false){
 
-updateNS();
-pose_we.theta = pose_ns.theta;
-updateWE(turning);
-//printRaw();
-//printTransformed();
+	updateNS();
+	pose_we.theta = pose_ns.theta;
+	updateWE(turning);
 
-//Pass through Kalman filter
-float NSdata[3], WEdata[3], track[9];
-NSdata[0] = pose_ns.x;
-NSdata[1] = pose_ns.y;
-NSdata[2] = pose_ns.theta;
 
-WEdata[0] = pose_we.x;
-WEdata[1] = pose_we.y;
-WEdata[2] = pose_we.theta;
-rovioKalmanFilter(&kf,NSdata, WEdata, track);
+	//Pass through Kalman filter
+	float NSdata[3], WEdata[3], track[9];
+	NSdata[0] = pose_ns.x;
+	NSdata[1] = pose_ns.y;
+	NSdata[2] = pose_ns.theta;
 
-//return the filtered robot pose
-pose_kalman.x = track[0];
-pose_kalman.y = track[1];
-pose_kalman.theta = track[2];
+	WEdata[0] = pose_we.x;
+	WEdata[1] = pose_we.y;
+	WEdata[2] = pose_we.theta;
+	rovioKalmanFilter(&kf,NSdata, WEdata, track);
+
+	//return the filtered robot pose
+	pose_kalman.x = track[0];
+	pose_kalman.y = track[1];
+	pose_kalman.theta = track[2];
 
 }
 
 //TODO This should probably just be moved into updatePosition()
-bool RobotPose::updateWE(bool turning){
-  double dx_2, dy_2;
+	bool RobotPose::updateWE(bool turning){
+	double dx_2, dy_2;
   
-int left = robot->getWheelEncoder(RI_WHEEL_LEFT);
-int right = robot->getWheelEncoder(RI_WHEEL_RIGHT);
-int rear = robot->getWheelEncoder(RI_WHEEL_REAR);
-//std::cout << "[" << left << ",\t\t" << right << ",\t\t" << rear << "]\n";
-if(!turning){
-left = firFilter(left_we, left);
-right = firFilter(right_we, right);
-}
-rear = firFilter(rear_we, rear);
-//std::cout << "{" << left << ",\t" << right << ",\t" << rear << "}\n";
-float dy = ((left * sin(150.0 * M_PI/180.0)) + (right * sin(30.0 * M_PI/180.0)) + (rear * sin(90.0 * M_PI/180.0)))/3.0;
-float dx = ((left * cos(150.0 * M_PI/180.0)) + (right * cos(30.0 * M_PI/180.0)))/2.0;
-dx = 0.0; // I don't think we are supposed to move in this direction.
-//printf("dx, dy: %f, %f\n", dx, dy);
-//float dtheta = (2*rear*we_to_cm)/(robot_diameter_cm);
-float dtheta = (rear*we_to_rad);
+	int left = robot->getWheelEncoder(RI_WHEEL_LEFT);
+	int right = robot->getWheelEncoder(RI_WHEEL_RIGHT);
+	int rear = robot->getWheelEncoder(RI_WHEEL_REAR);
+
+	if(!turning){
+		left = firFilter(left_we, left);
+		right = firFilter(right_we, right);
+	}
+	rear = firFilter(rear_we, rear);
+
+	float dy = ((left * sin(150.0 * M_PI/180.0)) + (right * sin(30.0 * M_PI/180.0)) + (rear * sin(90.0 * M_PI/180.0)))/3.0;
+	float dx = ((left * cos(150.0 * M_PI/180.0)) + (right * cos(30.0 * M_PI/180.0)))/2.0;
+	dx = 0.0; // I don't think we are supposed to move in this direction.
+
+	float dtheta = (rear*we_to_rad);
 
 //pose_we.theta += dtheta;
 
@@ -255,14 +253,13 @@ float dtheta = (rear*we_to_rad);
   pose_we.theta+=(2*M_PI);
 }*/
 
-if(!turning){
-dx_2 = dx * cos(pose_we.theta - M_PI_2) - dy * sin(pose_we.theta - M_PI_2);
-dy_2 = dx * sin(pose_we.theta - M_PI_2) + dy * cos(pose_we.theta - M_PI_2);
-//printf("dx2, dy2: %f, %f\n", dx_2, dy_2);
-pose_we.x += dx_2*we_to_cm;
-pose_we.y += dy_2*we_to_cm;
-}
-return true;
+	if(!turning){
+		dx_2 = dx * cos(pose_we.theta - M_PI_2) - dy * sin(pose_we.theta - M_PI_2);
+		dy_2 = dx * sin(pose_we.theta - M_PI_2) + dy * cos(pose_we.theta - M_PI_2);
+		pose_we.x += dx_2*we_to_cm;
+		pose_we.y += dy_2*we_to_cm;
+	}
+	return true;
 }
 
 //TODO This should also probably be merged with updatePosition()
@@ -278,17 +275,17 @@ bool RobotPose::updateNS(){
 * Room 5 = 0.041115
 * 
 * */
-static double prev_theta = robot->Theta() - pose_start.theta; 
-static double total_theta = robot->Theta() - pose_start.theta;
-double delta_theta;
-static int jump_ctr = 0;
-int room = robot->RoomID();
-double x, y, theta, x_2, y_2; 
+	static double prev_theta = robot->Theta() - pose_start.theta; 
+	static double total_theta = robot->Theta() - pose_start.theta;
+	double delta_theta;
+	static int jump_ctr = 0;
+	int room = robot->RoomID();
+	double x, y, theta, x_2, y_2; 
  
-  if(room != room_cur){
-printf("No room changing yet\n");
-exit(-1);
-}/*
+	if(room != room_cur){
+		printf("No room changing yet\n");
+		exit(-1);
+	}/*
     switch(room){
       case 2: pose_start.theta = 1.3554; break;
       case 3: pose_start.theta = -0.0019661; break;
@@ -308,39 +305,39 @@ exit(-1);
     
   }else{
     */
-    x = robot->X();
-    y = robot->Y();
-    theta = robot->Theta();
+	x = robot->X();
+	y = robot->Y();
+	theta = robot->Theta();
     
-    // rotate
-    x_2 = x * cos(-pose_start.theta) - y * sin(-pose_start.theta);
-    y_2 = x * sin(-pose_start.theta) + y * cos(-pose_start.theta);
+	// rotate
+	x_2 = x * cos(-pose_start.theta) - y * sin(-pose_start.theta);
+	y_2 = x * sin(-pose_start.theta) + y * cos(-pose_start.theta);
     
-    // translate
-    x = x_2 - pose_start.x;
-    y = y_2 - pose_start.y;
+	// translate
+	x = x_2 - pose_start.x;
+	y = y_2 - pose_start.y;
   
-    // scale
-    x = x * ns_x_to_cm;
-    y = y * ns_y_to_cm;
-    //printf("y: %f\n", y);
+	// scale
+	x = x * ns_x_to_cm;
+	y = y * ns_y_to_cm;
+	//printf("y: %f\n", y);
     
-    // transform theta
-    theta = (theta - pose_start.theta);
+	// transform theta
+	theta = (theta - pose_start.theta);
     
-    delta_theta = theta-prev_theta;
+	delta_theta = theta-prev_theta;
       
-      if(abs(delta_theta)>(3*M_PI_2) && prev_theta>0 && theta<0) {
-	jump_ctr+=1;
-      }
-      else if(abs(delta_theta)>(3*M_PI_2) && theta>0 && prev_theta<0) {
-	jump_ctr-=1;
-      }
+	if(abs(delta_theta)>(3*M_PI_2) && prev_theta>0 && theta<0) {
+		jump_ctr+=1;
+	}
+	else if(abs(delta_theta)>(3*M_PI_2) && theta>0 && prev_theta<0) {
+		jump_ctr-=1;
+	}
       
 	prev_theta=theta;
   //}
   
-  pose_ns.theta = theta;
+	pose_ns.theta = theta;
   
 
 
@@ -353,21 +350,19 @@ exit(-1);
 
 
 
-  // apply FIR filter
-  pose_ns.x = firFilter(x_ns,x);
-  pose_ns.y = firFilter(y_ns,y);
+	// apply FIR filter
+	pose_ns.x = firFilter(x_ns,x);
+	pose_ns.y = firFilter(y_ns,y);
   //pose_ns.theta = firFilter(theta_ns, theta+(jump_ctr*2*M_PI)) - (jump_ctr*2*M_PI);
   
-  double avg_theta = 0.0;
-  for (int i = 0; i < 3; i++) {
-    robot->update();
-    avg_theta += robot->Theta();
-  }
-  pose_ns.theta = avg_theta / 3.0;
-  //printf("Room: %d ", room);
- // std::cout << std::setw(6) << pose_ns.x << ",\t" << std::setw(6)<< pose_ns.y << ",\t"
- //   << std::setw(6)<< pose_ns.theta * (180/M_PI)<< ",\t Room: " << room_cur << ", Nav Strength:" << robot->NavStrengthRaw() << "\n";
-  return true;
+	double avg_theta = 0.0;
+	for (int i = 0; i < 3; i++) {
+		robot->update();
+		avg_theta += robot->Theta();
+	}
+	pose_ns.theta = avg_theta / 3.0;
+
+	return true;
 }
 
 // firFilterCreate()
@@ -375,36 +370,28 @@ exit(-1);
  
 filter *RobotPose::createFilter(char *coef_file, float initval)
 {
-int i;
-filter* f = (filter *)malloc(sizeof(filter));
-//printf("%d\n", sizeof(filter));
-f->TAPS = 0;
-f->next_sample = 0;
-FILE *fp = fopen(coef_file,"r+");
-if(fp==NULL){
-printf("Coefficients could not be loaded from %s\n", coef_file);
-exit(-1);
-}
+	int i;
+	filter* f = (filter *)malloc(sizeof(filter));
+	//printf("%d\n", sizeof(filter));
+	f->TAPS = 0;
+	f->next_sample = 0;
+	FILE *fp = fopen(coef_file,"r+");
+	if(fp==NULL){
+		printf("Coefficients could not be loaded from %s\n", coef_file);
+		exit(-1);
+	}
   
-//Read in coef & count, for TAPS
-for (i = 0; i < 30; i++){
-//f->samples[i] = 0;
-f->samples[i] = initval;
-if(1!=fscanf(fp,"%e ", &f->coefficients[i])){
-fclose(fp);
-break;
-}
-// printf("%f\n", f->coefficients[i]);
-f->TAPS++;
-}
-  
-//printf("Coefficients:\n");
-//for (i = 0; i < f->TAPS; i++) {
-//printf("%d: %f\n", i, f->coefficients[i]);
-//}
-  // std::cout << "Test:" << f->next_sample << "\n";
-
-return f;
+	//Read in coef & count, for TAPS
+	for (i = 0; i < 30; i++){
+		//f->samples[i] = 0;
+		f->samples[i] = initval;
+		if(1!=fscanf(fp,"%e ", &f->coefficients[i])){
+			fclose(fp);
+			break;
+		}
+		f->TAPS++;
+	}
+	return f;
 }
 
 // firFilter
@@ -415,19 +402,19 @@ return f;
 
 float RobotPose::firFilter(filter* f, float val)
 {
-float sum =0;
-int i,j;
+	float sum =0;
+	int i,j;
 
-// assign new value to "next" slot
-f->samples[f->next_sample] = val;
+	// assign new value to "next" slot
+	f->samples[f->next_sample] = val;
 
-// calculate a weighted sum
-// i tracks the next coeficeint
-// j tracks the samples w/wrap-around
-for( i=0,j=f->next_sample; i<f->TAPS; i++) {
-sum += f->coefficients[i]*f->samples[j++];
-if(j == f->TAPS) j=0;
-}
-if(++(f->next_sample) == f->TAPS) f->next_sample = 0;
-return(sum);
+	// calculate a weighted sum
+	// i tracks the next coeficeint
+	// j tracks the samples w/wrap-around
+	for( i=0,j=f->next_sample; i<f->TAPS; i++) {
+		sum += f->coefficients[i]*f->samples[j++];
+		if(j == f->TAPS) j=0;
+	}
+	if(++(f->next_sample) == f->TAPS) f->next_sample = 0;
+	return(sum);
 }
