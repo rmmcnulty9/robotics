@@ -46,9 +46,9 @@ RobotPose::RobotPose(RobotInterface *r){
 	//void initKalmanFilter(kalmanFilter *kf, float * initialPose, float *Velocity, int deltat) 
 	initKalmanFilter(&kf, initialPose, Velocity, deltat);
 //PIDController PID_x(10.0,-10.0,1.0,1.0,1.0);
-PID_x = new PIDController(10.0,-10.0,1.0,1.0,1.0);
-PID_y = new PIDController(10.0,-10.0,1.0,1.0,1.0);
-PID_theta = new PIDController(10.0,-10.0,1.0,1.0,1.0);
+PID_x = new PIDController(10.0,-10.0,0.05,0.5,1.0);
+PID_y = new PIDController(10.0,-10.0,0.05,0.5,1.0);
+PID_theta = new PIDController(10.0,-10.0,0.05,0.5,1.0);
 
 
 }
@@ -122,10 +122,18 @@ void RobotPose::moveTo(double x, double y) {
 
   double PID_xres = PID_x->UpdatePID(error_distance_x, pose_kalman.x);
   double PID_yres = PID_y->UpdatePID(error_distance_y, pose_kalman.y);
+  printf("Err x: %f\tErr y: %f\n", error_distance_x, error_distance_y);
   printf("PID x: %f\tPID y: %f\n", PID_xres, PID_yres);
   
+  //Calculate speed based on PID
+  double total_PID = sqrt(PID_xres * PID_xres + PID_yres * PID_yres);
+  int robot_speed = 5;
+  if(total_PID > 50)
+    robot_speed = 1;
+  else if(total_PID < 50 && total_PID > 25)
+     robot_speed = 3;
   if (error_distance > 10.0) {
-    robot->Move(RI_MOVE_FORWARD, RI_FASTEST);
+    robot->Move(RI_MOVE_FORWARD, robot_speed);
     
     moveTo(x, y);
   }
@@ -161,6 +169,11 @@ double PID_res = PID_theta->UpdatePID(error_theta, pose_kalman.theta);
 //Determine speed
 printf("Theta PID: %f\n", PID_res);
 
+int robot_speed = 10;
+  if(PID_res > 50)
+    robot_speed = 5;
+  else if(PID_res < 50 && PID_res > 25)
+     robot_speed = 7;
 
 if(error_theta==error_theta1){
 	printf("Turning Left \n", error_theta1*(180/M_PI), error_theta2*(180/M_PI));
