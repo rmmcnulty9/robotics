@@ -93,16 +93,17 @@ room_cur = room_start;
 }
 
 void RobotPose::moveTo(double x, double y) {
-   //updatePosition(false);
+   updatePosition(false);
     //Turn to
-    //double theta = atan((y-pose_kalman.y)/(x-pose_kalman.x)); 
   double theta = acos((x-pose_kalman.x)/sqrt((x-pose_kalman.x)*(x-pose_kalman.x)+(y-pose_kalman.y)*(y-pose_kalman.y)));
+
   if(y<=0.0){
   theta = -theta;
   }
     
 
-  printf(" %f %f theta %f \t %f %f\n",x, y, theta * 180/M_PI, pose_kalman.x, pose_kalman.y);
+  printf(" %f %f theta %f \t %f %f %f \t %f %f %f \t %f %f %f\n",x, y, theta * 180/M_PI, pose_kalman.x, pose_kalman.y, pose_kalman.theta*180/M_PI,
+	pose_ns.x, pose_ns.y, pose_ns.theta, pose_we.x, pose_we.y, pose_we.theta);
   turnTo(theta);  
 
   double error_distance_x = pose_kalman.x - x;
@@ -112,11 +113,6 @@ void RobotPose::moveTo(double x, double y) {
   if (error_distance > 10.0) {
     robot->Move(RI_MOVE_FORWARD, RI_FASTEST);
     
-    for(int i = 0; i < 25; i++){
-	  robot->update();
-	  //updatePosition(true);
-    }
-    updatePosition(false);
     moveTo(x, y);
   }
   else {
@@ -125,6 +121,7 @@ void RobotPose::moveTo(double x, double y) {
 }
 
 void RobotPose::turnTo(double goal_theta) {
+updatePosition(true);
 double error_theta1 = goal_theta-pose_kalman.theta;
 double error_theta2 = pose_kalman.theta-goal_theta;
 
@@ -133,7 +130,7 @@ if(error_theta2<0.0) error_theta2+=(2*M_PI);
 
 double error_theta = error_theta1<error_theta2?error_theta1:error_theta2;
 
-if(error_theta>=(-25.0*(M_PI/180)) && error_theta<= (25.0*(M_PI/180))){
+if(error_theta>=(-15.0*(M_PI/180)) && error_theta<= (15.0*(M_PI/180))){
  printf("Theta too small\n");
  return;
 }
@@ -147,14 +144,7 @@ if(error_theta==error_theta1){
 	printf("Turning Right \n", error_theta1*(180/M_PI), error_theta2*(180/M_PI));
 	robot->Move(RI_TURN_RIGHT,5);
 }
-//To clean up NS data as turning
-int i=0;
-for(;i<25;i++){
-//	robot->update();
-	updatePosition(true);
-}
-//updatePosition(true);
-//updatePosition(true);
+
 printf("Recursing: at %f %f %f not %f\n",pose_ns.theta*(180/M_PI), pose_we.theta*(180/M_PI), pose_kalman.theta*(180/M_PI), goal_theta*(180/M_PI));
 turnTo(goal_theta);
 
@@ -179,14 +169,11 @@ void RobotPose::printTransformed(){
 	printf("%f %f %f %f %f %f\n",pose_we.x, pose_we.y, pose_we.theta*(180/M_PI), pose_ns.x, pose_ns.y, pose_ns.theta*(180/M_PI));
 }
 
-bool RobotPose::getPosition(pose& bot){
-
-return true;
-}
-
 //TODO This should probably be private
 void RobotPose::updatePosition(bool turning=false){
-robot->update();
+int i=0;
+for(;i<3;i++)
+	robot->update();
 
 updateNS();
 pose_we.theta = pose_ns.theta;
@@ -269,8 +256,11 @@ double delta_theta;
 static int jump_ctr = 0;
 int room = robot->RoomID();
 double x, y, theta, x_2, y_2; 
-/* 
+ 
   if(room != room_cur){
+printf("No room changing yet\n");
+exit(-1);
+}/*
     switch(room){
       case 2: pose_start.theta = 1.3554; break;
       case 3: pose_start.theta = -0.0019661; break;

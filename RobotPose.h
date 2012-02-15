@@ -30,7 +30,6 @@ class RobotPose {
   void turnTo(double theta);
   void printRaw();
   void printTransformed();
-  bool getPosition(pose& robot);
   
   private:
   bool updateWE(bool turning);
