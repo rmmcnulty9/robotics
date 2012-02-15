@@ -72,20 +72,27 @@ pose_start.theta = 1.3554-M_PI_2; //2
 //pose_start.theta = 0.041115-M_PI_2; //5
 
 robot->update();
-pose_start.x =robot->X();
-pose_start.y = robot->Y();
+
+double x = robot->X();
+double y = robot->Y();
+
+pose_start.x = x * cos(-pose_start.theta) - y * sin(-pose_start.theta);
+pose_start.y = x * sin(-pose_start.theta) + y * cos(-pose_start.theta);
+
+//pose_start.x =robot->X();
+//pose_start.y = robot->Y();
 int i=0;
 for(;i<30;i++){
 pose_ns.theta = firFilter(theta_ns,(robot->Theta()-pose_start.theta));
 }
-pose_ns.x = 0;
-pose_ns.y = 0;
+pose_ns.x = 0.0;
+pose_ns.y = 0.0;
 
 
 //std::cout << "Start NS: " << pose_start.x << "," << pose_start.y << "," << pose_ns.theta * (180/M_PI) << "\n";
 
-pose_we.x = 0;
-pose_we.y = 0;
+pose_we.x = 0.0;
+pose_we.y = 0.0;
 pose_we.theta = M_PI_2;
 
 room_start = robot->RoomID();
@@ -125,8 +132,8 @@ updatePosition(true);
 double error_theta1 = goal_theta-pose_kalman.theta;
 double error_theta2 = pose_kalman.theta-goal_theta;
 
-if(error_theta1<0.0) error_theta1+=(2*M_PI);
-if(error_theta2<0.0) error_theta2+=(2*M_PI);
+if(error_theta1<0.0) error_theta1+=(2.0*M_PI);
+if(error_theta2<0.0) error_theta2+=(2.0*M_PI);
 
 double error_theta = error_theta1<error_theta2?error_theta1:error_theta2;
 
@@ -282,9 +289,25 @@ exit(-1);
     
   }else{
     */
-    x = (robot->X()- pose_start.x);
-    y = (robot->Y()- pose_start.y);
-    theta = (robot->Theta() - pose_start.theta);
+    x = robot->X();
+    y = robot->Y();
+    theta = robot->Theta();
+    
+    // rotate
+    x_2 = x * cos(-pose_start.theta) - y * sin(-pose_start.theta);
+    y_2 = x * sin(-pose_start.theta) + y * cos(-pose_start.theta);
+    
+    // translate
+    x = x_2 - pose_start.x;
+    y = y_2 - pose_start.y;
+  
+    // scale
+    x = -x * ns_to_cm;
+    y = -y * ns_to_cm;
+    
+    
+    // transform theta
+    theta = (theta - pose_start.theta);
     
     delta_theta = theta-prev_theta;
       
@@ -298,22 +321,21 @@ exit(-1);
 	prev_theta=theta;
   //}
   
-  
-  x_2 = x * cos(-pose_start.theta) - y * sin(-pose_start.theta);
-  y_2 = x * sin(-pose_start.theta) + y * cos(-pose_start.theta);
+  pose_ns.theta = theta;
+
 
 /*
 * Set the NS pose
 */
 
  //printf("%f %f\n", x_2, y_2);
-pose_ns.x = -x_2 * ns_to_cm;
-pose_ns.y = -y_2 * ns_to_cm;
-pose_ns.theta = theta;
 
-  pose_ns.x = firFilter(x_ns,pose_ns.x);
-  pose_ns.y = firFilter(y_ns,pose_ns.y);
-  pose_ns.theta = firFilter(theta_ns, pose_ns.theta+(jump_ctr*2*M_PI)) - (jump_ctr*2*M_PI);
+
+
+  // apply FIR filter
+  pose_ns.x = firFilter(x_ns,x);
+  pose_ns.y = firFilter(y_ns,y);
+  pose_ns.theta = firFilter(theta_ns, theta+(jump_ctr*2*M_PI)) - (jump_ctr*2*M_PI);
   //printf("Room: %d ", room);
  // std::cout << std::setw(6) << pose_ns.x << ",\t" << std::setw(6)<< pose_ns.y << ",\t"
  //   << std::setw(6)<< pose_ns.theta * (180/M_PI)<< ",\t Room: " << room_cur << ", Nav Strength:" << robot->NavStrengthRaw() << "\n";
