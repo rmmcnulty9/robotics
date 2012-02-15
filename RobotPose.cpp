@@ -46,9 +46,9 @@ RobotPose::RobotPose(RobotInterface *r){
 	//void initKalmanFilter(kalmanFilter *kf, float * initialPose, float *Velocity, int deltat) 
 	initKalmanFilter(&kf, initialPose, Velocity, deltat);
 //PIDController PID_x(10.0,-10.0,1.0,1.0,1.0);
-PID_x = new PIDController(10.0,-10.0,1.0,1.0,1.0);
-PID_y = new PIDController(10.0,-10.0,1.0,1.0,1.0);
-PID_theta = new PIDController(10.0,-10.0,1.0,1.0,1.0);
+PID_x = new PIDController(10.0,-10.0,0.05,0.5,1.0);
+PID_y = new PIDController(10.0,-10.0,0.05,0.5,1.0);
+PID_theta = new PIDController(10.0,-10.0,0.05,0.5,1.0);
 
 
 }
@@ -118,6 +118,7 @@ void RobotPose::moveTo(double x, double y) {
 
   double PID_xres = PID_x->UpdatePID(error_distance_x, pose_kalman.x);
   double PID_yres = PID_y->UpdatePID(error_distance_y, pose_kalman.y);
+  printf("Err x: %f\tErr y: %f\n", error_distance_x, error_distance_y);
   printf("PID x: %f\tPID y: %f\n", PID_xres, PID_yres);
   
   if (error_distance > 10.0) {
