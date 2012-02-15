@@ -14,24 +14,24 @@ extern "C" {
 }
 
 RobotPose::RobotPose(RobotInterface *r){
-  robot = r;
-    //Create all six FIR filters
-  x_ns = RobotPose::createFilter((char*)"fir_coef/s_72",0.0);
-  y_ns = RobotPose::createFilter((char*)"fir_coef/s_72",0.0);
-  theta_ns = RobotPose::createFilter((char*)"fir_coef/s_75",0.0);
+	robot = r;
+	//Create all six FIR filters
+	x_ns = RobotPose::createFilter((char*)"fir_coef/s_72",0.0);
+	y_ns = RobotPose::createFilter((char*)"fir_coef/s_72",0.0);
+	theta_ns = RobotPose::createFilter((char*)"fir_coef/s_75",0.0);
   
-  left_we = RobotPose::createFilter((char*)"fir_coef/s_72",0.0);
-  right_we = RobotPose::createFilter((char*)"fir_coef/s_72",0.0);
-  rear_we = RobotPose::createFilter((char*)"fir_coef/s_72",0.0);
+	left_we = RobotPose::createFilter((char*)"fir_coef/s_72",0.0);
+	right_we = RobotPose::createFilter((char*)"fir_coef/s_72",0.0);
+	rear_we = RobotPose::createFilter((char*)"fir_coef/s_72",0.0);
 
-  /*
-   * Resets the pose values & initializes start_pose
-   * */
-  resetCoord();
+	/*
+	* Resets the pose values & initializes start_pose
+	* */
+	resetCoord();
 
-  /*
-   * Initialize Kalman filter
-   * */
+	/*
+	* Initialize Kalman filter
+	* */
 
 	float initialPose[3];
 	initialPose[0] = 0;
@@ -45,146 +45,137 @@ RobotPose::RobotPose(RobotInterface *r){
 	int deltat = 1;
 	//void initKalmanFilter(kalmanFilter *kf, float * initialPose, float *Velocity, int deltat) 
 	initKalmanFilter(&kf, initialPose, Velocity, deltat);
-//PIDController PID_x(10.0,-10.0,1.0,1.0,1.0);
-PID_x = new PIDController(10.0,-10.0,0.05,0.5,1.0);
-PID_y = new PIDController(10.0,-10.0,0.05,0.5,1.0);
-PID_theta = new PIDController(10.0,-10.0,0.05,0.5,1.0);
-
-
+	//PIDController PID_x(10.0,-10.0,1.0,1.0,1.0);
+	PID_x = new PIDController(10.0,-10.0,0.05,0.5,1.0);
+	PID_y = new PIDController(10.0,-10.0,0.05,0.5,1.0);
+	PID_theta = new PIDController(10.0,-10.0,0.05,0.5,1.0);
 }
 
 RobotPose::~RobotPose(){
 }
 
 void RobotPose::resetCoord() {
-/*
- * Read in constant for current room for the start pose
- * Room 2 = 1.3554
- * Room 3 = -0.0019661
- * Room 4 =  1.5953
- * Room 5 = 0.041115
- * */
+	/*
+	 * Read in constant for current room for the start pose
+	 * Room 2 = 1.3554
+	 * Room 3 = -0.0019661
+	 * Room 4 =  1.5953
+	 * Room 5 = 0.041115
+	 * */
 
-// Will always start in Room 2
-pose_start.theta = 1.3554-M_PI; //2
-//pose_start.theta = -0.0019661-M_PI_2; //3
-//pose_start.theta = 1.5953-M_PI_2; //4
-//pose_start.theta = 0.041115-M_PI_2; //5
+	// Will always start in Room 2
+	pose_start.theta = 1.3554-M_PI; //2
+	//pose_start.theta = -0.0019661-M_PI_2; //3
+	//pose_start.theta = 1.5953-M_PI_2; //4
+	//pose_start.theta = 0.041115-M_PI_2; //5
 
-robot->update();
+	robot->update();
 
-double x = robot->X();
-double y = robot->Y();
+	double x = robot->X();
+	double y = robot->Y();
 
-pose_start.x = x * cos(-pose_start.theta) - y * sin(-pose_start.theta);
-pose_start.y = x * sin(-pose_start.theta) + y * cos(-pose_start.theta);
+	pose_start.x = x * cos(-pose_start.theta) - y * sin(-pose_start.theta);
+	pose_start.y = x * sin(-pose_start.theta) + y * cos(-pose_start.theta);
 
-//pose_start.x =robot->X();
-//pose_start.y = robot->Y();
-int i=0;
-for(;i<30;i++){
-pose_ns.theta = firFilter(theta_ns,(robot->Theta()-pose_start.theta));
-}
-pose_ns.x = 0.0;
-pose_ns.y = 0.0;
+	
+	for(int i=0;;i<30;i++){
+		pose_ns.theta = firFilter(theta_ns,(robot->Theta()-pose_start.theta));
+	}
+	pose_ns.x = 0.0;
+	pose_ns.y = 0.0;
 
+	pose_we.x = 0.0;
+	pose_we.y = 0.0;
+	pose_we.theta = M_PI_2;
 
-//std::cout << "Start NS: " << pose_start.x << "," << pose_start.y << "," << pose_ns.theta * (180/M_PI) << "\n";
-
-pose_we.x = 0.0;
-pose_we.y = 0.0;
-pose_we.theta = M_PI_2;
-
-room_start = robot->RoomID();
-room_cur = room_start;
+	room_start = robot->RoomID();
+	room_cur = room_start;
 }
 
 void RobotPose::moveTo(double x, double y) {
-   updatePosition(false);
-    //Turn to
-    //double theta = atan((y-pose_kalman.y)/(x-pose_kalman.x)); 
-  double goal_theta = acos((x-pose_kalman.x)/sqrt((x-pose_kalman.x)*(x-pose_kalman.x)+(y-pose_kalman.y)*(y-pose_kalman.y)));
+	updatePosition(false);
+	//Turn to
+	//double theta = atan((y-pose_kalman.y)/(x-pose_kalman.x)); 
+	double goal_theta = acos((x-pose_kalman.x)/sqrt((x-pose_kalman.x)*(x-pose_kalman.x)+(y-pose_kalman.y)*(y-pose_kalman.y)));
 
-  if(y<=0.0) {
-  goal_theta = -goal_theta;
-  }
+	if(y<=0.0) {
+		goal_theta = -goal_theta;
+	}
    
-  printf(" %f %f goal_theta %f \t %f %f\n",x, y, goal_theta * 180/M_PI, pose_kalman.x, pose_kalman.y);
+	printf(" %f %f goal_theta %f \t %f %f\n",x, y, goal_theta * 180/M_PI, pose_kalman.x, pose_kalman.y);
   
-    printf("kalman %f %f %f \t north star %f %f %f \t wheel encoder %f %f %f\n", pose_kalman.x, pose_kalman.y, pose_kalman.theta*180/M_PI,
+	printf("kalman %f %f %f \t north star %f %f %f \t wheel encoder %f %f %f\n", pose_kalman.x, pose_kalman.y, pose_kalman.theta*180/M_PI,
 	pose_ns.x, pose_ns.y, pose_ns.theta*180/M_PI, pose_we.x, pose_we.y, pose_we.theta*180/M_PI);
     
-  turnTo(goal_theta);  
+	turnTo(goal_theta);  
 
-  double error_distance_x = pose_kalman.x - x;
-  double error_distance_y = pose_kalman.y - y;
-  double error_distance = sqrt(error_distance_x * error_distance_x + error_distance_y * error_distance_y);
+	double error_distance_x = pose_kalman.x - x;
+	double error_distance_y = pose_kalman.y - y;
+	double error_distance = sqrt(error_distance_x * error_distance_x + error_distance_y * error_distance_y);
 
-  double PID_xres = PID_x->UpdatePID(error_distance_x, pose_kalman.x);
-  double PID_yres = PID_y->UpdatePID(error_distance_y, pose_kalman.y);
-  printf("Err x: %f\tErr y: %f\n", error_distance_x, error_distance_y);
-  printf("PID x: %f\tPID y: %f\n", PID_xres, PID_yres);
+	double PID_xres = PID_x->UpdatePID(error_distance_x, pose_kalman.x);
+	double PID_yres = PID_y->UpdatePID(error_distance_y, pose_kalman.y);
+	printf("Err x: %f\tErr y: %f\n", error_distance_x, error_distance_y);
+	printf("PID x: %f\tPID y: %f\n", PID_xres, PID_yres);
   
-  //Calculate speed based on PID
-  double total_PID = sqrt(PID_xres * PID_xres + PID_yres * PID_yres);
-  int robot_speed = 5;
-  if(total_PID > 50)
-    robot_speed = 1;
-  else if(total_PID < 50 && total_PID > 25)
-     robot_speed = 3;
-  if (error_distance > 10.0) {
-    robot->Move(RI_MOVE_FORWARD, robot_speed);
-    
-    moveTo(x, y);
-  }
-  else {
-    printf("arrived!\n");
-  }
+	//Calculate speed based on PID
+	double total_PID = sqrt(PID_xres * PID_xres + PID_yres * PID_yres);
+	int robot_speed = 5;
+	if(total_PID > 50)
+		robot_speed = 1;
+	else if(total_PID < 50 && total_PID > 25)
+		robot_speed = 3;
+	if (error_distance > 10.0) {
+		robot->Move(RI_MOVE_FORWARD, robot_speed);
+		 moveTo(x, y);
+	}
+	else {
+		printf("arrived!\n");
+	}
 }
 
 void RobotPose::turnTo(double goal_theta) {
-//for(int i = 0; i < 25 ; i++)
-	//robot->update();
-
-updatePosition(true);
-double error_theta1 = goal_theta-pose_kalman.theta;
-double error_theta2 = pose_kalman.theta-goal_theta;
-
-if(error_theta1<0.0) error_theta1+=(2.0*M_PI);
-if(error_theta2<0.0) error_theta2+=(2.0*M_PI);
-
-double error_theta = error_theta1<error_theta2?error_theta1:error_theta2;
-
-if(error_theta>=(-30.0*(M_PI/180)) && error_theta<= (30.0*(M_PI/180))){
- printf("Theta too small\n");
- return;
-}
 
 
-  printf("%f %f %f \t %f %f %f \t %f %f %f\n", pose_kalman.x, pose_kalman.y, pose_kalman.theta*180/M_PI,
+	updatePosition(true);
+	double error_theta1 = goal_theta-pose_kalman.theta;
+	double error_theta2 = pose_kalman.theta-goal_theta;
+
+	if(error_theta1<0.0) error_theta1+=(2.0*M_PI);
+	if(error_theta2<0.0) error_theta2+=(2.0*M_PI);
+
+	double error_theta = error_theta1<error_theta2?error_theta1:error_theta2;
+
+	if(error_theta>=(-30.0*(M_PI/180)) && error_theta<= (30.0*(M_PI/180))){
+		 printf("Theta too small\n");
+		 return;
+	}
+
+	printf("%f %f %f \t %f %f %f \t %f %f %f\n", pose_kalman.x, pose_kalman.y, pose_kalman.theta*180/M_PI,
 	pose_ns.x, pose_ns.y, pose_ns.theta*180/M_PI, pose_we.x, pose_we.y, pose_we.theta*180/M_PI);
   
-//Call PID for Theta
-double PID_res = PID_theta->UpdatePID(error_theta, pose_kalman.theta);
-//Determine speed
-printf("Theta PID: %f\n", PID_res);
+	//Call PID for Theta
+	double PID_res = PID_theta->UpdatePID(error_theta, pose_kalman.theta);
+	//Determine speed
+	printf("Theta PID: %f\n", PID_res);
 
-int robot_speed = 10; 
-  if(PID_res > 50)
-    robot_speed = 5;
-  else if(PID_res < 50 && PID_res > 25)
-     robot_speed = 7;
+	int robot_speed = 10; 
+	if(PID_res > 50)
+		robot_speed = 5;
+	else if(PID_res < 50 && PID_res > 25)
+		robot_speed = 7;
 
-if(error_theta==error_theta1){
-	printf("Turning Left \n", error_theta1*(180/M_PI), error_theta2*(180/M_PI));
- 	robot->Move(RI_TURN_LEFT, 5);
-}else if(error_theta==error_theta2){
-	printf("Turning Right \n", error_theta1*(180/M_PI), error_theta2*(180/M_PI));
-	robot->Move(RI_TURN_RIGHT,5);
-}
+	if(error_theta==error_theta1){
+		printf("Turning Left \n", error_theta1*(180/M_PI), error_theta2*(180/M_PI));
+ 		robot->Move(RI_TURN_LEFT, 5);
+	}
+	else if(error_theta==error_theta2){
+		printf("Turning Right \n", error_theta1*(180/M_PI), error_theta2*(180/M_PI));
+		robot->Move(RI_TURN_RIGHT,5);
+	}
 
-printf("Recursing: at %f %f %f not %f\n",pose_ns.theta*(180/M_PI), pose_we.theta*(180/M_PI), pose_kalman.theta*(180/M_PI), goal_theta*(180/M_PI));
-turnTo(goal_theta);
+	printf("Recursing: at %f %f %f not %f\n",pose_ns.theta*(180/M_PI), pose_we.theta*(180/M_PI), pose_kalman.theta*(180/M_PI), goal_theta*(180/M_PI));
+	turnTo(goal_theta);
 
 }
 
