@@ -45,10 +45,10 @@ RobotPose::RobotPose(RobotInterface *r){
 	int deltat = 1;
 	//void initKalmanFilter(kalmanFilter *kf, float * initialPose, float *Velocity, int deltat) 
 	initKalmanFilter(&kf, initialPose, Velocity, deltat);
-PIDController PID_x(10.0,-10.0,1.0,1.0,1.0);
-//PID_x = new PIDController::PIDController(10.0,-10.0,1.0,1.0,1.0);
-//PID_y = new PIDController(10.0,-10.0,1.0,1.0,1.0);
-//PID_theta = new PIDController(10.0,-10.0,1.0,1.0,1.0);
+//PIDController PID_x(10.0,-10.0,1.0,1.0,1.0);
+PID_x = new PIDController(10.0,-10.0,1.0,1.0,1.0);
+PID_y = new PIDController(10.0,-10.0,1.0,1.0,1.0);
+PID_theta = new PIDController(10.0,-10.0,1.0,1.0,1.0);
 
 
 }
