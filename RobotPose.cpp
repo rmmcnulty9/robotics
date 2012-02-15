@@ -209,6 +209,7 @@ pose_kalman.x = track[0];
 pose_kalman.y = track[1];
 pose_kalman.theta = track[2];
 
+printf("%f %f %f\n", track[0], track[1], track[2]);
 }
 
 //TODO This should probably just be moved into updatePosition()

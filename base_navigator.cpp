@@ -22,20 +22,23 @@ int main(int argv, char **argc)
 	RobotInterface *robot = new RobotInterface(argc[1],0);
 	//char *coefFile = argc[2];
 	RobotPose robotPose(robot);
-	pose we;
-	
+	//Base 0 to Base 1
+	robotPose.moveTo(0,341); // y =  134.5 inches x=0
+	//Base 1 to Base 2
+	robotPose.moveTo(-185,259); // x=-73 y=134.5-32.5 = 102
+	//Base 2 to Base 3
+	robotPose.moveTo(-354,424); // x=-73-66.5 = -139.5  y=102+65 = 167
+	//Base 3 to Base 4
+	robotPose.moveTo(-443,76); // x=-139.5-35 = -174.5  y=167-137=30
+	//Base 4 to Base 0
+	robotPose.moveTo(0,0); // x=0  y=0
+
+
 	//robotPose.turnTo(1.57);
 //	robotPose.moveTo(100,0);
-/*
-int i=0;
-for(;i<40;i++){
-robot->update();
-printf("%f\n", robot->Theta()*(180/M_PI));
-}
-*/
 
 //	robotPose.moveTo(-100, -1);
-	robotPose.moveTo(0,-100);
+//	robotPose.moveTo(0,-100);
 	
 //robotPose.moveTo(-100,100);	//45 deg
 //robotPose.moveTo(-100,-100);	//135 deg
@@ -45,6 +48,7 @@ printf("%f\n", robot->Theta()*(180/M_PI));
 	return 0;
 	
 	robotPose.updatePosition();
+
    // printf("Moving forward\n");
 /*	for(int i=0; i<60; i++){
 		  // Update the robot's sensor information
