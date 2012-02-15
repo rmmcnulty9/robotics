@@ -121,9 +121,9 @@ void RobotPose::moveTo(double x, double y) {
 	//Calculate speed based on PID
 	double total_PID = sqrt(PID_xres * PID_xres + PID_yres * PID_yres);
 	int robot_speed = 5;
-	if(total_PID > 50)
+	if(total_PID > 50.0)
 		robot_speed = 1;
-	else if(total_PID < 50 && total_PID > 25)
+	else if(total_PID < 50.0 && total_PID > 25.0)
 		robot_speed = 3;
 	if (error_distance > 10.0) {
 		robot->Move(RI_MOVE_FORWARD, robot_speed);
@@ -159,19 +159,22 @@ void RobotPose::turnTo(double goal_theta) {
 	//Determine speed
 	printf("Theta PID: %f\n", PID_res);
 
-	int robot_speed = 10; 
-	if(PID_res > 50)
+	int robot_speed; 
+	if(PID_res > 1.0)
 		robot_speed = 5;
-	else if(PID_res < 50 && PID_res > 25)
-		robot_speed = 7;
+	else if(PID_res < 1.0 && PID_res > 0.25)
+		robot_speed = 5;
+	else {
+		robot_speed = 5;
+	}
 
 	if(error_theta==error_theta1){
 		printf("Turning Left \n", error_theta1*(180/M_PI), error_theta2*(180/M_PI));
- 		robot->Move(RI_TURN_LEFT, 5);
+ 		robot->Move(RI_TURN_LEFT, robot_speed);
 	}
 	else if(error_theta==error_theta2){
 		printf("Turning Right \n", error_theta1*(180/M_PI), error_theta2*(180/M_PI));
-		robot->Move(RI_TURN_RIGHT,5);
+		robot->Move(RI_TURN_RIGHT, robot_speed);
 	}
 
 	printf("Recursing: at %f %f %f not %f\n",pose_ns.theta*(180/M_PI), pose_we.theta*(180/M_PI), pose_kalman.theta*(180/M_PI), goal_theta*(180/M_PI));
@@ -358,10 +361,12 @@ bool RobotPose::updateNS(){
 	double avg_theta = 0.0;
 	for (int i = 0; i < 3; i++) {
 		robot->update();
-		avg_theta += robot->Theta();
+		avg_theta += robot->Theta() + 0.34906585; //0.436332313 = 25 degrees
+		printf("theta.... %f\n", (robot->Theta() + 0.34906585) * 180.0/M_PI);
 	}
 	pose_ns.theta = avg_theta / 3.0;
-
+	printf("avg_theta %f\n", pose_ns.theta * 180.0/M_PI);
+	//pose_ns.theta = robot->Theta() - pose_start.theta;
 	return true;
 }
 
