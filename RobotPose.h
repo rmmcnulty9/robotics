@@ -3,7 +3,7 @@
 #define __ROBOT_POSE__
 
 #include "shared_constants.h"
-//#include "PIDController.h"
+#include "PIDController.h"
 
 extern "C" {
 #include <clapack.h>
@@ -43,7 +43,9 @@ class RobotPose {
   pose pose_we;
   pose pose_ns;
   //pose pose_robot;
-
+  PIDController *PID_x;
+  PIDController *PID_y;
+  PIDController *PID_theta;
   int room_start;
   int room_cur;
   double theta_ns_trans;
