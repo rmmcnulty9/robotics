@@ -230,8 +230,8 @@ float dtheta = (rear*we_to_rad);
 }*/
 
 if(!turning){
-dx_2 = dx * cos(pose_we.theta) - dy * sin(pose_we.theta);
-dy_2 = dx * sin(pose_we.theta) + dy * cos(pose_we.theta);
+dx_2 = dx * cos(pose_we.theta - M_PI_2) - dy * sin(pose_we.theta - M_PI_2);
+dy_2 = dx * sin(pose_we.theta - M_PI_2) + dy * cos(pose_we.theta - M_PI_2);
 printf("dx2, dy2: %f, %f\n", dx_2, dy_2);
 pose_we.x += dx_2*we_to_cm;
 pose_we.y += dy_2*we_to_cm;
