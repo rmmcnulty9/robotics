@@ -102,7 +102,7 @@ room_cur = room_start;
 void RobotPose::moveTo(double x, double y) {
    updatePosition(false);
     //Turn to
-  double theta = acos((x-pose_kalman.x)/sqrt((x-pose_kalman.x)*(x-pose_kalman.x)+(y-pose_kalman.y)*(y-pose_kalman.y)));
+ double theta = acos((x-pose_kalman.x)/sqrt((x-pose_kalman.x)*(x-pose_kalman.x)+(y-pose_kalman.y)*(y-pose_kalman.y)));
 
   if(y<=0.0){
   theta = -theta;
@@ -128,6 +128,10 @@ void RobotPose::moveTo(double x, double y) {
 }
 
 void RobotPose::turnTo(double goal_theta) {
+int i=0;
+for(;i<25;i++)
+	robot->update();
+
 updatePosition(true);
 double error_theta1 = goal_theta-pose_kalman.theta;
 double error_theta2 = pose_kalman.theta-goal_theta;
@@ -137,10 +141,14 @@ if(error_theta2<0.0) error_theta2+=(2.0*M_PI);
 
 double error_theta = error_theta1<error_theta2?error_theta1:error_theta2;
 
-if(error_theta>=(-15.0*(M_PI/180)) && error_theta<= (15.0*(M_PI/180))){
+if(error_theta>=(-30.0*(M_PI/180)) && error_theta<= (30.0*(M_PI/180))){
  printf("Theta too small\n");
  return;
 }
+
+
+  printf("%f %f %f \t %f %f %f \t %f %f %f\n", pose_kalman.x, pose_kalman.y, pose_kalman.theta*180/M_PI,
+	pose_ns.x, pose_ns.y, pose_ns.theta*180/M_PI, pose_we.x, pose_we.y, pose_we.theta*180/M_PI);
   
 //Call PID for Theta
 //Determine speed
@@ -178,9 +186,6 @@ void RobotPose::printTransformed(){
 
 //TODO This should probably be private
 void RobotPose::updatePosition(bool turning=false){
-int i=0;
-for(;i<3;i++)
-	robot->update();
 
 updateNS();
 pose_we.theta = pose_ns.theta;
