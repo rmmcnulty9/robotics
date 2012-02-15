@@ -103,14 +103,14 @@ void RobotPose::moveTo(double x, double y) {
    //updatePosition(false);
     //Turn to
     //double theta = atan((y-pose_kalman.y)/(x-pose_kalman.x)); 
-  double theta = acos((x-pose_kalman.x)/sqrt((x-pose_kalman.x)*(x-pose_kalman.x)+(y-pose_kalman.y)*(y-pose_kalman.y)));
+  double goal_theta = acos((x-pose_kalman.x)/sqrt((x-pose_kalman.x)*(x-pose_kalman.x)+(y-pose_kalman.y)*(y-pose_kalman.y)));
   if(y<=0.0){
-  theta = -theta;
+  goal_theta = -goal_theta;
   }
     
 
-  printf(" %f %f theta %f \t %f %f\n",x, y, theta * 180/M_PI, pose_kalman.x, pose_kalman.y);
-  turnTo(theta);  
+  printf(" %f %f goal_theta %f \t %f %f\n",x, y, goal_theta * 180/M_PI, pose_kalman.x, pose_kalman.y);
+  turnTo(goal_theta);  
 
   double error_distance_x = pose_kalman.x - x;
   double error_distance_y = pose_kalman.y - y;
