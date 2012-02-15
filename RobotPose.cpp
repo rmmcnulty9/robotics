@@ -98,7 +98,7 @@ void RobotPose::moveTo(double x, double y) {
 	//double theta = atan((y-pose_kalman.y)/(x-pose_kalman.x)); 
 	double goal_theta = acos((x-pose_kalman.x)/sqrt((x-pose_kalman.x)*(x-pose_kalman.x)+(y-pose_kalman.y)*(y-pose_kalman.y)));
 
-	if(y<=0.0) {
+	if((y-pose_kalman.y)<=0.0) {
 		goal_theta = -goal_theta;
 	}
    
