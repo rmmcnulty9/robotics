@@ -12,7 +12,7 @@ typedef struct {
 } pose;
 
 const float we_to_rad = M_PI/-120;
-const float we_to_cm = 1.0/2.0; //2.1; 
+const float we_to_cm = 1.5; //0.5; 
 const float ns_x_to_cm = 1.0/45; //1.0/30.0; 
 const float ns_y_to_cm = 1.0/42.0;
 const float robot_diameter_cm = 29.0;
