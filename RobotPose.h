@@ -29,11 +29,11 @@ class RobotPose {
   void turnTo(float theta);
   void printRaw();
   void printTransformed();
+  void updatePosition(bool turning);
   
   private:
   bool updateWE(bool turning);
   bool updateNS();
-  void updatePosition(bool turning);
   filter *createFilter(const char *coef, float initval);
   float firFilter(filter* f, float val);
   
