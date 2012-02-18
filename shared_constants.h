@@ -12,8 +12,8 @@ typedef struct {
 } pose;
 
 const float we_to_rad = M_PI/-120;
-const float we_to_cm = 2.1; //1.0/2.0
-const float ns_x_to_cm = 1.0/30.0; //1.0/45
+const float we_to_cm = 1.0/2.0; //2.1; 
+const float ns_x_to_cm = 1.0/45; //1.0/30.0; 
 const float ns_y_to_cm = 1.0/42.0;
 const float robot_diameter_cm = 29.0;
 const char* coef_filename = "fir_coef/s_72";
