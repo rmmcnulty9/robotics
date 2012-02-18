@@ -20,7 +20,7 @@ int main(int argv, char **argc)
 	}
     
 	RobotInterface *robot = new RobotInterface(argc[1],0);
-	//char *coefFile = argc[2];
+	
 	RobotPose robotPose(robot);
 	//Base 0 to Base 1
 	robotPose.moveTo(0.0,341.0); // y =  134.5 inches x=0

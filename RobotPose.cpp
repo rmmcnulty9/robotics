@@ -159,7 +159,7 @@ void RobotPose::turnTo(double goal_theta) {
 		 return;
 	}
 
-	printf("%f %f %f \t %f %f %f \t %f %f %f\n", pose_kalman.x, pose_kalman.y, pose_kalman.theta*180/M_PI,
+	printf("K: %f %f %f \t NS: %f %f %f \t WE: %f %f %f\n", pose_kalman.x, pose_kalman.y, pose_kalman.theta*180/M_PI,
 	pose_ns.x, pose_ns.y, pose_ns.theta*180/M_PI, pose_we.x, pose_we.y, pose_we.theta*180/M_PI);
   
 	//Call PID for Theta
@@ -185,7 +185,7 @@ void RobotPose::turnTo(double goal_theta) {
 		robot->Move(RI_TURN_RIGHT, robot_speed);
 	}
 
-	printf("Recursing: at %f %f %f not %f\n",pose_ns.theta*(180/M_PI), pose_we.theta*(180/M_PI), pose_kalman.theta*(180/M_PI), goal_theta*(180/M_PI));
+	printf("Recursing: at K: %f NS: %f WE: %f not %f\n",pose_kalman.theta*(180/M_PI), pose_ns.theta*(180/M_PI), pose_we.theta*(180/M_PI), goal_theta*(180/M_PI));
 	turnTo(goal_theta);
 
 }
