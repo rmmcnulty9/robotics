@@ -352,8 +352,8 @@ bool RobotPose::updateNS(){
 		x_2 = x * cos(-pose_start.theta) - y * sin(-pose_start.theta);
 		y_2 = x * sin(-pose_start.theta) + y * cos(-pose_start.theta);
 		
-		pose_start.x = pose_start.x - x_2;
-		pose_start.y = pose_start.y - y_2;
+		pose_start.x = x_2 - pose_start.x;
+		pose_start.y = y_2 - pose_start.y;
 		
 		room_cur = new_room;
 	}
