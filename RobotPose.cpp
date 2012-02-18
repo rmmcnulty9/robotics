@@ -75,13 +75,7 @@ void RobotPose::resetCoord() {
 	
 	room_start = robot->RoomID();
 	room_cur = room_start;
-	switch(room_start) {
-		case 2: pose_start.theta = ROOM2; break;
-		case 3: pose_start.theta = ROOM3; break;
-		case 4: pose_start.theta = ROOM4; break;
-		case 5: pose_start.theta = ROOM5; break;
-		default: printf("Error changing rooms!!!\n"); exit(-1); 
-	}
+	pose_start.theta = ns_theta[room_start];
 
 	float x = robot->X();
 	float y = robot->Y();
@@ -271,6 +265,8 @@ void RobotPose::updatePosition(bool turning=false){
 	pose_kalman.x = track[0];
 	pose_kalman.y = track[1];
 	pose_kalman.theta = track[2];
+	printf("K: %f %f %f \t NS: %f %f %f \t WE: %f %f %f\n", pose_kalman.x, pose_kalman.y, pose_kalman.theta*180/M_PI,
+	pose_ns.x, pose_ns.y, pose_ns.theta*180/M_PI, pose_we.x, pose_we.y, pose_we.theta*180/M_PI);
 
 }
 
@@ -336,13 +332,7 @@ bool RobotPose::updateNS(){
 		printf("ROOM CHANGED %d\n", new_room);
 		//exit(-1);
 	//}
-		switch(new_room){
-			case 2: pose_start.theta = ROOM2; break;
-			case 3: pose_start.theta = ROOM3; break;
-			case 4: pose_start.theta = ROOM4; break;
-			case 5: pose_start.theta = ROOM5; break;
-			default: printf("Error changing rooms!!!\n"); exit(-1); 
-		}
+		pose_start.theta = ns_theta[new_room];
     
 		//Set the new pose_start to current reading
 		pose_start.x = pose_kalman.x / ns_x_to_cm[room_cur];

@@ -11,9 +11,12 @@ typedef struct {
     float theta;
 } pose;
 
+
+// all for rosie
 float ns_x_to_cm[] = {0.0, 0.0, 1.0 / 35.0, 1.0 / 35.0, 1.0 / 35.0, 1.0 / 35.0};
 float ns_y_to_cm[] = {0.0, 0.0, 1.0 / 41.0, 1.0 / 41.0, 1.0 / 41.0, 1.0 / 41.0};
 float ns_theta_offset[] = {0.0, 0.0, 0.155946, M_PI_2, -0.101754, 1.488696};
+float ns_theta[] = {0.0, 0.0, -0.164750, -1.571900, 0.080450, -1.430050};
 
 const float we_to_rad = M_PI / -120.0;
 const float we_to_cm = 1.5; //0.5; 
