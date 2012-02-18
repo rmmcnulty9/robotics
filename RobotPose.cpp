@@ -72,6 +72,16 @@ void RobotPose::resetCoord() {
 	//pose_start.theta = ROOM5
 
 	robot->update();
+	
+	room_start = robot->RoomID();
+	room_cur = room_start;
+	switch(new_room){
+		case 2: pose_start.theta = ROOM2; break;
+		case 3: pose_start.theta = ROOM3; break;
+		case 4: pose_start.theta = ROOM4; break;
+		case 5: pose_start.theta = ROOM5; break;
+		default: printf("Error changing rooms!!!\n"); exit(-1); 
+	}
 
 	double x = robot->X();
 	double y = robot->Y();
@@ -89,9 +99,6 @@ void RobotPose::resetCoord() {
 	pose_we.x = 0.0;
 	pose_we.y = 0.0;
 	pose_we.theta = M_PI_2;
-
-	room_start = robot->RoomID();
-	room_cur = room_start;
 }
 
 void RobotPose::moveTo(double x, double y) {
