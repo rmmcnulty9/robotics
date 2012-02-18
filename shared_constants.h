@@ -28,4 +28,10 @@ const float vel_3 = .3;
 const float vel_5 = .25;
 const float vel_7 = .2;
 const float vel_10 = .2;
+//Robot turn speed in radians/s
+const float turn_1 = 3.142;
+const float turn_3 = 2.827;
+const float turn_5 = 2.094;
+const float turn_7 = 1.257;
+const float turn_10 = 1.047;
 #endif
