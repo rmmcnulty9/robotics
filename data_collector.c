@@ -53,9 +53,9 @@ int main(int argc, char **argv) {
                   ri_move(&ri, RI_TURN_LEFT,7);
 		  */
 	       int z;
-		for(z=0; z<60 && !ri_IR_Detected(&ri); z++){
+		for(z=0; z<80 && !ri_IR_Detected(&ri); z++){
 		 ri_update(&ri);
-		 ri_move(&ri, RI_MOVE_FORWARD, 1);
+		 ri_move(&ri, RI_TURN_LEFT, 10);
 		}
 		  
 
