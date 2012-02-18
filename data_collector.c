@@ -58,13 +58,13 @@ int main(int argc, char **argv) {
 		printf("Room %d\n", room);
 		float avg = 0;
 	       int z;
-		for(z=0; z<20 && !ri_IR_Detected(&ri); z++){
+		for(z=0; z<50 && !ri_IR_Detected(&ri); z++){
 		 ri_update(&ri);
 		 printf("%f\n", ri_getTheta(&ri));
 
 		 avg += ri_getTheta(&ri);
 		}
-		avg = avg / 20;
+		avg = avg / 50.0;
 		printf("Average: %f\n", avg);		
 		printf("Diff: %f\n", M_PI_2 - avg);
 		printf("Offset: %f\n", (180/M_PI) * (ns_theta_offset[room] + avg));
