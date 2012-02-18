@@ -147,7 +147,7 @@ void RobotPose::moveTo(float x, float y) {
 		velocity[2] = 0.0;
 		rovioKalmanFilterSetVelocity(&kf,velocity);
 	}
-	if (robot->IR_Detected() && x != -180.0) {
+	if (robot->IR_Detected() && x != -180.0 && x != -354.0) {
 		printf("wall!\n");
 		exit(0);
 	}
