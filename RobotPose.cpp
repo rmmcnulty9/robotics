@@ -72,6 +72,16 @@ void RobotPose::resetCoord() {
 	//pose_start.theta = ROOM5
 
 	robot->update();
+	
+	room_start = robot->RoomID();
+	room_cur = room_start;
+	switch(room_start) {
+		case 2: pose_start.theta = ROOM2; break;
+		case 3: pose_start.theta = ROOM3; break;
+		case 4: pose_start.theta = ROOM4; break;
+		case 5: pose_start.theta = ROOM5; break;
+		default: printf("Error changing rooms!!!\n"); exit(-1); 
+	}
 
 	double x = robot->X();
 	double y = robot->Y();
@@ -89,9 +99,6 @@ void RobotPose::resetCoord() {
 	pose_we.x = 0.0;
 	pose_we.y = 0.0;
 	pose_we.theta = M_PI_2;
-
-	room_start = robot->RoomID();
-	room_cur = room_start;
 }
 
 void RobotPose::moveTo(double x, double y) {
@@ -126,23 +133,23 @@ void RobotPose::moveTo(double x, double y) {
 	float velocity[3];
 	if(total_PID > 50.0){
 		robot_speed = 1;
-		velocity[0] = 0.0;
-		velocity[1] = vel_1;
+		velocity[0] = vel_1 * cos(pose_kalman.theta);
+		velocity[1] = vel_1 * sin(pose_kalman.theta);
 		velocity[2] = 0.0;
 		rovioKalmanFilterSetVelocity(&kf,velocity);
 	}
 	else if(total_PID < 50.0 && total_PID > 25.0){
 		robot_speed = 3;
 		float velocity [3];
-		velocity[0] = 0.0;
-		velocity[1] = vel_3;
+		velocity[0] = vel_3 * cos(pose_kalman.theta);
+		velocity[1] = vel_3 * sin(pose_kalman.theta);
 		velocity[2] = 0.0;
 		rovioKalmanFilterSetVelocity(&kf,velocity);
 	}
 	else {
 		robot_speed = 5;
-		velocity[0] = 0.0;
-		velocity[1] = vel_5;
+		velocity[0] = vel_5 * cos(pose_kalman.theta);
+		velocity[1] = vel_5 * sin(pose_kalman.theta);
 		velocity[2] = 0.0;
 		rovioKalmanFilterSetVelocity(&kf,velocity);
 	}
