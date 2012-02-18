@@ -112,7 +112,7 @@ void RobotPose::moveTo(float x, float y) {
 	}
    
 	printf(" %f %f %f \n",x, y, goal_theta * 180/M_PI);
-  
+ 	printf("kalman %f %f %f\n", pose_kalman.x, pose_kalman.y, pose_kalman.theta); 
 	printf("K: %f %f %f \t NS: %f %f %f \t WE: %f %f %f\n", pose_kalman.x, pose_kalman.y, pose_kalman.theta*180/M_PI,
 	pose_ns.x, pose_ns.y, pose_ns.theta*180/M_PI, pose_we.x, pose_we.y, pose_we.theta*180/M_PI);
     
