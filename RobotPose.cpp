@@ -75,7 +75,7 @@ void RobotPose::resetCoord() {
 	
 	room_start = robot->RoomID();
 	room_cur = room_start;
-	switch(new_room){
+	switch(room_start) {
 		case 2: pose_start.theta = ROOM2; break;
 		case 3: pose_start.theta = ROOM3; break;
 		case 4: pose_start.theta = ROOM4; break;
