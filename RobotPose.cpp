@@ -119,9 +119,10 @@ void RobotPose::moveTo(double x, double y) {
 	printf("Err x: %f\tErr y: %f\n", error_distance_x, error_distance_y);
   
 	//Calculate speed based on PID
-	double total_PID = sqrt(PID_xres * PID_xres + PID_yres * PID_yres);
+	double total_PID = abs(sqrt(PID_xres * PID_xres + PID_yres * PID_yres));
 	printf("PID x: %f\tPID y: %f\tTotal PID: %f\n", PID_xres, PID_yres, total_PID);
 	int robot_speed;
+	float velocity[3];
 	if(total_PID > 50.0)
 		robot_speed = 1;
 		velocity[0] = 0.0;
@@ -176,28 +177,29 @@ void RobotPose::turnTo(double goal_theta) {
 	pose_ns.x, pose_ns.y, pose_ns.theta*180/M_PI, pose_we.x, pose_we.y, pose_we.theta*180/M_PI);
   
 	//Call PID for Theta
-	double PID_res = PID_theta->UpdatePID(error_theta, pose_kalman.theta);
+	double PID_res = abs(PID_theta->UpdatePID(error_theta, pose_kalman.theta));
 	//Determine speed
 	printf("Theta PID: %f\n", PID_res);
 
 	int robot_speed; 
+	float velocity[3];
 	if(PID_res > 1.0)
 		robot_speed = 3;
 		velocity[0] = 0.0;
-		velocity[1] = vel_3;
-		velocity[2] = 0.0;
+		velocity[1] = 0.0;
+		velocity[2] = vel_3;
 		rovioKalmanFilterSetVelocity(kf,velocity);
 	else if(PID_res < 1.0 && PID_res > 0.25)
 		robot_speed = 5;
 		velocity[0] = 0.0;
-		velocity[1] = vel_5;
-		velocity[2] = 0.0;
+		velocity[1] = 0.0;
+		velocity[2] = vel_5;
 		rovioKalmanFilterSetVelocity(kf,velocity);
 	else {
 		robot_speed = 7;
 		velocity[0] = 0.0;
-		velocity[1] = vel_7;
-		velocity[2] = 0.0;
+		velocity[1] = 0.0;
+		velocity[2] = vel_7;
 		rovioKalmanFilterSetVelocity(kf,velocity);
 	}
 
