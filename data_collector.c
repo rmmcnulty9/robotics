@@ -4,7 +4,7 @@
 #include <unistd.h>
 #include <sys/time.h>
 #include <sys/types.h>
-#include "shared_constants.h";
+#include "shared_constants.h"
 
 int main(int argc, char **argv) {
         robot_if_t ri;
