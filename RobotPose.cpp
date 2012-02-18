@@ -16,6 +16,7 @@ extern "C" {
 
 RobotPose::RobotPose(RobotInterface *r){
 	robot = r;
+	//std::cout << "Battery:" << r->getBattery() >> "\n";
 	//Create all six FIR filters
 	fir_x_ns = RobotPose::createFilter(coef_filename,0.0);
 	fir_y_ns = RobotPose::createFilter(coef_filename,0.0);
@@ -103,7 +104,7 @@ void RobotPose::moveTo(double x, double y) {
 		goal_theta = -goal_theta;
 	}
    
-	printf(" %f %f %f \n",x, y, goal_theta * 180/M_PI, pose_kalman.x, pose_kalman.y);
+	printf(" %f %f %f \n",x, y, goal_theta * 180/M_PI);
   
 	printf("kalman %f %f %f \t north star %f %f %f \t wheel encoder %f %f %f\n", pose_kalman.x, pose_kalman.y, pose_kalman.theta*180/M_PI,
 	pose_ns.x, pose_ns.y, pose_ns.theta*180/M_PI, pose_we.x, pose_we.y, pose_we.theta*180/M_PI);
@@ -154,7 +155,7 @@ void RobotPose::moveTo(double x, double y) {
 		moveTo(x, y);
 	}
 	else {
-		printf("arrived!\n");
+		printf("ARRIVED!\n");
 	}
 }
 
@@ -170,7 +171,7 @@ void RobotPose::turnTo(double goal_theta) {
 
 	double error_theta = error_theta1<error_theta2?error_theta1:error_theta2;
 
-	if(error_theta>=(-30.0*(M_PI/180)) && error_theta<= (30.0*(M_PI/180))){
+	if(error_theta>=(-25.0*(M_PI/180)) && error_theta<= (25.0*(M_PI/180))){
 		 printf("Theta too small\n");
 		 return;
 	}
@@ -325,7 +326,7 @@ bool RobotPose::updateNS(){
 	double x, y, theta, x_2, y_2; 
  
 	if(room != room_cur){
-		//printf("No room changing yet\n");
+		printf("ROOM CHANGED %d\n", room);
 		//exit(-1);
 	//}
 		switch(room){
