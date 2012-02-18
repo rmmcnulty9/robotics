@@ -338,13 +338,23 @@ bool RobotPose::updateNS(){
 		}
     
 		//Set the new pose_start to current reading
-		pose_start.x = pose_kalman.x * 1.0 / ns_x_to_cm;
-		pose_start.y = pose_kalman.y * 1.0 / ns_y_to_cm;
+		pose_start.x = pose_kalman.x / ns_x_to_cm;
+		pose_start.y = pose_kalman.y / ns_y_to_cm;
     
 		//Simple send the last value back in to FIR for this room change cycle
 		//x = firFilter(x_ns,(robot->X() - pose_start.x));
 		//y = firFilter(y_ns,(robot->Y() - pose_start.y));
 		//theta = firFilter(theta_ns,(robot->Theta() - pose_start.theta));
+		
+		x = robot->X();
+		y = robot->Y();
+		
+		x_2 = x * cos(-pose_start.theta) - y * sin(-pose_start.theta);
+		y_2 = x * sin(-pose_start.theta) + y * cos(-pose_start.theta);
+		
+		pose_start.x = pose_start.x - x_2;
+		pose_start.y = pose_start.y - y_2;
+		
 		room_cur = new_room;
 	}
     
@@ -356,6 +366,9 @@ bool RobotPose::updateNS(){
 	x_2 = x * cos(-pose_start.theta) - y * sin(-pose_start.theta);
 	y_2 = x * sin(-pose_start.theta) + y * cos(-pose_start.theta);
     
+	printf("x2: %f, y2: %f\n", pose_start.x, pose_start.y);
+	printf("x2: %f, y2: %f\n", x_2, y_2);
+	
 	// translate
 	x = x_2 - pose_start.x;
 	y = y_2 - pose_start.y;
