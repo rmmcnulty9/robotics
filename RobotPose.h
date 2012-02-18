@@ -25,8 +25,8 @@ class RobotPose {
   ~RobotPose();
   
   void resetCoord();
-  void moveTo(double x, double y);
-  void turnTo(double theta);
+  void moveTo(float x, float y);
+  void turnTo(float theta);
   void printRaw();
   void printTransformed();
   
@@ -47,7 +47,7 @@ class RobotPose {
   PIDController *PID_theta;
   int room_start;
   int room_cur;
-  double theta_ns_trans;
+  float theta_ns_trans;
   
 
   //FIR Filters

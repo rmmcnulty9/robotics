@@ -11,10 +11,12 @@ typedef struct {
     float theta;
 } pose;
 
+float ns_x_to_cm[] = {0.0, 0.0, 1.0 / 35.0, 1.0 / 35.0, 1.0 / 35.0, 1.0 / 35.0};
+float ns_y_to_cm[] = {0.0, 0.0, 1.0 / 41.0, 1.0 / 41.0, 1.0 / 41.0, 1.0 / 41.0};
+float ns_theta_offset[] = {0.0, 0.0, 0.34906585, 0.34906585, 0.34906585, 0.34906585};
+
 const float we_to_rad = M_PI / -120.0;
 const float we_to_cm = 1.5; //0.5; 
-const float ns_x_to_cm = 1.0 / 35.0; //1.0/30.0; 
-const float ns_y_to_cm = 1.0 / 41.0;
 const float robot_diameter_cm = 29.0;
 const char* coef_filename = "fir_coef/s_72";
 
