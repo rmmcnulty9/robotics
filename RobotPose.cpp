@@ -123,25 +123,27 @@ void RobotPose::moveTo(double x, double y) {
 	printf("PID x: %f\tPID y: %f\tTotal PID: %f\n", PID_xres, PID_yres, total_PID);
 	int robot_speed;
 	float velocity[3];
-	if(total_PID > 50.0)
+	if(total_PID > 50.0){
 		robot_speed = 1;
 		velocity[0] = 0.0;
 		velocity[1] = vel_1;
 		velocity[2] = 0.0;
-		rovioKalmanFilterSetVelocity(kf,velocity);
-	else if(total_PID < 50.0 && total_PID > 25.0)
+		rovioKalmanFilterSetVelocity(&kf,velocity);
+	}
+	else if(total_PID < 50.0 && total_PID > 25.0){
 		robot_speed = 3;
 		float velocity [3];
 		velocity[0] = 0.0;
 		velocity[1] = vel_3;
 		velocity[2] = 0.0;
-		rovioKalmanFilterSetVelocity(kf,velocity);
+		rovioKalmanFilterSetVelocity(&kf,velocity);
+	}
 	else {
 		robot_speed = 5;
 		velocity[0] = 0.0;
 		velocity[1] = vel_5;
 		velocity[2] = 0.0;
-		rovioKalmanFilterSetVelocity(kf,velocity);
+		rovioKalmanFilterSetVelocity(&kf,velocity);
 	}
 	if (robot->IR_Detected()) {
 		printf("wall!\n");
@@ -183,24 +185,26 @@ void RobotPose::turnTo(double goal_theta) {
 
 	int robot_speed; 
 	float velocity[3];
-	if(PID_res > 1.0)
-		robot_speed = 3;
-		velocity[0] = 0.0;
-		velocity[1] = 0.0;
-		velocity[2] = vel_3;
-		rovioKalmanFilterSetVelocity(kf,velocity);
-	else if(PID_res < 1.0 && PID_res > 0.25)
+	if(PID_res > 1.0){
 		robot_speed = 5;
 		velocity[0] = 0.0;
 		velocity[1] = 0.0;
 		velocity[2] = vel_5;
-		rovioKalmanFilterSetVelocity(kf,velocity);
-	else {
+		//rovioKalmanFilterSetVelocity(&kf,velocity);
+	}
+	else if(PID_res < 1.0 && PID_res > 0.25){
 		robot_speed = 7;
 		velocity[0] = 0.0;
 		velocity[1] = 0.0;
 		velocity[2] = vel_7;
-		rovioKalmanFilterSetVelocity(kf,velocity);
+		//rovioKalmanFilterSetVelocity(&kf,velocity);
+	}
+	else {
+		robot_speed = 10;
+		velocity[0] = 0.0;
+		velocity[1] = 0.0;
+		velocity[2] = vel_10;
+		//rovioKalmanFilterSetVelocity(&kf,velocity);
 	}
 
 	if(error_theta==error_theta1){
