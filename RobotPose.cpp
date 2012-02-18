@@ -252,7 +252,7 @@ void RobotPose::printTransformed(){
 void RobotPose::updatePosition(bool turning=false){
 	robot->update();
 	updateNS();
-	pose_we.theta = pose_ns.theta;
+	//pose_we.theta = pose_ns.theta;
 	updateWE(turning);
 
 
@@ -290,18 +290,18 @@ void RobotPose::updatePosition(bool turning=false){
 
 	float dy = ((left * sin(150.0 * M_PI/180.0)) + (right * sin(30.0 * M_PI/180.0)) + (rear * sin(90.0 * M_PI/180.0)))/3.0;
 	float dx = ((left * cos(150.0 * M_PI/180.0)) + (right * cos(30.0 * M_PI/180.0)))/2.0;
-	dx = 0.0; // I don't think we are supposed to move in this direction.
+//	dx = 0.0; // I don't think we are supposed to move in this direction.
 
 	float dtheta = (rear*we_to_rad);
 
-//pose_we.theta += dtheta;
+	pose_we.theta += dtheta;
 
-//Normalizing the theta between PI and -PI
-/*if(pose_we.theta>M_PI){
- pose_we.theta-=(2*M_PI);
-}else if(pose_we.theta<-M_PI){
-  pose_we.theta+=(2*M_PI);
-}*/
+	//Normalizing the theta between PI and -PI
+	if(pose_we.theta>M_PI){
+		pose_we.theta-=(2*M_PI);
+	}else if(pose_we.theta<-M_PI){
+		pose_we.theta+=(2*M_PI);
+	}
 
 	if(!turning){
 		dx_2 = dx * cos(pose_we.theta - M_PI_2) - dy * sin(pose_we.theta - M_PI_2);
@@ -312,7 +312,6 @@ void RobotPose::updatePosition(bool turning=false){
 	return true;
 }
 
-//TODO This should also probably be merged with updatePosition()
 bool RobotPose::updateNS(){
  
 /*

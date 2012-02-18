@@ -22,6 +22,12 @@ int main(int argv, char **argc)
 	RobotInterface *robot = new RobotInterface(argc[1],0);
 	
 	RobotPose robotPose(robot);
+
+	//robotPose.moveTo(0.0, 20.0);
+
+	//robotPose.moveTo(20.0,0.0);	
+	//return 0;
+
 	//Base 0 to Base 1
 	robotPose.moveTo(0.0,341.0); // y =  134.5 inches x=0
 	//Base 1 to Base 2 -185
