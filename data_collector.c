@@ -25,15 +25,15 @@ int main(int argc, char **argv) {
           
           int x=0, y=0;
           float theta = 0.0;
-        
+        /*
         // Action loop
         do {
-                // Update the robot's sensor information
+                Update the robot's sensor information
                 if(ri_update(&ri) != RI_RESP_SUCCESS) {
                         printf("Failed to update sensor information!\n");
                         break;
                 }
-               // printf("N %ld.%ld %d %d %f\n",now.tv_sec, now.tv_usec, ri_getX(&ri), ri_getY(&ri), ri_getTheta(&ri));
+               printf("N %ld.%ld %d %d %f\n",now.tv_sec, now.tv_usec, ri_getX(&ri), ri_getY(&ri), ri_getTheta(&ri));
                 d_left = ri_getWheelEncoder(&ri,RI_WHEEL_LEFT);
                 d_right = ri_getWheelEncoder(&ri,RI_WHEEL_RIGHT);
                 d_rear = ri_getWheelEncoder(&ri,RI_WHEEL_REAR);
@@ -45,16 +45,21 @@ int main(int argc, char **argv) {
                y = ri_getY(&ri);
                theta = ri_getTheta(&ri);
                
-               printf("%d %d %f %d %d %d %d %d %d\n", x, y, theta, d_left, d_right, d_rear, t_left, t_right, t_rear);
+               //printf("%d %d %f %d %d %d %d %d %d\n", x, y, theta, d_left, d_right, d_rear, t_left, t_right, t_rear);
                   
                 // Move forward unless there's something in front of the robot
                 if(!ri_IR_Detected(&ri)){
-                 //ri_move(&ri, RI_MOVE_FORWARD, RI_FASTEST);
+                 ri_move(&ri, RI_MOVE_FORWARD, RI_FASTEST);
                   ri_move(&ri, RI_TURN_LEFT,7);
-                }else{
-                  break;
-                }
-        } while(1);
+		  */
+	       int z;
+		for(z=0; z<60 && !ri_IR_Detected(&ri); z++){
+		 ri_update(&ri);
+		 ri_move(&ri, RI_MOVE_FORWARD, 1);
+		}
+		  
+
+       // } while(1);
 
         return 0;
 }
