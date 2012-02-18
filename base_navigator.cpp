@@ -22,11 +22,7 @@ int main(int argv, char **argc)
 	RobotInterface *robot = new RobotInterface(argc[1],0);
 	
 	RobotPose robotPose(robot);
-	for (int i = 0; i < 20; i++) {
-		robot->Move(RI_MOVE_FORWARD, 1);
-		robotPose.updatePosition(false);
-	}
-	return 0;
+	
 	//Base 0 to Base 1
 	robotPose.moveTo(0.0,341.0); // y =  134.5 inches x=0
 	//Base 1 to Base 2 -185
@@ -50,6 +46,12 @@ int main(int argv, char **argc)
 //robotPose.moveTo(-100,-100);	//135 deg
 //robotPose.moveTo(100,100);	//-45 deg
 //robotPose.moveTo(100,-100);	//-135 deg
+	
+	/*for (int i = 0; i < 20; i++) {
+		robot->Move(RI_MOVE_FORWARD, 1);
+		robotPose.updatePosition(false);
+	}
+	return 0;*/
 	
 
 }
