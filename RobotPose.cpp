@@ -106,7 +106,7 @@ void RobotPose::moveTo(double x, double y) {
    
 	printf(" %f %f %f \n",x, y, goal_theta * 180/M_PI);
   
-	printf("kalman %f %f %f \t north star %f %f %f \t wheel encoder %f %f %f\n", pose_kalman.x, pose_kalman.y, pose_kalman.theta*180/M_PI,
+	printf("K: %f %f %f \t NS: %f %f %f \t WE: %f %f %f\n", pose_kalman.x, pose_kalman.y, pose_kalman.theta*180/M_PI,
 	pose_ns.x, pose_ns.y, pose_ns.theta*180/M_PI, pose_we.x, pose_we.y, pose_we.theta*180/M_PI);
     
 	turnTo(goal_theta);  
@@ -322,14 +322,14 @@ bool RobotPose::updateNS(){
 	static double total_theta = robot->Theta() - pose_start.theta;
 	double delta_theta;
 	static int jump_ctr = 0;
-	int room = robot->RoomID();
+	int new_room = robot->RoomID();
 	double x, y, theta, x_2, y_2; 
  
-	if(room != room_cur){
-		printf("ROOM CHANGED %d\n", room);
+	if(new_room != room_cur){
+		printf("ROOM CHANGED %d\n", new_room);
 		//exit(-1);
 	//}
-		switch(room){
+		switch(new_room){
 			case 2: pose_start.theta = ROOM2; break;
 			case 3: pose_start.theta = ROOM3; break;
 			case 4: pose_start.theta = ROOM4; break;
@@ -345,6 +345,7 @@ bool RobotPose::updateNS(){
 		//x = firFilter(x_ns,(robot->X() - pose_start.x));
 		//y = firFilter(y_ns,(robot->Y() - pose_start.y));
 		//theta = firFilter(theta_ns,(robot->Theta() - pose_start.theta));
+		room_cur = new_room;
 	}
     
 	x = robot->X();

@@ -24,8 +24,8 @@ int main(int argv, char **argc)
 	RobotPose robotPose(robot);
 	//Base 0 to Base 1
 	robotPose.moveTo(0.0,341.0); // y =  134.5 inches x=0
-	//Base 1 to Base 2
-	robotPose.moveTo(-185.0,259.0); // x=-73 y=134.5-32.5 = 102
+	//Base 1 to Base 2 -185
+	robotPose.moveTo(-180.0,259.0); // x=-73 y=134.5-32.5 = 102
 	//Base 2 to Base 3
 	robotPose.moveTo(-354.0,424.0); // x=-73-66.5 = -139.5  y=102+65 = 167
 	//Base 3 to Base 4
