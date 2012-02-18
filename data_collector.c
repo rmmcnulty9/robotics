@@ -4,6 +4,7 @@
 #include <unistd.h>
 #include <sys/time.h>
 #include <sys/types.h>
+#include "shared_constants.h";
 
 int main(int argc, char **argv) {
         robot_if_t ri;
@@ -52,11 +53,22 @@ int main(int argc, char **argv) {
                  ri_move(&ri, RI_MOVE_FORWARD, RI_FASTEST);
                   ri_move(&ri, RI_TURN_LEFT,7);
 		  */
+		ri_update(&ri);
+		int room = ri_getRoomID(&ri);
+		printf("Room %d\n", room);
+		float avg = 0;
 	       int z;
-		for(z=0; z<80 && !ri_IR_Detected(&ri); z++){
+		for(z=0; z<20 && !ri_IR_Detected(&ri); z++){
 		 ri_update(&ri);
-		 ri_move(&ri, RI_TURN_LEFT, 10);
+		 printf("%f\n", ri_getTheta(&ri));
+
+		 avg += ri_getTheta(&ri);
 		}
+		avg = avg / 20;
+		printf("Average: %f\n", avg);		
+		printf("Diff: %f\n", M_PI_2 - avg);
+		printf("Offset: %f\n", (180/M_PI) * (ns_theta_offset[room] + avg));
+		
 		  
 
        // } while(1);
