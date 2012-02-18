@@ -103,7 +103,7 @@ void RobotPose::moveTo(double x, double y) {
 		goal_theta = -goal_theta;
 	}
    
-	printf(" %f %f goal_theta %f \t %f %f\n",x, y, goal_theta * 180/M_PI, pose_kalman.x, pose_kalman.y);
+	printf(" %f %f %f \n",x, y, goal_theta * 180/M_PI, pose_kalman.x, pose_kalman.y);
   
 	printf("kalman %f %f %f \t north star %f %f %f \t wheel encoder %f %f %f\n", pose_kalman.x, pose_kalman.y, pose_kalman.theta*180/M_PI,
 	pose_ns.x, pose_ns.y, pose_ns.theta*180/M_PI, pose_we.x, pose_we.y, pose_we.theta*180/M_PI);
@@ -116,11 +116,11 @@ void RobotPose::moveTo(double x, double y) {
 
 	double PID_xres = PID_x->UpdatePID(error_distance_x, pose_kalman.x);
 	double PID_yres = PID_y->UpdatePID(error_distance_y, pose_kalman.y);
-	printf("Err x: %f\tErr y: %f\n", error_distance_x, error_distance_y);
+	//printf("Err x: %f\tErr y: %f\n", error_distance_x, error_distance_y);
   
 	//Calculate speed based on PID
 	double total_PID = abs(sqrt(PID_xres * PID_xres + PID_yres * PID_yres));
-	printf("PID x: %f\tPID y: %f\tTotal PID: %f\n", PID_xres, PID_yres, total_PID);
+	//printf("PID x: %f\tPID y: %f\tTotal PID: %f\n", PID_xres, PID_yres, total_PID);
 	int robot_speed;
 	float velocity[3];
 	if(total_PID > 50.0){
