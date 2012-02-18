@@ -291,11 +291,13 @@ void RobotPose::updatePosition(bool turning=false){
 	float dy = ((left * sin(150.0 * M_PI/180.0)) + (right * sin(30.0 * M_PI/180.0)) + (rear * sin(90.0 * M_PI/180.0)))/3.0;
 	float dx = ((left * cos(150.0 * M_PI/180.0)) + (right * cos(30.0 * M_PI/180.0)))/2.0;
 //	dx = 0.0; // I don't think we are supposed to move in this direction.
-
+	
 	float dtheta = (rear*we_to_rad);
-
-	pose_we.theta += dtheta;
-
+	//For drifting
+	if(dx>0.0)
+		dtheta += acos(dx/sqrt((dx*dx)+(dy*dy)));
+	pose_we.theta -= dtheta;
+	printf("WE THETA: %f %f\n",pose_we.theta*180/M_PI, dx);
 	//Normalizing the theta between PI and -PI
 	if(pose_we.theta>M_PI){
 		pose_we.theta-=(2*M_PI);
