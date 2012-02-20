@@ -30,6 +30,8 @@ class RobotPose {
   void printRaw();
   void printTransformed();
   void updatePosition(bool turning);
+  void resetPose();
+  void changeWE(float we);
   
   private:
   bool updateWE(bool turning);

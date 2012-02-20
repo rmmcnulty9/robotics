@@ -13,13 +13,13 @@ typedef struct {
 
 
 // all for rosie
-float ns_x_to_cm[] = {0.0, 0.0, 1.0 / 35.0, 1.0 / 35.0, 1.0 / 35.0, 1.0 / 45.0};
-float ns_y_to_cm[] = {0.0, 0.0, 1.0 / 39.0, 1.0 / 41.0, 1.0 / 50.0, 1.0 / 45.0};
+float ns_x_to_cm[] = {0.0, 0.0, 1.0 / 35.0, 1.0 / 35.0, 1.0 / 34.0, 1.0 / 32.0};
+float ns_y_to_cm[] = {0.0, 0.0, 1.0 / 40.0, 1.0 / 41.0, 1.0 / 37.0, 1.0 / 37.0};
 float ns_theta_offset[] = {0.0, 0.0, 0.155946, M_PI_2, -0.101754, 1.488696};
 float ns_theta[] = {0.0, 0.0, 1.3554 - M_PI, -1.571900 - M_PI_2, 0.080450 - M_PI_2, -1.430050 - M_PI_2};
 
 const float we_to_rad = M_PI / -120.0;
-const float we_to_cm = 1.5; //0.5; 
+float we_to_cm = 1.5; //0.5; 
 const float robot_diameter_cm = 29.0;
 const char* coef_filename = "fir_coef/s_72";
 

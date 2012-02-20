@@ -161,7 +161,7 @@ void RobotPose::moveTo(float x, float y) {
 		moveTo(x, y);
 	}
 	else {
-		printf("ARRIVED!\n");
+		printf("ARRIVED! %f %f\n", x, y);
 	}
 }
 
@@ -408,6 +408,20 @@ bool RobotPose::updateNS(){
 	//Rotate theta
 	pose_ns.theta = robot->Theta() + ns_theta_offset[room_cur];
 	return true;
+}
+
+void RobotPose::resetPose() {
+	/*pose_ns.x = pose_kalman.x;
+	pose_ns.y = pose_kalman.y;
+	pose_ns.theta = pose_kalman.theta;*/
+  
+	pose_we.x = pose_kalman.x;
+	pose_we.y = pose_kalman.y;
+	pose_we.theta = pose_kalman.theta;
+}
+
+void RobotPose::changeWE(float we) {
+	we_to_cm = we;
 }
 
 // firFilterCreate()
