@@ -162,6 +162,8 @@ void RobotPose::moveTo(float x, float y) {
 	}
 	else {
 		printf("ARRIVED! %f %f\n", x, y);
+		//robot->Move(RI_HEAD_UP, RI_FASTEST);
+		//robot->Move(RI_HEAD_DOWN, RI_FASTEST);
 	}
 }
 
@@ -255,7 +257,7 @@ void RobotPose::updatePosition(bool turning=false){
 	updateWE(turning);
 
 	//If there is a weaker NS signal change the uncertainty - higher NS lower WE and lower PRE
-	if(robot->NavStrengthRaw()<30000){
+	if(robot->NavStrengthRaw() < 5000){
 		rovioKalmanFilterSetUncertainty(&kf,uncertainty_weak_ns);
 	}else{
 		rovioKalmanFilterSetUncertainty(&kf,uncertainty_default);
