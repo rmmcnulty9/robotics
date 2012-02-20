@@ -39,4 +39,8 @@ const float turn_3 = 2.827;
 const float turn_5 = 2.094;
 const float turn_7 = 1.257;
 const float turn_10 = 1.047;
+
+float uncertainty_default [] = {.05, .05, .05, .05, .05, .05, .05, .05, .05};
+float uncertainty_weak_ns [] = {.03, .03, .03, .1, .1, .1, .04, .04, .04};
+
 #endif

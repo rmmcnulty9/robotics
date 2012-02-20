@@ -254,6 +254,12 @@ void RobotPose::updatePosition(bool turning=false){
 	pose_we.theta = pose_ns.theta;
 	updateWE(turning);
 
+	//If there is a weaker NS signal change the uncertainty - higher NS lower WE and lower PRE
+	if(robot->NavStrengthRaw()<30000){
+		rovioKalmanFilterSetUncertainty(&kf,uncertainty_weak_ns);
+	}else{
+		rovioKalmanFilterSetUncertainty(&kf,uncertainty_default);
+	}
 
 	//Pass through Kalman filter
 	float NSdata[3], WEdata[3], track[9];
