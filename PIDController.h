@@ -2,10 +2,6 @@
 #ifndef __PID_CONTROLLER__
 #define __PID_CONTROLLER__
 
-//#include "shared_constants.h"
-
-
-
 class PIDController {
   public:
   PIDController(double iMaxStart, double iMinStart, double iGainStart, double pGainStart, double dGainStart);

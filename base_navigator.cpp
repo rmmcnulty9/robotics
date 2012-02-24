@@ -25,16 +25,19 @@ int main(int argv, char **argc)
 	
 	//Base 0 to Base 1
 	robotPose.moveTo(0.0,350.0); // y =  134.5 inches x=0
+
 	//Base 1 to Base 2 -185
 	robotPose.moveTo(-180.0,259.0); // x=-73 y=134.5-32.5 = 102
-	robotPose.resetPose();
-	robotPose.moveTo(-180.0,340.0); // fake base 1
+
+	robotPose.resetSensorPose();
+	robotPose.moveTo(-180.0,340.0); // checkpoint between base 2 & 3
 	//Base 2 to Base 3
 	robotPose.moveTo(-354.0,424.0); // x=-73-66.5 = -139.5  y=102+65 = 167
-	robotPose.resetPose();
-	robotPose.changeWE(1.9);
+
+	robotPose.resetSensorPose();
+	robotPose.changeWEScalingConstant(1.9);
 	
-	robotPose.moveTo(-443.0,260.0); // fake base 2
+	robotPose.moveTo(-443.0,260.0); // checkpoint between base 3 & 4
 	//Base 3 to Base 4
 	robotPose.moveTo(-443.0,76.0); // x=-139.5-35 = -174.5  y=167-137=30
 	//Base 4 to Base 0
@@ -42,23 +45,6 @@ int main(int argv, char **argc)
 	delete(robot);
 	return 0;
 
-	//robotPose.turnTo(1.57);
-//	robotPose.moveTo(100,0);
-
-//	robotPose.moveTo(-100, -1);
-//	robotPose.moveTo(0,-100);
-	
-//robotPose.moveTo(-100,100);	//45 deg
-//robotPose.moveTo(-100,-100);	//135 deg
-//robotPose.moveTo(100,100);	//-45 deg
-//robotPose.moveTo(100,-100);	//-135 deg
-	
-	/*for (int i = 0; i < 20; i++) {
-		robot->Move(RI_MOVE_FORWARD, 1);
-		robotPose.updatePosition(false);
-	}
-	return 0;*/
-	
 
 }
 

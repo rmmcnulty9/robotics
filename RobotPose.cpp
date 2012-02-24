@@ -21,7 +21,9 @@ RobotPose::RobotPose(RobotInterface *r){
 	//Create all six FIR filters
 	fir_x_ns = RobotPose::createFilter(coef_filename,0.0);
 	fir_y_ns = RobotPose::createFilter(coef_filename,0.0);
-	fir_theta_ns = RobotPose::createFilter(coef_filename,0.0);
+
+	//We used a different set of coefficents for the theta
+	fir_theta_ns = RobotPose::createFilter(ns_theta_coef_filename,0.0);
   
 	fir_left_we = RobotPose::createFilter(coef_filename,0.0);
 	fir_right_we = RobotPose::createFilter(coef_filename,0.0);
@@ -30,7 +32,7 @@ RobotPose::RobotPose(RobotInterface *r){
 	/*
 	* Resets the pose values & initializes start_pose
 	* */
-	resetCoord();
+	initPose();
 
 	/*
 	* Initialize Kalman filter
@@ -56,9 +58,10 @@ RobotPose::RobotPose(RobotInterface *r){
 }
 
 RobotPose::~RobotPose(){
+
 }
 
-void RobotPose::resetCoord() {
+void RobotPose::initPose() {
 	/*
 	 * Read in constant for current room for the start pose
 	 * Room 2 = 1.3554
@@ -77,11 +80,12 @@ void RobotPose::resetCoord() {
 	
 	room_start = robot->RoomID();
 	room_cur = room_start;
-	pose_start.theta = ns_theta[room_start];
+	pose_start.theta = start_pose_thetas[room_start];
 
 	float x = robot->X();
 	float y = robot->Y();
 
+	//Rotate the start pose
 	pose_start.x = x * cos(-pose_start.theta) - y * sin(-pose_start.theta);
 	pose_start.y = x * sin(-pose_start.theta) + y * cos(-pose_start.theta);
 
@@ -94,13 +98,13 @@ void RobotPose::resetCoord() {
 
 	pose_we.x = 0.0;
 	pose_we.y = 0.0;
+	//Assuming we are always facing along +y axis
 	pose_we.theta = M_PI_2;
 }
 
 void RobotPose::moveTo(float x, float y) {
 	updatePosition(false);
 	//Determine how much robot needs to turn to reach goal
-	//float theta = atan((y-pose_kalman.y)/(x-pose_kalman.x)); 
 	float goal_theta = acos((x-pose_kalman.x)/sqrt((x-pose_kalman.x)*(x-pose_kalman.x)+(y-pose_kalman.y)*(y-pose_kalman.y)));
 
 	if((y-pose_kalman.y)<=0.0) {
@@ -112,6 +116,7 @@ void RobotPose::moveTo(float x, float y) {
 	printf("K: %f %f %f \t NS: %f %f %f \t WE: %f %f %f \t Signal: %d\n", pose_kalman.x, pose_kalman.y, pose_kalman.theta*180/M_PI,
 	pose_ns.x, pose_ns.y, pose_ns.theta*180/M_PI, pose_we.x, pose_we.y, pose_we.theta*180/M_PI, robot->NavStrengthRaw());
     
+	//Correct direction to reach goal
 	turnTo(goal_theta);  
 	
 	//Determine errors in pose
@@ -150,7 +155,7 @@ void RobotPose::moveTo(float x, float y) {
 		velocity[2] = 0.0;
 		rovioKalmanFilterSetVelocity(&kf,velocity);
 	}
-	//Wall check
+	//Wall check  - For some bases this is ignored to avoid false alarms
 	if (robot->IR_Detected() && x != -180.0 && x != -354.0) {
 		printf("wall!\n");
 		exit(0);
@@ -162,8 +167,6 @@ void RobotPose::moveTo(float x, float y) {
 	}
 	else {
 		printf("ARRIVED! %f %f\n", x, y);
-		//robot->Move(RI_HEAD_UP, RI_FASTEST);
-		//robot->Move(RI_HEAD_DOWN, RI_FASTEST);
 	}
 }
 
@@ -193,6 +196,7 @@ void RobotPose::turnTo(float goal_theta) {
 	//Determine speed
 	printf("Theta PID: %f\n", PID_res);
 
+	//TODO Should we be setting the kalman velocity? or can we remove the velocity[] also?
 	int robot_speed; 
 	float velocity[3];
 	if(PID_res > 1.0){
@@ -231,6 +235,7 @@ void RobotPose::turnTo(float goal_theta) {
 
 }
 
+// TODO Maybe we can move all our print statements into these functions
 void RobotPose::printRaw(){
 	int d_left = robot->getWheelEncoder(RI_WHEEL_LEFT);
 	int d_right = robot->getWheelEncoder(RI_WHEEL_RIGHT);
@@ -253,6 +258,7 @@ void RobotPose::printTransformed(){
 void RobotPose::updatePosition(bool turning=false){
 	robot->update();
 	updateNS();
+	//TODO we should figure out how to remove this hack
 	pose_we.theta = pose_ns.theta;
 	updateWE(turning);
 
@@ -289,7 +295,7 @@ bool RobotPose::updateWE(bool turning){
 	int left = robot->getWheelEncoder(RI_WHEEL_LEFT);
 	int right = robot->getWheelEncoder(RI_WHEEL_RIGHT);
 	int rear = robot->getWheelEncoder(RI_WHEEL_REAR);
-	//Filter wheel encoder data
+	//Filter WE data ignoring the left and right values while turning
 	if(!turning){
 		left = firFilter(fir_left_we, left);
 		right = firFilter(fir_right_we, right);
@@ -298,6 +304,7 @@ bool RobotPose::updateWE(bool turning){
 	//Transform data
 	float dy = ((left * sin(150.0 * M_PI/180.0)) + (right * sin(30.0 * M_PI/180.0)) + (rear * sin(90.0 * M_PI/180.0)))/3.0;
 	float dx = ((left * cos(150.0 * M_PI/180.0)) + (right * cos(30.0 * M_PI/180.0)))/2.0;
+	//TODO A better explanation of this?
 	dx = 0.0; // I don't think we are supposed to move in this direction.
 
 	float dtheta = (rear*we_to_rad);
@@ -344,16 +351,11 @@ bool RobotPose::updateNS(){
 	if(new_room != room_cur){
 		printf("ROOM CHANGED %d\n", new_room);
 
-		pose_start.theta = ns_theta[new_room];
+		pose_start.theta = start_pose_thetas[new_room];
     
-		//Set the new pose_start to current reading
+		//Set the new pose_start to current kalman filtered value
 		pose_start.x = pose_kalman.x / ns_x_to_cm[room_cur];
 		pose_start.y = pose_kalman.y / ns_y_to_cm[room_cur];
-    
-		//Simple send the last value back in to FIR for this room change cycle
-		//x = firFilter(x_ns,(robot->X() - pose_start.x));
-		//y = firFilter(y_ns,(robot->Y() - pose_start.y));
-		//theta = firFilter(theta_ns,(robot->Theta() - pose_start.theta));
 		
 		x = robot->X();
 		y = robot->Y();
@@ -389,7 +391,9 @@ bool RobotPose::updateNS(){
 	theta = (theta - pose_start.theta);
     
 	delta_theta = theta-prev_theta;
-      
+    /*
+     * To handle case when theta jumps from -pi to pi (& vice versa)
+     */
 	if(abs(delta_theta)>(3*M_PI_2) && prev_theta>0 && theta<0) {
 		jump_ctr+=1;
 	}
@@ -403,22 +407,18 @@ bool RobotPose::updateNS(){
 	//Apply FIR filter
 	pose_ns.x = firFilter(fir_x_ns,x);
 	pose_ns.y = firFilter(fir_y_ns,y);
-	//pose_ns.theta = firFilter(theta_ns, theta+(jump_ctr*2*M_PI)) - (jump_ctr*2*M_PI);
+
+	//TODO We should probably be filtering the theta, now that we have the correct coef file for it
+
+	pose_ns.theta = firFilter(fir_theta_ns, theta+(jump_ctr*2*M_PI)) - (jump_ctr*2*M_PI);
   
-	/*float avg_theta = 0.0;
-	for (int i = 0; i < 3; i++) {
-		robot->update();
-		avg_theta += robot->Theta() + 0.34906585; //0.436332313 = 25 degrees
-		//printf("theta.... %f\n", (robot->Theta() + 0.34906585) * 180.0/M_PI);
-	}
-	pose_ns.theta = avg_theta / 3.0;
-	//printf("avg_theta %f\n", pose_ns.theta * 180.0/M_PI);*/
 	//Rotate theta
-	pose_ns.theta = robot->Theta() + ns_theta_offset[room_cur];
+	pose_ns.theta = robot->Theta() + ns_theta_offsets[room_cur];
 	return true;
 }
 
-void RobotPose::resetPose() {
+//TODO Explanation of this function
+void RobotPose::resetSensorPose() {
 	/*pose_ns.x = pose_kalman.x;
 	pose_ns.y = pose_kalman.y;
 	pose_ns.theta = pose_kalman.theta;*/
@@ -428,7 +428,7 @@ void RobotPose::resetPose() {
 	pose_we.theta = pose_kalman.theta;
 }
 
-void RobotPose::changeWE(float we) {
+void RobotPose::changeWEScalingConstant(float we) {
 	we_to_cm = we;
 }
 

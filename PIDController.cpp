@@ -1,7 +1,5 @@
 #include "PIDController.h"
 
-
-
 PIDController::PIDController(double iMaxStart, double iMinStart, double iGainStart, double pGainStart, double dGainStart){
 	iMax = iMaxStart;
 	iMin = iMinStart;

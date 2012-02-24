@@ -10,6 +10,7 @@ extern "C" {
 #include "Kalman/rovioKalmanFilter.h"
 #include "Kalman/kalmanFilterDef.h"
 }
+
 typedef struct {
   float coefficients[30]; //WARNING SHOULD NOT HAVE MORE THAN 30 TAPS/COEF!!!
   int next_sample;
@@ -24,14 +25,14 @@ class RobotPose {
   RobotPose(RobotInterface *r);
   ~RobotPose();
   
-  void resetCoord();
+  void initPose();
   void moveTo(float x, float y);
   void turnTo(float theta);
   void printRaw();
   void printTransformed();
   void updatePosition(bool turning);
-  void resetPose();
-  void changeWE(float we);
+  void resetSensorPose();
+  void changeWEScalingConstant(float we);
   
   private:
   bool updateWE(bool turning);
