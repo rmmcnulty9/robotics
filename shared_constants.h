@@ -30,8 +30,11 @@ const float robot_diameter_cm = 29.0;
 const char* coef_filename = "fir_coef/s_72";
 const char* ns_theta_coef_filename = "fir_coef/s_73";
 
+const float MOVE_TO_EPSILON = 10.0;
+float TURN_TO_EPSILON = 25.0*(M_PI/180);
+
 /*
- * PID Controller speed constants
+ * PID Controller constants
  */
 
 //Robot forward velocity in cm/s
@@ -46,6 +49,13 @@ const float turn_3 = 2.827;
 const float turn_5 = 2.094;
 const float turn_7 = 1.257;
 const float turn_10 = 1.047;
+
+
+const double iMax = 10.0;
+const double iMin = -10.0;
+const double integral = 0.05;
+const double proportional = 0.5;
+const double derivative = 1.0;
 
 /*
  * Use different uncertainties when the NS signal is weak. No significant difference

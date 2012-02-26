@@ -6,7 +6,10 @@ CPP_LIB_FLAGS=${LIB_FLAGS} -lrobot_if++
 LIB_LINK=-lhighgui -lcv -lcxcore -lm 
 LIB_KALMAN = ${LIB_LINK} -lgslcblas -L/usr/lib64/atlas/ -lclapack
 
-all: data_collector simulator PIDController RobotPose base_navigator 
+all: data_collector simulator PIDController RobotPose base_navigator camera_tester
+
+camera_tester: camera_tester.cpp
+	g++ ${CFLAGS} -c camera_tester.cpp
 
 data_collector: data_collector.c
 	gcc ${CFLAGS} -c data_collector.c
@@ -36,3 +39,4 @@ clean:
 	rm -rf RobotPose
 	rm -rf PIDController
 	rm -rf base_navigator
+	rm -rf camera_teser

@@ -52,9 +52,9 @@ RobotPose::RobotPose(RobotInterface *r){
 	initKalmanFilter(&kf, initialPose, Velocity, deltat);
 	
 	//Initialize PID controllers
-	PID_x = new PIDController(10.0,-10.0,0.05,0.5,1.0);
-	PID_y = new PIDController(10.0,-10.0,0.05,0.5,1.0);
-	PID_theta = new PIDController(10.0,-10.0,0.05,0.5,1.0);
+	PID_x = new PIDController(iMax,iMin,integral,proportional,derivative);
+	PID_y = new PIDController(iMax,iMin,integral,proportional,derivative);
+	PID_theta = new PIDController(iMax,iMin,integral,proportional,derivative);
 }
 
 RobotPose::~RobotPose(){
@@ -98,10 +98,9 @@ void RobotPose::moveTo(float x, float y) {
 		goal_theta = -goal_theta;
 	}
    
-	printf(" %f %f %f \n",x, y, goal_theta * 180/M_PI);
+	printf("GOAL: %f %f %f \n",x, y, goal_theta * 180/M_PI);
  	//printf("kalman %f %f %f\n", pose_kalman.x, pose_kalman.y, pose_kalman.theta); 
-	printf("K: %f %f %f \t NS: %f %f %f \t WE: %f %f %f \t Signal: %d\n", pose_kalman.x, pose_kalman.y, pose_kalman.theta*180/M_PI,
-	pose_ns.x, pose_ns.y, pose_ns.theta*180/M_PI, pose_we.x, pose_we.y, pose_we.theta*180/M_PI, robot->NavStrengthRaw());
+	printTransformed();
     
 	//Correct direction to reach goal
 	turnTo(goal_theta);  
@@ -142,13 +141,13 @@ void RobotPose::moveTo(float x, float y) {
 		velocity[2] = 0.0;
 		rovioKalmanFilterSetVelocity(&kf,velocity);
 	}
-	//Wall check  - For some bases this is ignored to avoid false alarms
-	if (robot->IR_Detected() && x != -180.0 && x != -354.0) {
-		printf("wall!\n");
+	//Wall check  - For some bases(1 to 2 & 2 to 3) this is ignored to avoid false alarms
+	if (robot->IR_Detected() && x != -180.0 && x != -354.0){
+		printf("WALL!\n");
 		exit(0);
 	}
 	//Move unless within range of base
-	else if (error_distance > 10.0) {
+	else if (error_distance > MOVE_TO_EPSILON) {
 		robot->Move(RI_MOVE_FORWARD, robot_speed);
 		moveTo(x, y);
 	}
@@ -161,22 +160,29 @@ void RobotPose::turnTo(float goal_theta) {
 
 
 	updatePosition(true);
-	//Determine error in theta
+	/*
+	 * Calculate both thetas for turning left and right to get to goal_theta
+	 */
 	float error_theta1 = goal_theta-pose_kalman.theta;
 	float error_theta2 = pose_kalman.theta-goal_theta;
 
+	/*
+	 * Correct for  negative thetas to make math easier
+	 */
 	if(error_theta1<0.0) error_theta1+=(2.0*M_PI);
 	if(error_theta2<0.0) error_theta2+=(2.0*M_PI);
 
+	/*
+	 * Take the smaller angle and turn that direct to get to goal_theta
+	 */
 	float error_theta = error_theta1<error_theta2?error_theta1:error_theta2;
 	//Don't turn if error theta not large enough
-	if(error_theta>=(-25.0*(M_PI/180)) && error_theta<= (25.0*(M_PI/180))){
+	if(error_theta>=(-TURN_TO_EPSILON) && error_theta<= (TURN_TO_EPSILON)){
 		 printf("Theta too small\n");
 		 return;
 	}
 
-	printf("K: %f %f %f \t NS: %f %f %f \t WE: %f %f %f\n", pose_kalman.x, pose_kalman.y, pose_kalman.theta*180/M_PI,
-	pose_ns.x, pose_ns.y, pose_ns.theta*180/M_PI, pose_we.x, pose_we.y, pose_we.theta*180/M_PI);
+	printTransformed();
   
 	//Call PID for Theta
 	float PID_res = abs(PID_theta->UpdatePID(error_theta, pose_kalman.theta));
@@ -206,7 +212,7 @@ void RobotPose::turnTo(float goal_theta) {
 //		velocity[2] = vel_10;
 //		rovioKalmanFilterSetVelocity(&kf,velocity);
 	}
-	//Turn depending on error 
+	//Turn depending on error angle
 	if(error_theta==error_theta1){
 		printf("Turning Left \n", error_theta1*(180/M_PI), error_theta2*(180/M_PI));
  		robot->Move(RI_TURN_LEFT, robot_speed);
@@ -216,12 +222,11 @@ void RobotPose::turnTo(float goal_theta) {
 		robot->Move(RI_TURN_RIGHT, robot_speed);
 	}
 
-	printf("Recursing: at K: %f NS: %f WE: %f not %f\n",pose_kalman.theta*(180/M_PI), pose_ns.theta*(180/M_PI), pose_we.theta*(180/M_PI), goal_theta*(180/M_PI));
+	printTransformed();
 	turnTo(goal_theta);
 
 }
 
-// TODO Maybe we can move all our print statements into these functions
 void RobotPose::printRaw(){
 	int d_left = robot->getWheelEncoder(RI_WHEEL_LEFT);
 	int d_right = robot->getWheelEncoder(RI_WHEEL_RIGHT);
@@ -237,8 +242,9 @@ void RobotPose::printRaw(){
 	printf("%d %d %f %d %d %d %d %d %d\n", x, y, theta, d_left, d_right, d_rear, t_left, t_right, t_rear);
 }
 void RobotPose::printTransformed(){
-	//Prints wheel encoder and then north star transformed data
-	printf("%f %f %f %f %f %f\n",pose_we.x, pose_we.y, pose_we.theta*(180/M_PI), pose_ns.x, pose_ns.y, pose_ns.theta*(180/M_PI));
+
+	printf("K: %f %f %f \t NS: %f %f %f \t WE: %f %f %f \t Signal: %d\n", pose_kalman.x, pose_kalman.y, pose_kalman.theta*180/M_PI,
+	pose_ns.x, pose_ns.y, pose_ns.theta*180/M_PI, pose_we.x, pose_we.y, pose_we.theta*180/M_PI, robot->NavStrengthRaw());
 }
 
 void RobotPose::updatePosition(bool turning=false){
@@ -386,12 +392,10 @@ bool RobotPose::updateNS(){
 	//Apply FIR filter
 	pose_ns.x = firFilter(fir_x_ns,x);
 	pose_ns.y = firFilter(fir_y_ns,y);
-
-	//TODO We should probably be filtering the theta, now that we have the correct coef file for it
-
 	pose_ns.theta = firFilter(fir_theta_ns, theta+(jump_ctr*2*M_PI)) - (jump_ctr*2*M_PI);
   
 	//Rotate theta
+	//TODO Probably shoudl not do this? - add offset to the FIR somehow
 	pose_ns.theta = robot->Theta() + ns_theta_offsets[room_cur];
 	return true;
 }
