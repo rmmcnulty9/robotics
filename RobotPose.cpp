@@ -250,8 +250,6 @@ void RobotPose::printTransformed(){
 void RobotPose::updatePosition(bool turning=false){
 	robot->update();
 	updateNS();
-	//TODO we should figure out how to remove this hack
-	pose_we.theta = pose_ns.theta;
 	updateWE(turning);
 
 	/*
@@ -284,7 +282,7 @@ void RobotPose::updatePosition(bool turning=false){
 
 }
 
-bool RobotPose::updateWE(bool turning){
+bool RobotPose::updateWE(bool turning) {
 	float dx_2, dy_2;
   
 	int left = robot->getWheelEncoder(RI_WHEEL_LEFT);
@@ -302,18 +300,20 @@ bool RobotPose::updateWE(bool turning){
 	//TODO A better explanation of this?
 	dx = 0.0; // I don't think we are supposed to move in this direction.
 
-	float dtheta = (rear*we_to_rad);
+	float dtheta = (rear * we_to_rad);
 
-//pose_we.theta += dtheta;
+	pose_we.theta += dtheta;
 
-//Normalizing the theta between PI and -PI
-/*if(pose_we.theta>M_PI){
- pose_we.theta-=(2*M_PI);
-}else if(pose_we.theta<-M_PI){
-  pose_we.theta+=(2*M_PI);
-}*/
+	//Normalizing the theta between PI and -PI
+	if (pose_we.theta>M_PI) {
+		pose_we.theta-=(2*M_PI);
+	}
+	else if (pose_we.theta<-M_PI) {
+		pose_we.theta+=(2*M_PI);
+	}
+	
 	//Rotate delta x and y data to align with global coordinates
-	if(!turning){
+	if (!turning) {
 		dx_2 = dx * cos(pose_we.theta - M_PI_2) - dy * sin(pose_we.theta - M_PI_2);
 		dy_2 = dx * sin(pose_we.theta - M_PI_2) + dy * cos(pose_we.theta - M_PI_2);
 		pose_we.x += dx_2*we_to_cm;
@@ -322,7 +322,7 @@ bool RobotPose::updateWE(bool turning){
 	return true;
 }
 
-bool RobotPose::updateNS(){
+bool RobotPose::updateNS() {
  
 	//Get initial data
 	static float prev_theta = robot->Theta() - pose_start.theta; 
@@ -333,7 +333,7 @@ bool RobotPose::updateNS(){
 	float x, y, theta, x_2, y_2; 
  
 	//Change room coordinates
-	if(new_room != room_cur){
+	if(new_room != room_cur) {
 		printf("ROOM CHANGED %d\n", new_room);
 
 		pose_start.theta = start_pose_thetas[new_room];
@@ -376,9 +376,9 @@ bool RobotPose::updateNS(){
 	theta = (theta - pose_start.theta);
     
 	delta_theta = theta-prev_theta;
-    /*
-     * To handle case when theta jumps from -pi to pi (& vice versa)
-     */
+	/*
+	 * To handle case when theta jumps from -pi to pi (& vice versa)
+	 */
 	if(abs(delta_theta)>(3*M_PI_2) && prev_theta>0 && theta<0) {
 		jump_ctr+=1;
 	}

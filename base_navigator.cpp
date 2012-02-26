@@ -33,9 +33,7 @@ int main(int argv, char **argc)
 	robotPose.moveTo(-180.0,340.0); // checkpoint between base 2 & 3
 	//Base 2 to Base 3
 	robotPose.moveTo(-354.0,424.0); // x=-73-66.5 = -139.5  y=102+65 = 167
-
 	robotPose.resetWEPose();
-	robotPose.changeWEScalingConstant(1.9);
 	
 	robotPose.moveTo(-443.0,260.0); // checkpoint between base 3 & 4
 	//Base 3 to Base 4
