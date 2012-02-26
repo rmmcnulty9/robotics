@@ -10,8 +10,7 @@ PIDController::PIDController(double iMaxStart, double iMinStart, double iGainSta
 	dState = 0;
 	iState = 0;
 }
-PIDController::~PIDController(){
-}
+PIDController::~PIDController(){}
 
 double PIDController::UpdatePID(double error, double position)
 {

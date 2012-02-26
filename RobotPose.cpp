@@ -62,19 +62,6 @@ RobotPose::~RobotPose(){
 }
 
 void RobotPose::initPose() {
-	/*
-	 * Read in constant for current room for the start pose
-	 * Room 2 = 1.3554
-	 * Room 3 = -0.0019661
-	 * Room 4 =  1.5953
-	 * Room 5 = 0.041115
-	 * */
-
-	// Will always start in Room 2
-	pose_start.theta = ROOM2;
-	//pose_start.theta = ROOM3
-	//pose_start.theta = ROOM4
-	//pose_start.theta = ROOM5
 
 	robot->update();
 	
@@ -196,29 +183,28 @@ void RobotPose::turnTo(float goal_theta) {
 	//Determine speed
 	printf("Theta PID: %f\n", PID_res);
 
-	//TODO Should we be setting the kalman velocity? or can we remove the velocity[] also?
 	int robot_speed; 
 	float velocity[3];
 	if(PID_res > 1.0){
 		robot_speed = 5;
-		velocity[0] = 0.0;
-		velocity[1] = 0.0;
-		velocity[2] = vel_5;
-		//rovioKalmanFilterSetVelocity(&kf,velocity);
+//		velocity[0] = 0.0;
+//		velocity[1] = 0.0;
+//		velocity[2] = vel_5;
+//		rovioKalmanFilterSetVelocity(&kf,velocity);
 	}
 	else if(PID_res < 1.0 && PID_res > 0.25){
 		robot_speed = 7;
-		velocity[0] = 0.0;
-		velocity[1] = 0.0;
-		velocity[2] = vel_7;
-		//rovioKalmanFilterSetVelocity(&kf,velocity);
+//		velocity[0] = 0.0;
+//		velocity[1] = 0.0;
+//		velocity[2] = vel_7;
+//		rovioKalmanFilterSetVelocity(&kf,velocity);
 	}
 	else {
 		robot_speed = 10;
-		velocity[0] = 0.0;
-		velocity[1] = 0.0;
-		velocity[2] = vel_10;
-		//rovioKalmanFilterSetVelocity(&kf,velocity);
+//		velocity[0] = 0.0;
+//		velocity[1] = 0.0;
+//		velocity[2] = vel_10;
+//		rovioKalmanFilterSetVelocity(&kf,velocity);
 	}
 	//Turn depending on error 
 	if(error_theta==error_theta1){
@@ -262,12 +248,15 @@ void RobotPose::updatePosition(bool turning=false){
 	pose_we.theta = pose_ns.theta;
 	updateWE(turning);
 
-	//If there is a weaker NS signal change the uncertainty - higher NS lower WE and lower PRE
-	if(robot->NavStrengthRaw() < 5000){
-		rovioKalmanFilterSetUncertainty(&kf,uncertainty_weak_ns);
-	}else{
-		rovioKalmanFilterSetUncertainty(&kf,uncertainty_default);
-	}
+	/*
+	 * If there is a weaker NS signal change the uncertainty - higher NS lower WE and lower prediction
+	 * No significant difference.
+	 */
+//	if(robot->NavStrengthRaw() < 5000){
+//		rovioKalmanFilterSetUncertainty(&kf,uncertainty_weak_ns);
+//	}else{
+//		rovioKalmanFilterSetUncertainty(&kf,uncertainty_default);
+//	}
 
 	//Pass through Kalman filter
 	float NSdata[3], WEdata[3], track[9];
@@ -329,16 +318,6 @@ bool RobotPose::updateWE(bool turning){
 
 bool RobotPose::updateNS(){
  
-/*
-* Check for a new room - if different change the way we do conversion:
-* 
-* Read in constant for current room for the start pose
-* Room 2 = 1.3554
-* Room 3 = -0.0019661
-* Room 4 =  1.5953
-* Room 5 = 0.041115
-* 
-* */
 	//Get initial data
 	static float prev_theta = robot->Theta() - pose_start.theta; 
 	static float total_theta = robot->Theta() - pose_start.theta;
@@ -417,11 +396,10 @@ bool RobotPose::updateNS(){
 	return true;
 }
 
-//TODO Explanation of this function
-void RobotPose::resetSensorPose() {
-	/*pose_ns.x = pose_kalman.x;
-	pose_ns.y = pose_kalman.y;
-	pose_ns.theta = pose_kalman.theta;*/
+/*
+ * Resets the pose for the WE. This is used when we change rooms to help with WE drift
+ */
+void RobotPose::resetWEPose() {
   
 	pose_we.x = pose_kalman.x;
 	pose_we.y = pose_kalman.y;
@@ -432,9 +410,13 @@ void RobotPose::changeWEScalingConstant(float we) {
 	we_to_cm = we;
 }
 
-// firFilterCreate()
-// creates, allocates, and initializes a new firFilter
- 
+
+/*
+ * Create a FIR filter, there is the option to supply an inital value
+ * to populate it with. Also, the filename where the coefs are located
+ * must be provided
+ */
+
 filter *RobotPose::createFilter(const char *coef_file, float initval)
 {
 	int i;
@@ -476,7 +458,7 @@ float RobotPose::firFilter(filter* f, float val)
 	f->samples[f->next_sample] = val;
 
 	// calculate a weighted sum
-	// i tracks the next coeficeint
+	// i tracks the next coefficient
 	// j tracks the samples w/wrap-around
 	for( i=0,j=f->next_sample; i<f->TAPS; i++) {
 		sum += f->coefficients[i]*f->samples[j++];

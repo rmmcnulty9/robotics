@@ -31,7 +31,7 @@ class RobotPose {
   void printRaw();
   void printTransformed();
   void updatePosition(bool turning);
-  void resetSensorPose();
+  void resetWEPose();
   void changeWEScalingConstant(float we);
   
   private:

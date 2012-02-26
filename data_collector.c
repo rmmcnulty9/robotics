@@ -53,6 +53,7 @@ int main(int argc, char **argv) {
                  ri_move(&ri, RI_MOVE_FORWARD, RI_FASTEST);
                   ri_move(&ri, RI_TURN_LEFT,7);
 		  */
+
 		ri_update(&ri);
 		int room = ri_getRoomID(&ri);
 		printf("Room %d\n", room);
@@ -67,7 +68,7 @@ int main(int argc, char **argv) {
 		avg = avg / 50.0;
 		printf("Average: %f\n", avg);		
 		printf("Diff: %f\n", M_PI_2 - avg);
-		printf("Offset: %f\n", (180/M_PI) * (ns_theta_offset[room] + avg));
+		printf("Offset: %f\n", (180/M_PI) * (ns_theta_offsets[room] + avg));
 		
 		  
 
