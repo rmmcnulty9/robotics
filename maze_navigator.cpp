@@ -8,6 +8,7 @@
 #include <string>
 #include "shared_constants.h"
 #include "RobotPose.cpp"
+#include "CameraPose.cpp"
 #include "PIDController.h"
 extern "C" {
 #include "Kalman/kalmanFilterDef.h"
@@ -21,11 +22,15 @@ int main(int argv, char **argc)
 		exit(-1);
 	}
     
+	// Setup the robot
 	RobotInterface *robot = new RobotInterface(argc[1],0);
-	
 	RobotPose robotPose(robot);
-	
-	
+	CameraPose cameraPose(robot);
+	while(true){
+		cameraPose.updateCamera();
+	}
+        
+
 	delete(robot);
 	return 0;
 

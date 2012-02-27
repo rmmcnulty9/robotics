@@ -12,7 +12,7 @@ camera_tester: camera_tester.cpp
 	g++ ${CFLAGS} -c camera_tester.cpp
 	g++ ${CFLAGS} -o camera_tester camera_tester.o PIDController.o rovioKalmanFilter.o ${CPP_LIB_FLAGS} ${LIB_KALMAN}
 
-maze_navigator: maze_navigator.cpp
+maze_navigator: maze_navigator.cpp RobotPose.o rovioKalmanFilter.o PIDController.o CameraPose.o
 	g++ ${CFLAGS} -c maze_navigator.cpp
 	g++ ${CFLAGS} -o maze_navigator maze_navigator.o PIDController.o rovioKalmanFilter.o ${CPP_LIB_FLAGS} ${LIB_KALMAN}
 
@@ -28,6 +28,9 @@ PIDController: PIDController.cpp
 
 RobotPose: RobotPose.cpp
 	g++ ${CFLAGS} -c RobotPose.cpp
+
+CameraPose: CameraPose.cpp
+	g++ ${CFLAGS} -c CameraPose.cpp
 
 simulator: simulator.c
 	gcc ${CFLAGS} -c simulator.c
