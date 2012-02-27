@@ -100,7 +100,7 @@ void RobotPose::moveTo(float x, float y) {
    
 	printf("GOAL: %f %f %f \n",x, y, goal_theta * 180/M_PI);
  	//printf("kalman %f %f %f\n", pose_kalman.x, pose_kalman.y, pose_kalman.theta); 
-	printTransformed();
+	printPoses();
     
 	//Correct direction to reach goal
 	turnTo(goal_theta);  
@@ -182,7 +182,7 @@ void RobotPose::turnTo(float goal_theta) {
 		 return;
 	}
 
-	printTransformed();
+	printPoses();
   
 	//Call PID for Theta
 	float PID_res = abs(PID_theta->UpdatePID(error_theta, pose_kalman.theta));
@@ -222,7 +222,7 @@ void RobotPose::turnTo(float goal_theta) {
 		robot->Move(RI_TURN_RIGHT, robot_speed);
 	}
 
-	printTransformed();
+	printPoses();
 	turnTo(goal_theta);
 
 }
@@ -241,7 +241,7 @@ void RobotPose::printRaw(){
                
 	printf("%d %d %f %d %d %d %d %d %d\n", x, y, theta, d_left, d_right, d_rear, t_left, t_right, t_rear);
 }
-void RobotPose::printTransformed(){
+void RobotPose::printPoses(){
 
 	printf("K: %f %f %f \t NS: %f %f %f \t WE: %f %f %f \t Signal: %d\n", pose_kalman.x, pose_kalman.y, pose_kalman.theta*180/M_PI,
 	pose_ns.x, pose_ns.y, pose_ns.theta*180/M_PI, pose_we.x, pose_we.y, pose_we.theta*180/M_PI, robot->NavStrengthRaw());
@@ -279,8 +279,6 @@ void RobotPose::updatePosition(bool turning=false){
 	pose_kalman.x = track[0];
 	pose_kalman.y = track[1];
 	pose_kalman.theta = track[2];
-	//printf("K: %f %f %f \t NS: %f %f %f \t WE: %f %f %f\n", pose_kalman.x, pose_kalman.y, pose_kalman.theta*180/M_PI,
-	//pose_ns.x, pose_ns.y, pose_ns.theta*180/M_PI, pose_we.x, pose_we.y, pose_we.theta*180/M_PI);
 
 }
 

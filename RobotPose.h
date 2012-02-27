@@ -29,7 +29,7 @@ class RobotPose {
   void moveTo(float x, float y);
   void turnTo(float theta);
   void printRaw();
-  void printTransformed();
+  void printPoses();
   void updatePosition(bool turning);
   void resetWEPose();
   void changeWEScalingConstant(float we);
