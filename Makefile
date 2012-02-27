@@ -10,6 +10,7 @@ all: data_collector simulator PIDController RobotPose base_navigator camera_test
 
 camera_tester: camera_tester.cpp
 	g++ ${CFLAGS} -c camera_tester.cpp
+	g++ ${CFLAGS} -o camera_tester camera_tester.o PIDController.o rovioKalmanFilter.o ${CPP_LIB_FLAGS} ${LIB_KALMAN}
 
 data_collector: data_collector.c
 	gcc ${CFLAGS} -c data_collector.c
