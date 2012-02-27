@@ -14,7 +14,7 @@ class CameraPose {
   
 	void updateCamera();
 	void displayImage();
-	void findSquares();
+	void findSquares(IplImage *f, CvScalar color);
 	private:
   
 	RobotInterface *robot;

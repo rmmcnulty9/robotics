@@ -35,7 +35,11 @@ void CameraPose::updateCamera(){
 	robot->getImage(image);
 	// Convert to hsv
 	cvCvtColor(image, hsv, CV_BGR2HSV);
-	findSquares();
+	cvInRangeS(hsv, RC_PINK_LOW, RC_PINK_HIGH, filtered);
+	findSquares(filtered, CV_RGB(255,0,0));	
+	cvInRangeS(hsv, RC_YELLOW_LOW, RC_YELLOW_HIGH, filtered);
+	findSquares(filtered, CV_RGB(0,255,0));
+	
 	displayImage();
 }
 
@@ -46,11 +50,10 @@ void CameraPose::displayImage(){
 	cvWaitKey(25);
 }
 
-void CameraPose::findSquares(){
+void CameraPose::findSquares(IplImage *f, CvScalar color){
 	squares_t *squares;
 	CvPoint pt1, pt2;
-	cvInRangeS(hsv, RC_YELLOW_LOW, RC_YELLOW_HIGH, filtered);
-	squares = robot->findSquares(filtered, RI_DEFAULT_SQUARE_SIZE);
+	squares = robot->findSquares(filtered, 10);
 	while(squares != NULL) {
         
 			int sq_amt = (int) (sqrt(squares->area) / 2);
@@ -60,27 +63,27 @@ void CameraPose::findSquares(){
                         pt1.y = squares->center.y - sq_amt;
                         pt2.x = squares->center.x - sq_amt;
                         pt2.y = squares->center.y + sq_amt;
-                        cvLine(image, pt1, pt2, CV_RGB(0, 255, 0), 3, CV_AA, 0);
+                        cvLine(image, pt1, pt2, color, 2, CV_AA, 0);
 
                         // Lower Left to Lower Right
                         pt1.x = squares->center.x - sq_amt;
                         pt1.y = squares->center.y + sq_amt;
                         pt2.x = squares->center.x + sq_amt;
                         pt2.y = squares->center.y + sq_amt;
-                        cvLine(image, pt1, pt2, CV_RGB(0, 255, 0), 3, CV_AA, 0);                        
+                        cvLine(image, pt1, pt2, color, 2, CV_AA, 0);                        
 			// Upper Left to Upper Right
                         pt1.x = squares->center.x - sq_amt;
                         pt1.y = squares->center.y - sq_amt;
                         pt2.x = squares->center.x + sq_amt;
                         pt2.y = squares->center.y - sq_amt;
-                        cvLine(image, pt1, pt2, CV_RGB(0, 255, 0), 3, CV_AA, 0);
+                        cvLine(image, pt1, pt2, color, 2, CV_AA, 0);
 
                         // Lower Right to Upper Right
                         pt1.x = squares->center.x + sq_amt;
                         pt1.y = squares->center.y + sq_amt;
                         pt2.x = squares->center.x + sq_amt;
                         pt2.y = squares->center.y - sq_amt;
-                        cvLine(image, pt1, pt2, CV_RGB(0, 255, 0), 3, CV_AA, 0);
+                        cvLine(image, pt1, pt2, color, 2, CV_AA, 0);
 		squares = squares->next;
 	}
 }
