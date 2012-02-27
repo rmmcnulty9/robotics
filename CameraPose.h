@@ -14,11 +14,14 @@ class CameraPose {
   
 	void updateCamera();
 	void displayImage();
-  
+	void findSquares();
+	void markSquares();
 	private:
   
 	RobotInterface *robot;
 	IplImage *currentImage;
+	IplImage *currentHSV;
+  
 };
 
 
