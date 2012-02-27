@@ -2,6 +2,8 @@
 
 #include <stdio.h>
 #include <robot_if++.h>
+#include "robot_if++.h"
+#include "robot_color.h"
 #include <iostream>
 #include <string>
 #include "shared_constants.h"
