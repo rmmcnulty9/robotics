@@ -10,14 +10,15 @@
 #include "robot_if++.h"
 #include "robot_color.h"
 
-
 CameraPose::CameraPose(RobotInterface *r){
 	robot = r;
-	currentImage = cvCreateImage(cvSize(320, 240), IPL_DEPTH_8U, 3);
-	currentHSV = cvCreateImage(cvSize(320, 240), IPL_DEPTH_8U, 3);
+	image = cvCreateImage(cvSize(320, 240), IPL_DEPTH_8U, 3);
+	hsv = cvCreateImage(cvSize(320, 240), IPL_DEPTH_8U, 3);
+	filtered = cvCreateImage(cvSize(320, 240), IPL_DEPTH_8U, 1);
 
 	cvNamedWindow("Unfiltered", CV_WINDOW_AUTOSIZE);
 	cvNamedWindow("HSV", CV_WINDOW_AUTOSIZE);
+	cvNamedWindow("Filtered", CV_WINDOW_AUTOSIZE);
 
 	// Setup the camera
         if(robot->CameraCfg(RI_CAMERA_DEFAULT_BRIGHTNESS, RI_CAMERA_DEFAULT_CONTRAST, 5, RI_CAMERA_RES_320, RI_CAMERA_QUALITY_HIGH)) {
@@ -31,24 +32,57 @@ void CameraPose::updateCamera(){
 	// Update the robot's sensor information
 	robot->update();
 	// Get the current camera image
-	robot->getImage(currentImage);
+	robot->getImage(image);
 	// Convert to hsv
-	cvCvtColor(currentImage, currentHSV, CV_BGR2HSV);
+	cvCvtColor(image, hsv, CV_BGR2HSV);
+	findSquares();
 	displayImage();
 }
 
 void CameraPose::displayImage(){
-	cvShowImage("Unfiltered", currentImage);
-	cvShowImage("HSV", currentHSV);
-	cvWaitKey(10);
+	cvShowImage("Unfiltered", image);
+	cvShowImage("HSV", hsv);
+	cvShowImage("Filtered", filtered);
+	cvWaitKey(25);
 }
 
 void CameraPose::findSquares(){
-  
-}
+	squares_t *squares;
+	CvPoint pt1, pt2;
+	cvInRangeS(hsv, RC_YELLOW_LOW, RC_YELLOW_HIGH, filtered);
+	squares = robot->findSquares(filtered, RI_DEFAULT_SQUARE_SIZE);
+	while(squares != NULL) {
+        
+			int sq_amt = (int) (sqrt(squares->area) / 2);
 
-void CameraPose::markSquares(){
-  
+                        // Upper Left to Lower Left
+                        pt1.x = squares->center.x - sq_amt;
+                        pt1.y = squares->center.y - sq_amt;
+                        pt2.x = squares->center.x - sq_amt;
+                        pt2.y = squares->center.y + sq_amt;
+                        cvLine(image, pt1, pt2, CV_RGB(0, 255, 0), 3, CV_AA, 0);
+
+                        // Lower Left to Lower Right
+                        pt1.x = squares->center.x - sq_amt;
+                        pt1.y = squares->center.y + sq_amt;
+                        pt2.x = squares->center.x + sq_amt;
+                        pt2.y = squares->center.y + sq_amt;
+                        cvLine(image, pt1, pt2, CV_RGB(0, 255, 0), 3, CV_AA, 0);                        
+			// Upper Left to Upper Right
+                        pt1.x = squares->center.x - sq_amt;
+                        pt1.y = squares->center.y - sq_amt;
+                        pt2.x = squares->center.x + sq_amt;
+                        pt2.y = squares->center.y - sq_amt;
+                        cvLine(image, pt1, pt2, CV_RGB(0, 255, 0), 3, CV_AA, 0);
+
+                        // Lower Right to Upper Right
+                        pt1.x = squares->center.x + sq_amt;
+                        pt1.y = squares->center.y + sq_amt;
+                        pt2.x = squares->center.x + sq_amt;
+                        pt2.y = squares->center.y - sq_amt;
+                        cvLine(image, pt1, pt2, CV_RGB(0, 255, 0), 3, CV_AA, 0);
+		squares = squares->next;
+	}
 }
 
 

@@ -25,6 +25,7 @@ int main(int argv, char **argc)
 	// Setup the robot
 	RobotInterface *robot = new RobotInterface(argc[1],0);
 	RobotPose robotPose(robot);
+	robot->Move(RI_HEAD_MIDDLE, RI_FASTEST);
 	CameraPose cameraPose(robot);
 	while(true){
 		cameraPose.updateCamera();
