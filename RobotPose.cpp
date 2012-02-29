@@ -295,7 +295,7 @@ bool RobotPose::updateWE(bool turning) {
 	//Transform data
 	float dy = ((left * sin(150.0 * M_PI/180.0)) + (right * sin(30.0 * M_PI/180.0)) + (rear * sin(90.0 * M_PI/180.0)))/3.0;
 	float dx = ((left * cos(150.0 * M_PI/180.0)) + (right * cos(30.0 * M_PI/180.0)))/2.0;
-	//TODO A better explanation of this?
+
 	dx = 0.0; // I don't think we are supposed to move in this direction.
 
 	float dtheta = (rear * we_to_rad);
@@ -393,7 +393,6 @@ bool RobotPose::updateNS() {
 	pose_ns.theta = firFilter(fir_theta_ns, theta+(jump_ctr*2*M_PI)) - (jump_ctr*2*M_PI);
   
 	//Rotate theta
-	//TODO Probably shoudl not do this? - add offset to the FIR somehow
 	pose_ns.theta = robot->Theta() + ns_theta_offsets[room_cur];
 	return true;
 }

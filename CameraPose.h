@@ -5,7 +5,9 @@
 #include "shared_constants.h"
 #include "robot_if++.h"
 #include "robot_color.h"
+#include <list>
 
+using namespace std;
 /*
  * Holds pair of matching squares
  */
@@ -23,7 +25,7 @@ class CameraPose {
   
 	void updateCamera();
 	void displayImages();
-	squarePair* matchSquares(squares_t *squares);
+	list<squarePair> matchSquares(squares_t *squares);
 	void drawSquares(squares_t *squares, CvScalar displayColor);
 	private:
   

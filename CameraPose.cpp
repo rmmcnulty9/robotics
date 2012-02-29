@@ -15,6 +15,9 @@
 #include "shared_constants.h"
 #include "robot_if++.h"
 #include "robot_color.h"
+#include <list>
+
+using namespace std;
 
 /*
  * Initializes the CameraPose to handle camera based navigation
@@ -117,14 +120,23 @@ void CameraPose::drawSquares(squares_t *squares, CvScalar displayColor){
 		squares = squares->next;
 	}
 }
+/*
+ * Comparator for  sorting the squarePair list
+ */
+bool byArea(squarePair first, squarePair second){
+	int firstArea = (first.left->area + first.right->area)/2;
+	int secondArea = (second.left->area + second.right->area)/2;
+	return firstArea>secondArea;
+}
 
 /*
  * Find squares of same height and draw lines between them
  */
-squarePair* CameraPose::matchSquares(squares_t *squares){
+list<squarePair> CameraPose::matchSquares(squares_t *squares){
 	squares_t *tempSquares;
-	squarePair* pairs = (squarePair *)malloc(sizeof(squarePair)); 
-	pairs->left = NULL; pairs->right = NULL;
+	list <squarePair> pair_list;
+	squarePair temp_pair;
+	temp_pair.left = NULL; temp_pair.right = NULL;
 	CvPoint pt1, pt2;
 	while(squares != NULL){
 		tempSquares = squares->next;
@@ -138,14 +150,14 @@ squarePair* CameraPose::matchSquares(squares_t *squares){
 				
 				//Record squares
 				int newArea = (squares->area + tempSquares->area)/2;
-				if(pairs->left == NULL || (pairs->left->area + pairs->right->area)/2 < newArea){
+				if(temp_pair.left == NULL || (temp_pair.left->area + temp_pair.right->area)/2 < newArea){
 					if(squares->center.x < tempSquares->center.x){
-						pairs->left = squares;
-						pairs->right = tempSquares;
+						temp_pair.left = squares;
+						temp_pair.right = tempSquares;
 					}
 					else{
-						pairs->left = tempSquares;
-						pairs->right = squares;
+						temp_pair.left = tempSquares;
+						temp_pair.right = squares;
 					}
 				
 					break;
@@ -154,10 +166,14 @@ squarePair* CameraPose::matchSquares(squares_t *squares){
 		  
 			tempSquares = tempSquares->next;
 		}
+		pair_list.push_back(temp_pair);
 		squares = squares->next;
 		
 	}
-	return pairs;
+	pair_list.sort(byArea);
+
+	return pair_list;
 	
 }
+
 
