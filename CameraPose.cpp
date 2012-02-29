@@ -18,6 +18,8 @@
 
 using namespace std;
 
+const float STRAFE_EPSILON = 5.0;
+
 /*
  * Initializes the CameraPose to handle camera based navigation
  * Configures camera and initializes images and display windows
@@ -41,6 +43,29 @@ CameraPose::CameraPose(RobotInterface *r){
         }
 }
 CameraPose::~CameraPose(){}
+
+/*
+ * Function that will strafe a delta Y value positive = right, negative = left
+ * delta_y's range isn -320 to +320
+ */
+void CameraPose::strafeTo(float delta_y){
+	int robot_speed = 5;
+
+	//PID Controller code here
+
+
+	//move the robot left or right
+	if((delta_y+STRAFE_EPSILON)<0){
+		robot->Move(RI_MOVE_LEFT, robot_speed);
+	}else if((delta_y-STRAFE_EPSILON)>0){
+		robot->Move(RI_MOVE_RIGHT, robot_speed);
+	}else{
+		//Base case
+		return;
+	}
+	//Call to updateCamera() & getError()
+	strafeTo(delta_y);
+}
 
 /*
  * Updates robot and gets current image
