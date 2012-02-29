@@ -30,6 +30,8 @@ class CameraPose {
 	void strafeTo(float delta_y);
 	void printCenters(list <squarePair>);
 	int getError(list<squarePair> pairs);
+
+
 	private:
   
 	RobotInterface *robot;
