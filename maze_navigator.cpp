@@ -2,13 +2,12 @@
 
 #include <stdio.h>
 #include <robot_if++.h>
-#include "robot_if++.h"
 #include "robot_color.h"
 #include <iostream>
 #include <string>
+#include "CameraPose.cpp"
 #include "shared_constants.h"
 #include "RobotPose.cpp"
-#include "CameraPose.cpp"
 #include "PIDController.h"
 extern "C" {
 #include "Kalman/kalmanFilterDef.h"

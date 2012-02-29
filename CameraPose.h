@@ -27,7 +27,8 @@ class CameraPose {
 	void displayImages();
 	list<squarePair> matchSquares(squares_t *squares);
 	void drawSquares(squares_t *squares, CvScalar displayColor);
-	void strafeTo(float delta_y);
+	void strafeTo(int delta_y);
+	void moveTo(int delta_y);
 	void printCenters(list <squarePair>);
 	int getError(list<squarePair> pairs);
 
@@ -39,6 +40,7 @@ class CameraPose {
 	IplImage *hsvImage;
 	IplImage *filteredImage;
 	static const int MIN_SQUARE = 200;
+	static const float STRAFE_EPSILON = 5.0;
   
 };
 
