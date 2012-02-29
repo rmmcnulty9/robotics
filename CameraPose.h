@@ -13,14 +13,14 @@ class CameraPose {
 	~CameraPose();
   
 	void updateCamera();
-	void displayImage();
-	void findSquares(IplImage *f, CvScalar color);
+	void displayImages();
+	void findSquares(IplImage *f, CvScalar displayColor);
 	private:
   
 	RobotInterface *robot;
-	IplImage *image;
-	IplImage *hsv;
-	IplImage *filtered;
+	IplImage *cameraImage;
+	IplImage *hsvImage;
+	IplImage *filteredImage;
 
   
 };
