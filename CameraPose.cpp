@@ -50,12 +50,19 @@ void CameraPose::updateCamera(){
 	robot->getImage(cameraImage);
 	// Convert to hsv
 	cvCvtColor(cameraImage, hsvImage, CV_BGR2HSV);
-
-	cvInRangeS(hsvImage, RC_YELLOW_LOW, RC_YELLOW_HIGH, filteredImage);
-	findSquares(filteredImage, CV_RGB(0,255,0));
 	
+	//Find and match yellow squares
+	squares_t * currentSquares;
+	cvInRangeS(hsvImage, RC_YELLOW_LOW, RC_YELLOW_HIGH, filteredImage);
+	currentSquares = robot->findSquares(filteredImage, MIN_SQUARE);
+	drawSquares(currentSquares, CV_RGB(0,255,0));
+	matchSquares(currentSquares);
+	
+	//Find and match pink squares
 	cvInRangeS(hsvImage, RC_PINK_LOW, RC_PINK_HIGH, filteredImage);
-	findSquares(filteredImage, CV_RGB(255,0,0));	
+	currentSquares = robot->findSquares(filteredImage, MIN_SQUARE);
+	drawSquares(currentSquares, CV_RGB(255,0,0));
+	//matchSquares(currentSquares);
 	
 	displayImages();
 }
@@ -67,14 +74,14 @@ void CameraPose::displayImages(){
 	cvShowImage("Filtered", filteredImage);
 	cvWaitKey(500);
 }
+
 /*
- * Finds squares in a prefiltered image *f 
- *  and draws boxes around them of color displayColor
+ * Draw boxes around squares found in robot->findSquares
+ *  draw in color displayColor
  */
-void CameraPose::findSquares(IplImage *f, CvScalar displayColor){
-	squares_t *squares;
+void CameraPose::drawSquares(squares_t *squares, CvScalar displayColor){
 	CvPoint pt1, pt2;
-	squares = robot->findSquares(f, 250);
+	
 	while(squares != NULL) {
         
 		int sq_amt = (int) (sqrt(squares->area) / 2);
@@ -109,4 +116,25 @@ void CameraPose::findSquares(IplImage *f, CvScalar displayColor){
 	}
 }
 
+/*
+ * Find squares of same height and draw lines between them
+ */
+void CameraPose::matchSquares(squares_t *squares){
+	squares_t *tempSquares;
+	CvPoint pt1, pt2;
+	while(squares->next != NULL){
+		tempSquares = squares->next;
+		while(tempSquares != NULL){
+			if(abs(squares->center.y - tempSquares->center.y) < 10){
+				pt1 = cvPoint(squares->center.x, squares->center.y);
+				pt2 = cvPoint(tempSquares->center.x, tempSquares->center.y);
+				cvLine(cameraImage, pt1, pt2, CV_RGB(0,0,255), 2, CV_AA, 0);
+			}
+		  
+			tempSquares = tempSquares->next;
+		}
+		squares = squares->next;
+	}
+	
+}
 

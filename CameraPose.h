@@ -14,14 +14,15 @@ class CameraPose {
   
 	void updateCamera();
 	void displayImages();
-	void findSquares(IplImage *f, CvScalar displayColor);
+	void matchSquares(squares_t *squares);
+	void drawSquares(squares_t *squares, CvScalar displayColor);
 	private:
   
 	RobotInterface *robot;
 	IplImage *cameraImage;
 	IplImage *hsvImage;
 	IplImage *filteredImage;
-
+	static const int MIN_SQUARE = 200;
   
 };
 
