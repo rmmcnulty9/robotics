@@ -28,8 +28,8 @@ class CameraPose {
 	list<squarePair> matchSquares(squares_t *squares);
 	void drawSquares(squares_t *squares, CvScalar displayColor);
 	void strafeTo(float delta_y);
-	void printCenters(list <squarePair>);
-	int getError(list<squarePair> pairs);
+	void printCenters(list<squarePair> pairs);
+	int getCenterError(list<squarePair> pairs);
 	private:
   
 	RobotInterface *robot;
