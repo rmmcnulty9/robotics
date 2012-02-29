@@ -120,14 +120,6 @@ void CameraPose::drawSquares(squares_t *squares, CvScalar displayColor){
 		squares = squares->next;
 	}
 }
-/*
- * Comparator for  sorting the squarePair list
- */
-bool byArea(squarePair first, squarePair second){
-	int firstArea = (first.left->area + first.right->area)/2;
-	int secondArea = (second.left->area + second.right->area)/2;
-	return firstArea>secondArea;
-}
 
 /*
  * Find squares of same height and draw lines between them
@@ -150,27 +142,24 @@ list<squarePair> CameraPose::matchSquares(squares_t *squares){
 				
 				//Record squares
 				int newArea = (squares->area + tempSquares->area)/2;
-				if(temp_pair.left == NULL || (temp_pair.left->area + temp_pair.right->area)/2 < newArea){
-					if(squares->center.x < tempSquares->center.x){
-						temp_pair.left = squares;
-						temp_pair.right = tempSquares;
-					}
-					else{
-						temp_pair.left = tempSquares;
-						temp_pair.right = squares;
-					}
-				
-					break;
+				if(squares->center.x < tempSquares->center.x){
+					temp_pair.left = squares;
+					temp_pair.right = tempSquares;
 				}
+				else{
+					temp_pair.left = tempSquares;
+					temp_pair.right = squares;
+				}
+				pair_list.push_back(temp_pair);
+				break;
+				
 			}
 		  
 			tempSquares = tempSquares->next;
 		}
-		pair_list.push_back(temp_pair);
 		squares = squares->next;
 		
 	}
-	pair_list.sort(byArea);
 
 	return pair_list;
 	
