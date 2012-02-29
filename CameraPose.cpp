@@ -56,19 +56,19 @@ void CameraPose::updateCamera(){
 	
 	//Find and match yellow squares
 	squares_t * currentSquares;
-	
+	list<squarePair> pairs;
 	cvInRangeS(hsvImage, RC_YELLOW_LOW, RC_YELLOW_HIGH, filteredImage);
 	currentSquares = robot->findSquares(filteredImage, MIN_SQUARE);
 	drawSquares(currentSquares, CV_RGB(0,255,0));
-	matchSquares(currentSquares);
-	
+	pairs = matchSquares(currentSquares);
+	printCenters(pairs);
 	
 	//Find and match pink squares
 	cvInRangeS(hsvImage, RC_PINK_LOW, RC_PINK_HIGH, filteredImage);
 	currentSquares = robot->findSquares(filteredImage, MIN_SQUARE);
 	drawSquares(currentSquares, CV_RGB(255,0,0));
-	matchSquares(currentSquares);
-	
+	pairs = matchSquares(currentSquares);
+	printCenters(pairs);
 	displayImages();
 }
 /*
@@ -154,15 +154,26 @@ list<squarePair> CameraPose::matchSquares(squares_t *squares){
 				break;
 				
 			}
-		  
 			tempSquares = tempSquares->next;
 		}
 		squares = squares->next;
-		
 	}
-
 	return pair_list;
-	
+}
+void CameraPose::printCenters(list<squarePair> pairs){
+	list<squarePair>::iterator it;
+	cvLine(cameraImage, cvPoint(320,0), cvPoint(320,480), CV_RGB(128,128,128), 2, CV_AA, 0);
+	int center = 0; 
+	int height = 0;
+	for(it=pairs.begin(); it!=pairs.end(); it++){
+		center = (it->left->center.x + it->right->center.x)/2;
+		height = (it->left->center.y + it->right->center.y)/2;
+		cvLine(cameraImage, cvPoint(center,height-5), cvPoint(center,height+5), CV_RGB(255,0,0), 2, CV_AA, 0);
+
+	}
+}
+int getError(list<squarePair> pairs){
+  
 }
 
 
