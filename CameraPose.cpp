@@ -63,7 +63,7 @@ void CameraPose::strafeTo(int delta_x){
 		return;
 	}
 	//Call to updateCamera() & getError()
-	strafeTo(delta_x);
+	//strafeTo(getCenterError);
 }
 
 /*
@@ -109,7 +109,7 @@ void CameraPose::updateCamera(){
 	drawSquares(currentSquares, CV_RGB(0,255,0));
 	pairs = matchSquares(currentSquares);
 	printCenters(pairs);
-	printf("Error: %d\n", getCenterError(pairs));
+	strafeTo(getCenterError(pairs));
 	
 	//Find and match pink squares
 	cvInRangeS(hsvImage, RC_PINK_LOW, RC_PINK_HIGH, filteredImage);
