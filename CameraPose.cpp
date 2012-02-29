@@ -53,16 +53,18 @@ void CameraPose::updateCamera(){
 	
 	//Find and match yellow squares
 	squares_t * currentSquares;
+	
 	cvInRangeS(hsvImage, RC_YELLOW_LOW, RC_YELLOW_HIGH, filteredImage);
 	currentSquares = robot->findSquares(filteredImage, MIN_SQUARE);
 	drawSquares(currentSquares, CV_RGB(0,255,0));
 	matchSquares(currentSquares);
 	
+	
 	//Find and match pink squares
 	cvInRangeS(hsvImage, RC_PINK_LOW, RC_PINK_HIGH, filteredImage);
 	currentSquares = robot->findSquares(filteredImage, MIN_SQUARE);
 	drawSquares(currentSquares, CV_RGB(255,0,0));
-	//matchSquares(currentSquares);
+	matchSquares(currentSquares);
 	
 	displayImages();
 }
@@ -119,22 +121,39 @@ void CameraPose::drawSquares(squares_t *squares, CvScalar displayColor){
 /*
  * Find squares of same height and draw lines between them
  */
-void CameraPose::matchSquares(squares_t *squares){
+squarePair* CameraPose::matchSquares(squares_t *squares){
 	squares_t *tempSquares;
+	squarePair* pairs = (squarePair*)malloc(sizeof(squarePair)); 
+	int x = 0;
 	CvPoint pt1, pt2;
-	while(squares->next != NULL){
+	while(squares != NULL){
 		tempSquares = squares->next;
 		while(tempSquares != NULL){
-			if(abs(squares->center.y - tempSquares->center.y) < 10){
+			
+			if(abs(squares->center.y - tempSquares->center.y) < 20 && abs(squares->center.x - tempSquares->center.x) > 20){
+				//Draw line
 				pt1 = cvPoint(squares->center.x, squares->center.y);
 				pt2 = cvPoint(tempSquares->center.x, tempSquares->center.y);
 				cvLine(cameraImage, pt1, pt2, CV_RGB(0,0,255), 2, CV_AA, 0);
+				
+				//Record squares
+				if(squares->center.x < tempSquares->center.x){
+					pairs->left = *squares;
+					pairs->right = *tempSquares;
+				}
+				else{
+					pairs->left = *tempSquares;
+					pairs->right = *squares;
+				}
+				
+				break;
 			}
 		  
 			tempSquares = tempSquares->next;
 		}
 		squares = squares->next;
 	}
+	return pairs;
 	
 }
 

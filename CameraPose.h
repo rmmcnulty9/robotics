@@ -6,6 +6,15 @@
 #include "robot_if++.h"
 #include "robot_color.h"
 
+/*
+ * Holds pair of matching squares
+ */
+typedef struct {
+	squares_t left;
+	squares_t right;
+} squarePair;
+
+
 class CameraPose {
   
 	public:
@@ -14,7 +23,7 @@ class CameraPose {
   
 	void updateCamera();
 	void displayImages();
-	void matchSquares(squares_t *squares);
+	squarePair* matchSquares(squares_t *squares);
 	void drawSquares(squares_t *squares, CvScalar displayColor);
 	private:
   
