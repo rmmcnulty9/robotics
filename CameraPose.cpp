@@ -1,3 +1,9 @@
+/*
+ * CameraPose Class
+ *  Used to collect, filter, and interpret camera data
+ *   Written by Greg Seaman, Adam Park, and Ryan McNulty
+ */
+
 #include <robot_if++.h>
 #include <iostream>
 #include <iomanip>
@@ -10,14 +16,20 @@
 #include "robot_if++.h"
 #include "robot_color.h"
 
+/*
+ * Initializes the CameraPose to handle camera based navigation
+ * Configures camera and intilizes images and display windows
+ */
+
 CameraPose::CameraPose(RobotInterface *r){
 	robot = r;
-	image = cvCreateImage(cvSize(640, 480), IPL_DEPTH_8U, 3);
-	hsv = cvCreateImage(cvSize(640, 480), IPL_DEPTH_8U, 3);
-	filtered = cvCreateImage(cvSize(640, 480), IPL_DEPTH_8U, 1);
+	//Initializes images for storing most recent camera data
+	cameraImage = cvCreateImage(cvSize(640, 480), IPL_DEPTH_8U, 3);
+	hsvImage = cvCreateImage(cvSize(640, 480), IPL_DEPTH_8U, 3);
+	filteredImage = cvCreateImage(cvSize(640, 480), IPL_DEPTH_8U, 1);
 
+	//Setup display windows
 	cvNamedWindow("Unfiltered", CV_WINDOW_AUTOSIZE);
-	cvNamedWindow("HSV", CV_WINDOW_AUTOSIZE);
 	cvNamedWindow("Filtered", CV_WINDOW_AUTOSIZE);
 
 	// Setup the camera
@@ -28,65 +40,120 @@ CameraPose::CameraPose(RobotInterface *r){
 }
 CameraPose::~CameraPose(){}
 
+/*
+ * Updates robot and gets current image
+ */
 void CameraPose::updateCamera(){
 	// Update the robot's sensor information
 	robot->update();
 	// Get the current camera image
-	robot->getImage(image);
+	robot->getImage(cameraImage);
 	// Convert to hsv
-	cvCvtColor(image, hsv, CV_BGR2HSV);
-
-	cvInRangeS(hsv, RC_YELLOW_LOW, RC_YELLOW_HIGH, filtered);
-	findSquares(filtered, CV_RGB(0,255,0));
+	cvCvtColor(cameraImage, hsvImage, CV_BGR2HSV);
 	
-	cvInRangeS(hsv, RC_PINK_LOW, RC_PINK_HIGH, filtered);
-	findSquares(filtered, CV_RGB(255,0,0));	
+	//Find and match yellow squares
+	squares_t * currentSquares;
 	
-	displayImage();
+	cvInRangeS(hsvImage, RC_YELLOW_LOW, RC_YELLOW_HIGH, filteredImage);
+	currentSquares = robot->findSquares(filteredImage, MIN_SQUARE);
+	drawSquares(currentSquares, CV_RGB(0,255,0));
+	matchSquares(currentSquares);
+	
+	
+	//Find and match pink squares
+	cvInRangeS(hsvImage, RC_PINK_LOW, RC_PINK_HIGH, filteredImage);
+	currentSquares = robot->findSquares(filteredImage, MIN_SQUARE);
+	drawSquares(currentSquares, CV_RGB(255,0,0));
+	matchSquares(currentSquares);
+	
+	displayImages();
+}
+/*
+ * Displays current images
+ */
+void CameraPose::displayImages(){
+	cvShowImage("Unfiltered", cameraImage);
+	cvShowImage("Filtered", filteredImage);
+	cvWaitKey(500);
 }
 
-void CameraPose::displayImage(){
-	cvShowImage("Unfiltered", image);
-	cvShowImage("Filtered", filtered);
-	cvWaitKey(1000);
-}
-
-void CameraPose::findSquares(IplImage *f, CvScalar color){
-	squares_t *squares;
+/*
+ * Draw boxes around squares found in robot->findSquares
+ *  draw in color displayColor
+ */
+void CameraPose::drawSquares(squares_t *squares, CvScalar displayColor){
 	CvPoint pt1, pt2;
-	squares = robot->findSquares(filtered, 250);
+	
 	while(squares != NULL) {
         
-			int sq_amt = (int) (sqrt(squares->area) / 2);
+		int sq_amt = (int) (sqrt(squares->area) / 2);
 
-                        // Upper Left to Lower Left
-                        pt1.x = squares->center.x - sq_amt;
-                        pt1.y = squares->center.y - sq_amt;
-                        pt2.x = squares->center.x - sq_amt;
-                        pt2.y = squares->center.y + sq_amt;
-                        cvLine(image, pt1, pt2, color, 2, CV_AA, 0);
+		// Upper Left to Lower Left
+		pt1.x = squares->center.x - sq_amt;
+		pt1.y = squares->center.y - sq_amt;
+		pt2.x = squares->center.x - sq_amt;
+		pt2.y = squares->center.y + sq_amt;
+		cvLine(cameraImage, pt1, pt2, displayColor, 2, CV_AA, 0);
 
-                        // Lower Left to Lower Right
-                        pt1.x = squares->center.x - sq_amt;
-                        pt1.y = squares->center.y + sq_amt;
-                        pt2.x = squares->center.x + sq_amt;
-                        pt2.y = squares->center.y + sq_amt;
-                        cvLine(image, pt1, pt2, color, 2, CV_AA, 0);                        
-			// Upper Left to Upper Right
-                        pt1.x = squares->center.x - sq_amt;
-                        pt1.y = squares->center.y - sq_amt;
-                        pt2.x = squares->center.x + sq_amt;
-                        pt2.y = squares->center.y - sq_amt;
-                        cvLine(image, pt1, pt2, color, 2, CV_AA, 0);
+		// Lower Left to Lower Right
+		pt1.x = squares->center.x - sq_amt;
+		pt1.y = squares->center.y + sq_amt;
+		pt2.x = squares->center.x + sq_amt;
+		pt2.y = squares->center.y + sq_amt;
+		cvLine(cameraImage, pt1, pt2, displayColor, 2, CV_AA, 0);                        
+		// Upper Left to Upper Right
+		pt1.x = squares->center.x - sq_amt;
+		pt1.y = squares->center.y - sq_amt;
+		pt2.x = squares->center.x + sq_amt;
+		pt2.y = squares->center.y - sq_amt;
+		cvLine(cameraImage, pt1, pt2, displayColor, 2, CV_AA, 0);
 
-                        // Lower Right to Upper Right
-                        pt1.x = squares->center.x + sq_amt;
-                        pt1.y = squares->center.y + sq_amt;
-                        pt2.x = squares->center.x + sq_amt;
-                        pt2.y = squares->center.y - sq_amt;
-                        cvLine(image, pt1, pt2, color, 2, CV_AA, 0);
+		// Lower Right to Upper Right
+		pt1.x = squares->center.x + sq_amt;
+		pt1.y = squares->center.y + sq_amt;
+		pt2.x = squares->center.x + sq_amt;
+		pt2.y = squares->center.y - sq_amt;
+		cvLine(cameraImage, pt1, pt2, displayColor, 2, CV_AA, 0);
 		squares = squares->next;
 	}
 }
 
+/*
+ * Find squares of same height and draw lines between them
+ */
+squarePair* CameraPose::matchSquares(squares_t *squares){
+	squares_t *tempSquares;
+	squarePair* pairs = (squarePair*)malloc(sizeof(squarePair)); 
+	int x = 0;
+	CvPoint pt1, pt2;
+	while(squares != NULL){
+		tempSquares = squares->next;
+		while(tempSquares != NULL){
+			
+			if(abs(squares->center.y - tempSquares->center.y) < 20 && abs(squares->center.x - tempSquares->center.x) > 20){
+				//Draw line
+				pt1 = cvPoint(squares->center.x, squares->center.y);
+				pt2 = cvPoint(tempSquares->center.x, tempSquares->center.y);
+				cvLine(cameraImage, pt1, pt2, CV_RGB(0,0,255), 2, CV_AA, 0);
+				
+				//Record squares
+				if(squares->center.x < tempSquares->center.x){
+					pairs->left = *squares;
+					pairs->right = *tempSquares;
+				}
+				else{
+					pairs->left = *tempSquares;
+					pairs->right = *squares;
+				}
+				
+				break;
+			}
+		  
+			tempSquares = tempSquares->next;
+		}
+		squares = squares->next;
+	}
+	return pairs;
+	
+}
 
