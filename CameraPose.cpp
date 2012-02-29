@@ -21,7 +21,7 @@ using namespace std;
 
 /*
  * Initializes the CameraPose to handle camera based navigation
- * Configures camera and intilizes images and display windows
+ * Configures camera and initializes images and display windows
  */
 
 CameraPose::CameraPose(RobotInterface *r){

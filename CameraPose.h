@@ -27,6 +27,7 @@ class CameraPose {
 	void displayImages();
 	list<squarePair> matchSquares(squares_t *squares);
 	void drawSquares(squares_t *squares, CvScalar displayColor);
+	void strafeTo(float delta_y);
 	private:
   
 	RobotInterface *robot;
