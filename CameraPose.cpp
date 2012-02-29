@@ -51,13 +51,16 @@ void CameraPose::strafeTo(int delta_x){
 	int robot_speed = 5;
 
 	//PID Controller code here
-
+	
+	printf("DELTA: %d\n", delta_x);
 
 	//move the robot left or right
 	if((delta_x+STRAFE_EPSILON)<0){
 		robot->Move(RI_MOVE_LEFT, robot_speed);
+		printf("Moving Left\n");
 	}else if((delta_x-STRAFE_EPSILON)>0){
 		robot->Move(RI_MOVE_RIGHT, robot_speed);
+		printf("Move Right\n");
 	}else{
 		//Base case
 		return;
