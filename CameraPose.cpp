@@ -109,6 +109,7 @@ void CameraPose::updateCamera(){
 	drawSquares(currentSquares, CV_RGB(0,255,0));
 	pairs = matchSquares(currentSquares);
 	printCenters(pairs);
+	printf("Error: %d\n", getCenterError(pairs));
 	
 	//Find and match pink squares
 	cvInRangeS(hsvImage, RC_PINK_LOW, RC_PINK_HIGH, filteredImage);
@@ -216,11 +217,21 @@ void CameraPose::printCenters(list<squarePair> pairs){
 		center = (it->left->center.x + it->right->center.x)/2;
 		height = (it->left->center.y + it->right->center.y)/2;
 		cvLine(cameraImage, cvPoint(center,height-5), cvPoint(center,height+5), CV_RGB(255,0,0), 2, CV_AA, 0);
-
 	}
 }
-int getError(list<squarePair> pairs){
-  
+int CameraPose::getCenterError(list<squarePair> pairs){
+	list<squarePair>::iterator it;
+	int centers = 0; 
+	int size = 0;
+	for(it=pairs.begin(); it!=pairs.end(); it++){
+		centers += (it->left->center.x + it->right->center.x)/2;
+		size++;
+	}	
+	if(size == 0)
+		return 0;
+	else
+		return centers/size - 320;
+	
 }
 
 

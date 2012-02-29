@@ -29,8 +29,10 @@ class CameraPose {
 	void drawSquares(squares_t *squares, CvScalar displayColor);
 	void strafeTo(int delta_y);
 	void moveTo(int delta_y);
-	void printCenters(list <squarePair>);
-	int getError(list<squarePair> pairs);
+
+	void strafeTo(float delta_y);
+	void printCenters(list<squarePair> pairs);
+	int getCenterError(list<squarePair> pairs);
 
 
 	private:
