@@ -10,8 +10,8 @@
  * Holds pair of matching squares
  */
 typedef struct {
-	squares_t left;
-	squares_t right;
+	squares_t* left;
+	squares_t* right;
 } squarePair;
 
 
