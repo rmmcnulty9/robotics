@@ -123,8 +123,8 @@ void CameraPose::drawSquares(squares_t *squares, CvScalar displayColor){
  */
 squarePair* CameraPose::matchSquares(squares_t *squares){
 	squares_t *tempSquares;
-	squarePair* pairs = (squarePair*)malloc(sizeof(squarePair)); 
-	int x = 0;
+	squarePair* pairs = (squarePair *)malloc(sizeof(squarePair)); 
+	pairs->left = NULL; pairs->right = NULL;
 	CvPoint pt1, pt2;
 	while(squares != NULL){
 		tempSquares = squares->next;
@@ -137,21 +137,25 @@ squarePair* CameraPose::matchSquares(squares_t *squares){
 				cvLine(cameraImage, pt1, pt2, CV_RGB(0,0,255), 2, CV_AA, 0);
 				
 				//Record squares
-				if(squares->center.x < tempSquares->center.x){
-					pairs->left = *squares;
-					pairs->right = *tempSquares;
-				}
-				else{
-					pairs->left = *tempSquares;
-					pairs->right = *squares;
-				}
+				int newArea = (squares->area + tempSquares->area)/2;
+				if(pairs->left == NULL || (pairs->left->area + pairs->right->area)/2 < newArea){
+					if(squares->center.x < tempSquares->center.x){
+						pairs->left = squares;
+						pairs->right = tempSquares;
+					}
+					else{
+						pairs->left = tempSquares;
+						pairs->right = squares;
+					}
 				
-				break;
+					break;
+				}
 			}
 		  
 			tempSquares = tempSquares->next;
 		}
 		squares = squares->next;
+		
 	}
 	return pairs;
 	
