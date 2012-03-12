@@ -65,38 +65,40 @@ void CameraPose::strafeTo(int delta_x){
 		//Base case
 		return;
 	}
-	//Call to updateCamera() & getError()
-	//strafeTo(getCenterError);
+
+	list<squarePair> pairs = updateCamera();
+	strafeTo(getCenterError(pairs));
 }
 
 /*
  * Move forward to the delta_y
  */
-void CameraPose::moveTo(int delta_y){
+void CameraPose::moveTo(){
 	int robot_speed = 3;
 
 	//PID Controller goes here
+	int ctr=0;
 
-	if(delta_y > MOVE_TO_EPSILON) {
-			robot->Move(RI_MOVE_FORWARD, robot_speed);
+	while(ctr<20){		
+		list<squarePair> pairs = updateCamera();
+		strafeTo(getCenterError(pairs));
+		robot->Move(RI_MOVE_FORWARD, robot_speed);
 
-			/*
-			 * If not done move
-			 *
-			 * For not just decrement delta_y
-			 */
-			moveTo(delta_y-5);
-
-	}else{
-		printf("ARRIVED\n");
-		return;
+		/*
+		 * If not done move
+		 *
+		 * For not just decrement delta_y
+		 */
+		moveTo();
+		ctr+=1;
 	}
+	printf("ARRIVED\n");
 }
 
 /*
  * Updates robot and gets current image
  */
-void CameraPose::updateCamera(){
+list<squarePair> CameraPose::updateCamera(){
 	// Update the robot's sensor information
 	robot->update();
 	// Get the current camera image
@@ -120,8 +122,8 @@ void CameraPose::updateCamera(){
 	drawSquares(currentSquares, CV_RGB(255,0,0));
 	pairs = matchSquares(currentSquares);
 	printCenters(pairs);
-	strafeTo(getCenterError(pairs));
 	displayImages();
+	return pairs;
 }
 /*
  * Displays current images

@@ -23,12 +23,12 @@ class CameraPose {
 	CameraPose(RobotInterface *r);
 	~CameraPose();
   
-	void updateCamera();
+	list<squarePair> updateCamera();
 	void displayImages();
 	list<squarePair> matchSquares(squares_t *squares);
 	void drawSquares(squares_t *squares, CvScalar displayColor);
 	void strafeTo(int delta_y);
-	void moveTo(int delta_y);
+	void moveTo();
 
 	void strafeTo(float delta_y);
 	void printCenters(list<squarePair> pairs);

@@ -28,7 +28,7 @@ int main(int argv, char **argc)
 	CameraPose cameraPose(robot);
 	while(!robot->IR_Detected()){
 		robot->Move(RI_MOVE_FORWARD, 5);
-		cameraPose.updateCamera();
+		cameraPose.moveTo();
 	}
         
 
