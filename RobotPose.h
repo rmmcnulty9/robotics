@@ -27,6 +27,7 @@ class RobotPose {
   
   void initPose();
   void moveTo(float x, float y);
+
   void turnTo(float theta);
   void printRaw();
   void printPoses();
@@ -34,6 +35,15 @@ class RobotPose {
   void resetWEPose();
   void changeWEScalingConstant(float we);
   
+  // Camera functions
+  void moveToCell(const int direction);
+  void strafeTo(int delta_x);
+
+	static const int LEFT = 1;
+	static const int RIGHT = 2;
+	static const int FORWARD = 3;
+	static const int BACKWARD = 4;
+
   private:
   bool updateWE(bool turning);
   bool updateNS();
@@ -65,6 +75,8 @@ class RobotPose {
   kalmanFilter kf;
   pose pose_kalman;
   
+  //CameraPose
+  CameraPose pose_cam;
 };
 
 

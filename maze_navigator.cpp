@@ -5,9 +5,9 @@
 #include "robot_color.h"
 #include <iostream>
 #include <string>
-#include "CameraPose.cpp"
+#include "CameraPose.h"
 #include "shared_constants.h"
-#include "RobotPose.cpp"
+#include "RobotPose.h"
 #include "PIDController.h"
 extern "C" {
 #include "Kalman/kalmanFilterDef.h"
@@ -25,10 +25,15 @@ int main(int argv, char **argc)
 	RobotInterface *robot = new RobotInterface(argc[1],0);
 	RobotPose robotPose(robot);
 	robot->Move(RI_HEAD_MIDDLE, RI_FASTEST);
-	CameraPose cameraPose(robot);
-	while(!robot->IR_Detected()){
-		robot->Move(RI_MOVE_FORWARD, 5);
-		cameraPose.moveTo();
+	RobotPose robotPose(robot);
+
+	/*
+	 * Move forward down the hallway
+	 */
+	int ctr = 0;
+	while(!robot->IR_Detected() && ctr<=4){
+		robotPose.moveToCell(RobotPose::FORWARD);
+		ctr+=1;
 	}
         
 

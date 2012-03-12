@@ -8,6 +8,8 @@
 #include "RobotPose.h"
 #include "PIDController.h"
 #include "shared_constants.h"
+#include <list>
+#include "CameraPose.h"
 
 extern "C" {
 #include "Kalman/kalmanFilterDef.h"
@@ -87,6 +89,67 @@ void RobotPose::initPose() {
 	pose_we.y = 0.0;
 	//Assuming we are always facing along +y axis
 	pose_we.theta = M_PI_2;
+
+	//Create CameraPose object
+	pose_cam = new CameraPose(robot);
+
+}
+
+
+/*
+ * Function that will strafe a delta Y value positive = right, negative = left
+ * delta_x's range is -320 to +320
+ */
+void RobotPose::strafeTo(int delta_x){
+	int robot_speed = 5;
+
+	//PID Controller code here
+
+	printf("DELTA: %d\n", delta_x);
+
+	//move the robot left or right
+	if((delta_x+CameraPose::STRAFE_EPSILON)<0){
+		robot->Move(RI_MOVE_RIGHT, robot_speed);
+		printf("Moving Right\n");
+	}else if((delta_x-CameraPose::STRAFE_EPSILON)>0){
+		robot->Move(RI_MOVE_LEFT, robot_speed);
+		printf("Move Left\n");
+	}else{
+		//Base case
+		return;
+	}
+
+	list<squarePair> pairs = pose_cam.updateCamera();
+	strafeTo(pose_cam.getCenterError(pairs));
+}
+
+
+void RobotPose::moveToCell(const int direction){
+
+	pose_cam.updateCamera();
+	return;
+
+	if(direction == LEFT){
+
+	}else if(direction == RIGHT){
+
+	}else if(direction == FORWARD){
+
+	/*
+	 * While WE and camera say we are not in the center of a cell
+	 * in center when the closed square is a certain size & location
+	 */
+	robot->Move(RI_MOVE_FORWARD, RI_FASTEST);
+
+	}else if(direction == BACKWARD){
+
+	}
+	/*
+	 * Make sure we are centered in cell
+	 */
+
+	list<squarePair> pairs = pose_cam.updateCamera();
+	strafeTo(pose_cam.getCenterError(pairs));
 }
 
 void RobotPose::moveTo(float x, float y) {

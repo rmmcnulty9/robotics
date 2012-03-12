@@ -123,6 +123,10 @@ list<squarePair> CameraPose::updateCamera(){
 	pairs = matchSquares(currentSquares);
 	printCenters(pairs);
 	displayImages();
+
+	//Save image
+	cvSaveImage("test.jpg",cameraImage);
+
 	return pairs;
 }
 /*
