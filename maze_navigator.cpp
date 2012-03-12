@@ -25,7 +25,6 @@ int main(int argv, char **argc)
 	RobotInterface *robot = new RobotInterface(argc[1],0);
 	RobotPose robotPose(robot);
 	robot->Move(RI_HEAD_MIDDLE, RI_FASTEST);
-	RobotPose robotPose(robot);
 
 	/*
 	 * Move forward down the hallway

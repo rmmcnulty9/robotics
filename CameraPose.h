@@ -34,6 +34,7 @@ class CameraPose {
 	void printCenters(list<squarePair> pairs);
 	int getCenterError(list<squarePair> pairs);
 
+	static const float STRAFE_EPSILON = 5.0;
 
 	private:
   
@@ -42,7 +43,6 @@ class CameraPose {
 	IplImage *hsvImage;
 	IplImage *filteredImage;
 	static const int MIN_SQUARE = 200;
-	static const float STRAFE_EPSILON = 5.0;
 	static const int SCREEN_WIDTH = 640;
 	static const int SCREEN_HEIGHT = 480;
   

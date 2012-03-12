@@ -4,6 +4,7 @@
 
 #include "shared_constants.h"
 #include "PIDController.h"
+#include "CameraPose.h"
 
 extern "C" {
 #include <clapack.h>
@@ -76,7 +77,7 @@ class RobotPose {
   pose pose_kalman;
   
   //CameraPose
-  CameraPose pose_cam;
+  CameraPose *pose_cam;
 };
 
 

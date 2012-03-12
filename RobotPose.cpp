@@ -119,14 +119,14 @@ void RobotPose::strafeTo(int delta_x){
 		return;
 	}
 
-	list<squarePair> pairs = pose_cam.updateCamera();
-	strafeTo(pose_cam.getCenterError(pairs));
+	list<squarePair> pairs = pose_cam->updateCamera();
+	strafeTo(pose_cam->getCenterError(pairs));
 }
 
 
 void RobotPose::moveToCell(const int direction){
 
-	pose_cam.updateCamera();
+	pose_cam->updateCamera();
 	return;
 
 	if(direction == LEFT){
@@ -148,8 +148,8 @@ void RobotPose::moveToCell(const int direction){
 	 * Make sure we are centered in cell
 	 */
 
-	list<squarePair> pairs = pose_cam.updateCamera();
-	strafeTo(pose_cam.getCenterError(pairs));
+	list<squarePair> pairs = pose_cam->updateCamera();
+	strafeTo(pose_cam->getCenterError(pairs));
 }
 
 void RobotPose::moveTo(float x, float y) {
