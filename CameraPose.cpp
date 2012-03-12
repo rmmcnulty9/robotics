@@ -112,7 +112,7 @@ void CameraPose::updateCamera(){
 	drawSquares(currentSquares, CV_RGB(0,255,0));
 	pairs = matchSquares(currentSquares);
 	printCenters(pairs);
-	strafeTo(getCenterError(pairs));
+	//strafeTo(getCenterError(pairs));
 	
 	//Find and match pink squares
 	cvInRangeS(hsvImage, RC_PINK_LOW, RC_PINK_HIGH, filteredImage);
@@ -185,7 +185,11 @@ list<squarePair> CameraPose::matchSquares(squares_t *squares){
 		tempSquares = squares->next;
 		while(tempSquares != NULL){
 			
-			if(abs(squares->center.y - tempSquares->center.y) < 20 && abs(squares->center.x - tempSquares->center.x) > 20){
+			//Test if y values are close, if x values are far, and if centers in top half of screen
+			if(abs(squares->center.y - tempSquares->center.y) < SCREEN_HEIGHT/24 
+				&& abs(squares->center.x - tempSquares->center.x) > SCREEN_WIDTH/4
+				&& (squares->center.y) < SCREEN_HEIGHT/2
+				&& (tempSquares->center.y) < SCREEN_HEIGHT/2){
 				//Draw line
 				pt1 = cvPoint(squares->center.x, squares->center.y);
 				pt2 = cvPoint(tempSquares->center.x, tempSquares->center.y);
