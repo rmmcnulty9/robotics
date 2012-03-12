@@ -13,7 +13,7 @@
 #include <cstdio>
 #include "CameraPose.h"
 #include "shared_constants.h"
-#include "robot_color.h"
+#include "modified_color.h"
 #include <list>
 
 using namespace std;
