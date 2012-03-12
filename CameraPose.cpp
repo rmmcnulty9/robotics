@@ -27,9 +27,9 @@ using namespace std;
 CameraPose::CameraPose(RobotInterface *r){
 	robot = r;
 	//Initializes images for storing most recent camera data
-	cameraImage = cvCreateImage(cvSize(640, 480), IPL_DEPTH_8U, 3);
-	hsvImage = cvCreateImage(cvSize(640, 480), IPL_DEPTH_8U, 3);
-	filteredImage = cvCreateImage(cvSize(640, 480), IPL_DEPTH_8U, 1);
+	cameraImage = cvCreateImage(cvSize(SCREEN_WIDTH, SCREEN_HEIGHT), IPL_DEPTH_8U, 3);
+	hsvImage = cvCreateImage(cvSize(SCREEN_WIDTH, SCREEN_HEIGHT), IPL_DEPTH_8U, 3);
+	filteredImage = cvCreateImage(cvSize(SCREEN_WIDTH, SCREEN_HEIGHT), IPL_DEPTH_8U, 1);
 
 	//Setup display windows
 	cvNamedWindow("Unfiltered", CV_WINDOW_AUTOSIZE);
@@ -213,7 +213,7 @@ list<squarePair> CameraPose::matchSquares(squares_t *squares){
 }
 void CameraPose::printCenters(list<squarePair> pairs){
 	list<squarePair>::iterator it;
-	cvLine(cameraImage, cvPoint(320,0), cvPoint(320,480), CV_RGB(128,128,128), 2, CV_AA, 0);
+	cvLine(cameraImage, cvPoint(SCREEN_WIDTH/2,0), cvPoint(SCREEN_WIDTH/2,SCREEN_HEIGHT), CV_RGB(128,128,128), 2, CV_AA, 0);
 	int center = 0; 
 	int height = 0;
 	for(it=pairs.begin(); it!=pairs.end(); it++){
@@ -225,15 +225,13 @@ void CameraPose::printCenters(list<squarePair> pairs){
 int CameraPose::getCenterError(list<squarePair> pairs){
 	list<squarePair>::iterator it;
 	int centers = 0; 
-	int size = 0;
 	for(it=pairs.begin(); it!=pairs.end(); it++){
 		centers += (it->left->center.x + it->right->center.x)/2;
-		size++;
 	}	
-	if(size == 0)
+	if(pairs.size() == 0)
 		return 0;
 	else
-		return centers/size - 320;
+		return (centers/pairs.size()) - (SCREEN_WIDTH/2);
 	
 }
 
