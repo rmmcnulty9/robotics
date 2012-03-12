@@ -56,11 +56,11 @@ void CameraPose::strafeTo(int delta_x){
 
 	//move the robot left or right
 	if((delta_x+STRAFE_EPSILON)<0){
+		robot->Move(RI_MOVE_LEFT, robot_speed);
+		printf("Moving Left\n");
+	}else if((delta_x-STRAFE_EPSILON)>0){
 		robot->Move(RI_MOVE_RIGHT, robot_speed);
 		printf("Moving Right\n");
-	}else if((delta_x-STRAFE_EPSILON)>0){
-		robot->Move(RI_MOVE_LEFT, robot_speed);
-		printf("Move Left\n");
 	}else{
 		//Base case
 		return;
@@ -120,6 +120,7 @@ void CameraPose::updateCamera(){
 	drawSquares(currentSquares, CV_RGB(255,0,0));
 	pairs = matchSquares(currentSquares);
 	printCenters(pairs);
+	strafeTo(getCenterError(pairs));
 	displayImages();
 }
 /*
@@ -128,7 +129,7 @@ void CameraPose::updateCamera(){
 void CameraPose::displayImages(){
 	cvShowImage("Unfiltered", cameraImage);
 	cvShowImage("Filtered", filteredImage);
-	cvWaitKey(500);
+	cvWaitKey(2000);
 }
 
 /*
