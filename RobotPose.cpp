@@ -144,7 +144,7 @@ void RobotPose::moveToCell(const int direction){
 	 * in center when the closed square is a certain size & location
 	 */
 	
-	robot->Move(RI_MOVE_FORWARD, RI_FASTEST);
+	//robot->Move(RI_MOVE_FORWARD, RI_FASTEST);
 
 
 	/*
