@@ -33,7 +33,7 @@ class RobotPose {
   void printRaw();
   void printPoses();
   void updatePosition(bool turning);
-  void resetWEPose();
+  void resetWEPose(float x, float y, float theta);
   void changeWEScalingConstant(float we);
   
   // Camera functions

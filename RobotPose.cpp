@@ -57,6 +57,9 @@ RobotPose::RobotPose(RobotInterface *r){
 	PID_x = new PIDController(iMax,iMin,integral,proportional,derivative);
 	PID_y = new PIDController(iMax,iMin,integral,proportional,derivative);
 	PID_theta = new PIDController(iMax,iMin,integral,proportional,derivative);
+	
+	//Create CameraPose object
+	pose_cam = new CameraPose(robot);
 }
 
 RobotPose::~RobotPose(){
@@ -90,8 +93,7 @@ void RobotPose::initPose() {
 	//Assuming we are always facing along +y axis
 	pose_we.theta = M_PI_2;
 
-	//Create CameraPose object
-	pose_cam = new CameraPose(robot);
+
 
 }
 
@@ -127,23 +129,24 @@ void RobotPose::strafeTo(int delta_x){
 void RobotPose::moveToCell(const int direction){
 
 	pose_cam->updateCamera();
-	return;
 
 	if(direction == LEFT){
-
+		turnTo(pose_kalman.theta + 90.0* (M_PI/180.0));
 	}else if(direction == RIGHT){
-
-	}else if(direction == FORWARD){
+		turnTo(pose_kalman.theta - 90.0* (M_PI/180.0));
+	}	
+	else if(direction == BACKWARD){
+		turnTo(pose_kalman.theta + 180.0* (M_PI/180.0));
+	}
 
 	/*
 	 * While WE and camera say we are not in the center of a cell
 	 * in center when the closed square is a certain size & location
 	 */
+	
 	robot->Move(RI_MOVE_FORWARD, RI_FASTEST);
 
-	}else if(direction == BACKWARD){
 
-	}
 	/*
 	 * Make sure we are centered in cell
 	 */
@@ -459,11 +462,11 @@ bool RobotPose::updateNS() {
 /*
  * Resets the pose for the WE. This is used when we change rooms to help with WE drift
  */
-void RobotPose::resetWEPose() {
+void RobotPose::resetWEPose(float x, float y, float theta) {
   
-	pose_we.x = pose_kalman.x;
-	pose_we.y = pose_kalman.y;
-	pose_we.theta = pose_kalman.theta;
+	pose_we.x = x;
+	pose_we.y = y;
+	pose_we.theta = theta;
 }
 
 void RobotPose::changeWEScalingConstant(float we) {
