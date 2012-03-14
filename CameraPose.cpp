@@ -108,26 +108,30 @@ list<squarePair> CameraPose::updateCamera(){
 	
 	//Find and match yellow squares
 	squares_t * currentSquares;
-	list<squarePair> pairs;
+	list<squarePair> yellowPairs, pinkPairs;
+	
 	cvInRangeS(hsvImage, RC_YELLOW_LOW, RC_YELLOW_HIGH, filteredImage);
 	currentSquares = robot->findSquares(filteredImage, MIN_SQUARE);
 	drawSquares(currentSquares, CV_RGB(0,255,0));
-	pairs = matchSquares(currentSquares);
-	printCenters(pairs);
-	//strafeTo(getCenterError(pairs));
+	yellowPairs = matchSquares(currentSquares);
+	printCenters(yellowPairs);
+	//strafeTo(getCenterError(yellowPairs));
 	
 	//Find and match pink squares
 	cvInRangeS(hsvImage, RC_PINK_LOW, RC_PINK_HIGH, filteredImage);
 	currentSquares = robot->findSquares(filteredImage, MIN_SQUARE);
 	drawSquares(currentSquares, CV_RGB(255,0,0));
-	pairs = matchSquares(currentSquares);
-	printCenters(pairs);
+	pinkPairs = matchSquares(currentSquares);
+	printCenters(pinkPairs);
 	displayImages();
 
 	//Save image
 	cvSaveImage("test.jpg",cameraImage);
-
-	return pairs;
+	
+	//Return both yellow and pink pairs
+	yellowPairs.splice(yellowPairs.end(), pinkPairs);
+	return yellowPairs;
+  
 }
 /*
  * Displays current images
