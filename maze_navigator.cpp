@@ -5,9 +5,9 @@
 #include "robot_color.h"
 #include <iostream>
 #include <string>
-#include "CameraPose.h"
+#include "CameraPose.cpp"
 #include "shared_constants.h"
-#include "RobotPose.h"
+#include "RobotPose.cpp"
 #include "PIDController.h"
 extern "C" {
 #include "Kalman/kalmanFilterDef.h"

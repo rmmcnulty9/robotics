@@ -204,13 +204,9 @@ void RobotPose::moveTo(float x, float y) {
 		velocity[2] = 0.0;
 		rovioKalmanFilterSetVelocity(&kf,velocity);
 	}
-	//Wall check  - For some bases(1 to 2 & 2 to 3) this is ignored to avoid false alarms
-	if (robot->IR_Detected() && x != -180.0 && x != -354.0){
-		printf("WALL!\n");
-		exit(0);
-	}
+
 	//Move unless within range of base
-	else if (error_distance > MOVE_TO_EPSILON) {
+	if (error_distance > MOVE_TO_EPSILON) {
 		robot->Move(RI_MOVE_FORWARD, robot_speed);
 		moveTo(x, y);
 	}
