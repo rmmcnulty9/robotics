@@ -44,7 +44,7 @@ class RobotPose {
   
   // Camera functions
   void moveToCell(const int direction);
-  void strafeTo(int delta_x);
+  bool strafeTo(int delta_x);
 
 	static const int LEFT = 1;
 	static const int RIGHT = 2;

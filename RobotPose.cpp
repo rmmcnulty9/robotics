@@ -110,9 +110,10 @@ void RobotPose::initPose() {
 
 /*
  * Function that will strafe a delta Y value positive = right, negative = left
- * delta_x's range is -320 to +320
+ * delta_x's range is -320 to +320 and return whether there was a strafing done
  */
-void RobotPose::strafeTo(int delta_x){
+bool RobotPose::strafeTo(int delta_x){
+	
 	int robot_speed = 5;
 
 	//PID Controller code here
@@ -121,25 +122,25 @@ void RobotPose::strafeTo(int delta_x){
 
 	//move the robot left or right
 	if((delta_x+CameraPose::STRAFE_EPSILON)<0){
-		robot->Move(RI_MOVE_RIGHT, robot_speed);
+	//	robot->Move(RI_MOVE_RIGHT, robot_speed);
 		printf("Moving Right\n");
 	}else if((delta_x-CameraPose::STRAFE_EPSILON)>0){
-		robot->Move(RI_MOVE_LEFT, robot_speed);
+	//	robot->Move(RI_MOVE_LEFT, robot_speed);
 		printf("Move Left\n");
 	}else{
 		//Base case
-		return;
+		return false;
 	}
-
+	//If we have gotten here there was a strafe
 	list<squarePair> pairs = pose_cam->updateCamera();
-	strafeTo(pose_cam->getCenterError(pairs));
+	return (strafeTo(pose_cam->getCenterError(pairs)) || true);
 }
 
 
 void RobotPose::moveToCell(const int direction){
 
 	pose_cam->updateCamera();
-
+	updatePosition(false);
 	if(direction == LEFT){
 		turnTo(pose_kalman.theta + 90.0* (M_PI/180.0));
 	}else if(direction == RIGHT){
@@ -157,15 +158,22 @@ void RobotPose::moveToCell(const int direction){
 	 */
 
 	list<squarePair> pairs = pose_cam->updateCamera();
-	strafeTo(pose_cam->getCenterError(pairs));
+	bool strafed = strafeTo(pose_cam->getCenterError(pairs));
+	//Reset WE if we strafed to prevent error in WE pose
+	if(strafed){
 
+		robot->getWheelEncoder(RI_WHEEL_LEFT);
+		robot->getWheelEncoder(RI_WHEEL_RIGHT);
+		robot->getWheelEncoder(RI_WHEEL_REAR);
+	}
+	
 	/*
 	 * While WE and camera say we are not in the center of a cell
 	 * in center when the closed square is a certain size & location
 	 */
 	int camera_cell_error = pose_cam->getCellError(pairs);
 	int kalman_cell_error = sqrt(pose_kalman.x*pose_kalman.x + pose_kalman.y*pose_kalman.y)- RobotPose::CELL_DIMENSION_CM;
-
+	printf("Camera Cell Error: %d Kalman Cell Error: %d\n", camera_cell_error, kalman_cell_error);
 	//PID CODE???
 	if(false){
 		moveToCell(FORWARD);
@@ -343,9 +351,13 @@ void RobotPose::updatePosition(bool turning=false){
 
 	//Pass through Kalman filter
 	float NSdata[3], WEdata[3], track[9];
-	NSdata[0] = pose_ns.x;
-	NSdata[1] = pose_ns.y;
-	NSdata[2] = pose_ns.theta;
+	//NSdata[0] = pose_ns.x;
+	//NSdata[1] = pose_ns.y;
+	//NSdata[2] = pose_ns.theta;
+	printf("Warning not passing NS data into Kalman Filter!\n");
+	NSdata[0] = pose_we.x;
+	NSdata[1] = pose_we.y;
+	NSdata[2] = pose_we.theta;
 
 	WEdata[0] = pose_we.x;
 	WEdata[1] = pose_we.y;

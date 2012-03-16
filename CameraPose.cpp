@@ -30,10 +30,17 @@ CameraPose::CameraPose(RobotInterface *r){
 	cameraImage = cvCreateImage(cvSize(SCREEN_WIDTH, SCREEN_HEIGHT), IPL_DEPTH_8U, 3);
 	hsvImage = cvCreateImage(cvSize(SCREEN_WIDTH, SCREEN_HEIGHT), IPL_DEPTH_8U, 3);
 	filteredImage = cvCreateImage(cvSize(SCREEN_WIDTH, SCREEN_HEIGHT), IPL_DEPTH_8U, 1);
+	pinkLow = cvCreateImage(cvSize(SCREEN_WIDTH, SCREEN_HEIGHT), IPL_DEPTH_8U, 1);
+	pinkHigh = cvCreateImage(cvSize(SCREEN_WIDTH, SCREEN_HEIGHT), IPL_DEPTH_8U, 1);
+	yellow = cvCreateImage(cvSize(SCREEN_WIDTH, SCREEN_HEIGHT), IPL_DEPTH_8U, 1);
 
 	//Setup display windows
 	cvNamedWindow("Unfiltered", CV_WINDOW_AUTOSIZE);
+	cvNamedWindow("Filtered Pink High", CV_WINDOW_AUTOSIZE);
+	cvNamedWindow("Filtered Pink Low", CV_WINDOW_AUTOSIZE);
+	cvNamedWindow("Filtered Yellow", CV_WINDOW_AUTOSIZE);
 	cvNamedWindow("Filtered", CV_WINDOW_AUTOSIZE);
+	//cvNamedWindow("All Filtered", CV_WINDOW_AUTOSIZE);
 
 	// Setup the camera
         if(robot->CameraCfg(RI_CAMERA_DEFAULT_BRIGHTNESS, RI_CAMERA_DEFAULT_CONTRAST, 5, RI_CAMERA_RES_640, RI_CAMERA_QUALITY_HIGH)) {
@@ -112,18 +119,11 @@ list<squarePair> CameraPose::updateCamera(){
 	squares_t * currentSquares;
 	list<squarePair> yellowPairs, pinkPairs;
 	
-	cvInRangeS(hsvImage, RC_YELLOW_LOW, RC_YELLOW_HIGH, filteredImage);
+	cvInRangeS(hsvImage, RC_YELLOW_LOW, RC_YELLOW_HIGH, yellow);
 	currentSquares = robot->findSquares(filteredImage, MIN_SQUARE);
 	drawSquares(currentSquares, CV_RGB(0,255,0));
 	yellowPairs = matchSquares(currentSquares);
 	printCenters(yellowPairs);
-	//strafeTo(getCenterError(yellowPairs));
-	cvSaveImage("yellow.jpg",filteredImage);
-
-	
-	
-	IplImage *pinkLow = cvCreateImage(cvSize(SCREEN_WIDTH, SCREEN_HEIGHT), IPL_DEPTH_8U, 1);
-	IplImage *pinkHigh = cvCreateImage(cvSize(SCREEN_WIDTH, SCREEN_HEIGHT), IPL_DEPTH_8U, 1);
 
 
 	//Find and match pink squares
@@ -146,6 +146,9 @@ list<squarePair> CameraPose::updateCamera(){
 	sprintf(file_name,"filtered.%04d.jpg", image_ctr);
 	cvSaveImage(file_name,filteredImage);
 
+	sprintf(file_name,"yellow.%04d.jpg",image_ctr);
+	cvSaveImage(file_name,yellow);
+
 	sprintf(file_name,"pinklow.%04d.jpg", image_ctr);
 	cvSaveImage(file_name,pinkLow);
 
@@ -164,6 +167,10 @@ list<squarePair> CameraPose::updateCamera(){
 void CameraPose::displayImages(){
 	cvShowImage("Unfiltered", cameraImage);
 	cvShowImage("Filtered", filteredImage);
+	cvShowImage("Filtered Pink High", pinkHigh);
+	cvShowImage("Filtered Pink Low", pinkLow);
+	cvShowImage("Filtered Yellow", yellow);
+	//cvShowImage("Filtered All", filteredImage);
 	cvWaitKey(2000);
 }
 

@@ -43,6 +43,9 @@ class CameraPose {
 	RobotInterface *robot;
 	IplImage *cameraImage;
 	IplImage *hsvImage;
+	IplImage *pinkHigh;
+	IplImage *pinkLow;
+	IplImage *yellow;
 	IplImage *filteredImage;
 	static const int MIN_SQUARE = 200;
 	static const int SCREEN_WIDTH = 640;
