@@ -135,6 +135,7 @@ list<squarePair> CameraPose::updateCamera(){
 	drawSquares(currentSquares, CV_RGB(255,0,0));
 	pinkPairs = matchSquares(currentSquares);
 	printCenters(pinkPairs);
+
 	displayImages();
 
 	//Save image
