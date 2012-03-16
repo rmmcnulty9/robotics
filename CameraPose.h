@@ -36,8 +36,6 @@ class CameraPose {
 
 	static const float STRAFE_EPSILON = 5.0;
 
-	static const float STRAFE_EPSILON = 5.0;
-
 	private:
   
 	RobotInterface *robot;

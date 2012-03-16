@@ -136,11 +136,20 @@ list<squarePair> CameraPose::updateCamera(){
 	displayImages();
 
 	//Save image
-	cvSaveImage("test.jpg",cameraImage);
-	cvSaveImage("filtered.jpg",filteredImage);
-	cvSaveImage("pinklow.jpg",pinkLow);
-	cvSaveImage("pinkhigh.jpg",pinkHigh);
+	static unsigned int image_ctr=0;
+	char file_name [256];
+	sprintf(file_name,"camera.%04d.jpg", image_ctr);
+	cvSaveImage(file_name,cameraImage);
 
+	sprintf(file_name,"filtered.%04d.jpg", image_ctr);
+	cvSaveImage(file_name,filteredImage);
+
+	sprintf(file_name,"pinklow.%04d.jpg", image_ctr);
+	cvSaveImage(file_name,pinkLow);
+
+	sprintf(file_name,"pinkhigh.%04d.jpg", image_ctr);
+	cvSaveImage(file_name,pinkHigh);
+	image_ctr+=1;
 	
 	//Return both yellow and pink pairs
 	yellowPairs.splice(yellowPairs.end(), pinkPairs);
