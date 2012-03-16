@@ -1,3 +1,9 @@
+/*
+ * RobotPose Class
+ *  Used to collect, filter, and interpret camera data
+ *   Written by Greg Seaman, Adam Park, and Ryan McNulty
+ */
+
 #include <robot_if++.h>
 #include <iostream>
 #include <iomanip>
@@ -151,6 +157,7 @@ void RobotPose::moveToCell(const int direction){
 	 */
 
 	list<squarePair> pairs = pose_cam->updateCamera();
+	strafeTo(pose_cam->getCenterError(pairs));
 
 	/*
 	 * While WE and camera say we are not in the center of a cell
@@ -160,8 +167,9 @@ void RobotPose::moveToCell(const int direction){
 	int kalman_cell_error = sqrt(pose_kalman.x*pose_kalman.x + pose_kalman.y*pose_kalman.y)- RobotPose::CELL_DIMENSION_CM;
 
 	//PID CODE???
-
-	strafeTo(pose_cam->getCenterError(pairs));
+	if(false){
+		moveToCell(FORWARD);
+	}
 }
 
 void RobotPose::moveTo(float x, float y) {

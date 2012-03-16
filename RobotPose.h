@@ -1,3 +1,8 @@
+/*
+ * RobotPose Class
+ *  Used to collect, filter, and interpret camera data
+ *   Written by Greg Seaman, Adam Park, and Ryan McNulty
+ */
 
 #ifndef __ROBOT_POSE__
 #define __ROBOT_POSE__
