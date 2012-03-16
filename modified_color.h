@@ -16,7 +16,7 @@
 #define RC_PINK2_HIGH	cvScalar(359/2, 255, 255, 0)
 
 /* Yellow */
-#define RC_YELLOW	30
+#define RC_YELLOW	36
 #define RC_YELLOW_LOW	RC_LOW(RC_YELLOW)
 #define RC_YELLOW_HIGH	RC_HIGH(RC_YELLOW)
 
