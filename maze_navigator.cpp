@@ -2,12 +2,11 @@
 
 #include <stdio.h>
 #include <robot_if++.h>
-#include "robot_color.h"
 #include <iostream>
 #include <string>
-#include "CameraPose.h"
+#include "CameraPose.cpp"
 #include "shared_constants.h"
-#include "RobotPose.h"
+#include "RobotPose.cpp"
 #include "PIDController.h"
 extern "C" {
 #include "Kalman/kalmanFilterDef.h"
@@ -25,7 +24,6 @@ int main(int argv, char **argc)
 	RobotInterface *robot = new RobotInterface(argc[1],0);
 	RobotPose robotPose(robot);
 	robot->Move(RI_HEAD_MIDDLE, RI_FASTEST);
-	RobotPose robotPose(robot);
 
 
 	/*

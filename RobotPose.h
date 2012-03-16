@@ -4,6 +4,7 @@
 
 #include "shared_constants.h"
 #include "PIDController.h"
+#include "CameraPose.h"
 
 
 extern "C" {
@@ -33,7 +34,7 @@ class RobotPose {
   void printRaw();
   void printPoses();
   void updatePosition(bool turning);
-  void resetWEPose();
+  void resetWEPose(float x, float y, float theta);
   void changeWEScalingConstant(float we);
   
   // Camera functions
@@ -77,7 +78,7 @@ class RobotPose {
   pose pose_kalman;
   
   //CameraPose
-  CameraPose pose_cam;
+  CameraPose *pose_cam;
 };
 
 
