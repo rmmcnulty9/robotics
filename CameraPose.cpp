@@ -138,7 +138,6 @@ list<squarePair> CameraPose::updateCamera(){
 
 	displayImages();
 	
-	image_ctr=0;
 	//Save image
 	char file_name [256];
 	sprintf(file_name,"camera.%04d.jpg", image_ctr);
