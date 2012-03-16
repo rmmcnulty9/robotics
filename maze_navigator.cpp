@@ -27,6 +27,7 @@ int main(int argv, char **argc)
 	robot->Move(RI_HEAD_MIDDLE, RI_FASTEST);
 	RobotPose robotPose(robot);
 
+
 	/*
 	 * Move forward down the hallway
 	 */

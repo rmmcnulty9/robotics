@@ -35,6 +35,8 @@ class CameraPose {
 	int getCenterError(list<squarePair> pairs);
 
 
+	static const float STRAFE_EPSILON = 5.0;
+
 	private:
   
 	RobotInterface *robot;
@@ -42,7 +44,6 @@ class CameraPose {
 	IplImage *hsvImage;
 	IplImage *filteredImage;
 	static const int MIN_SQUARE = 200;
-	static const float STRAFE_EPSILON = 5.0;
 	static const int SCREEN_WIDTH = 640;
 	static const int SCREEN_HEIGHT = 480;
   
