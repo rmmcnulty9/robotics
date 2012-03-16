@@ -285,7 +285,7 @@ int CameraPose::getCenterError(list<squarePair> pairs){
  * Find the distance to the next cell based on where it finds squarePairs in the image
  * -based onthe location and size of squarePairs
  */
-int getCellError(list<squarePair> pairs){
+int CameraPose::getCellError(list<squarePair> pairs){
 
 	return 0;
 }
