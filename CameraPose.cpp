@@ -120,7 +120,7 @@ list<squarePair> CameraPose::updateCamera(){
 	list<squarePair> yellowPairs, pinkPairs;
 	
 	cvInRangeS(hsvImage, RC_YELLOW_LOW, RC_YELLOW_HIGH, yellow);
-	currentSquares = robot->findSquares(filteredImage, MIN_SQUARE);
+	currentSquares = robot->findSquares(yellow, MIN_SQUARE);
 	drawSquares(currentSquares, CV_RGB(0,255,0));
 	yellowPairs = matchSquares(currentSquares);
 	printCenters(yellowPairs);
@@ -137,9 +137,9 @@ list<squarePair> CameraPose::updateCamera(){
 	printCenters(pinkPairs);
 
 	displayImages();
-
+	
+	image_ctr=0;
 	//Save image
-	static unsigned int image_ctr=0;
 	char file_name [256];
 	sprintf(file_name,"camera.%04d.jpg", image_ctr);
 	cvSaveImage(file_name,cameraImage);

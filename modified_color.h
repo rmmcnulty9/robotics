@@ -8,15 +8,15 @@
 
 /* Pink */
 #define RC_PINK1	0
-#define RC_PINK1_LOW	cvScalar(0, 100, 100, 0)
-#define RC_PINK1_HIGH	cvScalar(20/2, 255, 255, 0)
+#define RC_PINK1_LOW	cvScalar(0.0, 90.0, 90.0, 0.0)
+#define RC_PINK1_HIGH	cvScalar(25.0 / 2.0, 255.0, 255.0, 0.0)
 
-#define RC_PINK2	359
-#define RC_PINK2_LOW	cvScalar(340/2, 100, 100, 0)
-#define RC_PINK2_HIGH	cvScalar(359/2, 255, 255, 0)
+#define RC_PINK2	359.0 / 2.0
+#define RC_PINK2_LOW	cvScalar(300.0 / 2.0, 90.0, 90.0, 0.0)
+#define RC_PINK2_HIGH	cvScalar(359.0 / 2.0, 255.0, 255.0, 0.0)
 
 /* Yellow */
-#define RC_YELLOW	36
+#define RC_YELLOW	68/2
 #define RC_YELLOW_LOW	RC_LOW(RC_YELLOW)
 #define RC_YELLOW_HIGH	RC_HIGH(RC_YELLOW)
 
