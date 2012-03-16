@@ -27,12 +27,14 @@ class CameraPose {
 	void displayImages();
 	list<squarePair> matchSquares(squares_t *squares);
 	void drawSquares(squares_t *squares, CvScalar displayColor);
-	void strafeTo(int delta_y);
-	void moveTo();
+//NOT USED RIGHT NOW
+//	void strafeTo(int delta_y);
+//	void moveTo();
 
 	void strafeTo(float delta_y);
 	void printCenters(list<squarePair> pairs);
 	int getCenterError(list<squarePair> pairs);
+	int getCellError(list<squarePair> pairs);
 
 	static const float STRAFE_EPSILON = 5.0;
 

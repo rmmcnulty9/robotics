@@ -45,6 +45,8 @@ class RobotPose {
 	static const int RIGHT = 2;
 	static const int FORWARD = 3;
 	static const int BACKWARD = 4;
+	static const int CELL_DIMENSION_CM = 65;
+	static const int CELL_EPSILON_CM = 3;
 
   private:
   bool updateWE(bool turning);

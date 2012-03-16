@@ -15,10 +15,11 @@ extern "C" {
 #include "Kalman/kalmanFilterDef.h"
 }
 
-
+/*
+ * Constructor definition for RobotPose class
+ */
 RobotPose::RobotPose(RobotInterface *r){
 	robot = r;
-	//std::cout << "Battery:" << r->getBattery() >> "\n";
 	
 	//Create all six FIR filters
 	fir_x_ns = RobotPose::createFilter(coef_filename,0.0);
@@ -66,6 +67,9 @@ RobotPose::~RobotPose(){
 
 }
 
+/*
+* Resets the pose values & initializes start_pose
+* */
 void RobotPose::initPose() {
 
 	robot->update();
@@ -139,11 +143,6 @@ void RobotPose::moveToCell(const int direction){
 		turnTo(pose_kalman.theta + 180.0* (M_PI/180.0));
 	}
 
-	/*
-	 * While WE and camera say we are not in the center of a cell
-	 * in center when the closed square is a certain size & location
-	 */
-	
 	//robot->Move(RI_MOVE_FORWARD, RI_FASTEST);
 
 
@@ -152,6 +151,16 @@ void RobotPose::moveToCell(const int direction){
 	 */
 
 	list<squarePair> pairs = pose_cam->updateCamera();
+
+	/*
+	 * While WE and camera say we are not in the center of a cell
+	 * in center when the closed square is a certain size & location
+	 */
+	int camera_cell_error = pose_cam->getCellError(pairs);
+	int kalman_cell_error = sqrt(pose_kalman.x*pose_kalman.x + pose_kalman.y*pose_kalman.y)- RobotPose::CELL_DIMENSION_CM;
+
+	//PID CODE???
+
 	strafeTo(pose_cam->getCenterError(pairs));
 }
 

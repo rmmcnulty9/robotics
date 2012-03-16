@@ -43,60 +43,62 @@ CameraPose::CameraPose(RobotInterface *r){
 }
 CameraPose::~CameraPose(){}
 
+//NOT USED RIGHT NOW
+///*
+// * Function that will strafe a delta Y value positive = right, negative = left
+// * delta_x's range is -320 to +320
+// */
+//void CameraPose::strafeTo(int delta_x){
+//	int robot_speed = 5;
+//
+//	//PID Controller code here
+//
+//	printf("DELTA: %d\n", delta_x);
+//
+//	//move the robot left or right
+//	if((delta_x+STRAFE_EPSILON)<0){
+//		robot->Move(RI_MOVE_LEFT, robot_speed);
+//		printf("Moving Left\n");
+//	}else if((delta_x-STRAFE_EPSILON)>0){
+//		robot->Move(RI_MOVE_RIGHT, robot_speed);
+//		printf("Moving Right\n");
+//	}else{
+//		//Base case
+//		return;
+//	}
+//
+//	list<squarePair> pairs = updateCamera();
+//	strafeTo(getCenterError(pairs));
+//}
+
+//NOT USED RIGHT NOW
+///*
+// * Move forward to the delta_y
+// */
+//void CameraPose::moveTo(){
+//	int robot_speed = 3;
+//
+//	//PID Controller goes here
+//	int ctr=0;
+//
+//	while(ctr<20){
+//		list<squarePair> pairs = updateCamera();
+//		strafeTo(getCenterError(pairs));
+//		robot->Move(RI_MOVE_FORWARD, robot_speed);
+//
+//		/*
+//		 * If not done move
+//		 *
+//		 * For not just decrement delta_y
+//		 */
+//		moveTo();
+//		ctr+=1;
+//	}
+//	printf("ARRIVED\n");
+//}
+
 /*
- * Function that will strafe a delta Y value positive = right, negative = left
- * delta_x's range is -320 to +320
- */
-void CameraPose::strafeTo(int delta_x){
-	int robot_speed = 5;
-
-	//PID Controller code here
-	
-	printf("DELTA: %d\n", delta_x);
-
-	//move the robot left or right
-	if((delta_x+STRAFE_EPSILON)<0){
-		robot->Move(RI_MOVE_LEFT, robot_speed);
-		printf("Moving Left\n");
-	}else if((delta_x-STRAFE_EPSILON)>0){
-		robot->Move(RI_MOVE_RIGHT, robot_speed);
-		printf("Moving Right\n");
-	}else{
-		//Base case
-		return;
-	}
-
-	list<squarePair> pairs = updateCamera();
-	strafeTo(getCenterError(pairs));
-}
-
-/*
- * Move forward to the delta_y
- */
-void CameraPose::moveTo(){
-	int robot_speed = 3;
-
-	//PID Controller goes here
-	int ctr=0;
-
-	while(ctr<20){		
-		list<squarePair> pairs = updateCamera();
-		strafeTo(getCenterError(pairs));
-		robot->Move(RI_MOVE_FORWARD, robot_speed);
-
-		/*
-		 * If not done move
-		 *
-		 * For not just decrement delta_y
-		 */
-		moveTo();
-		ctr+=1;
-	}
-	printf("ARRIVED\n");
-}
-
-/*
- * Updates robot and gets current image
+ * Updates robot and gets current image & manipulated them
  */
 list<squarePair> CameraPose::updateCamera(){
 	// Update the robot's sensor information
@@ -157,7 +159,7 @@ list<squarePair> CameraPose::updateCamera(){
   
 }
 /*
- * Displays current images
+ * Displays current images - filtered and unfiltered
  */
 void CameraPose::displayImages(){
 	cvShowImage("Unfiltered", cameraImage);
@@ -249,6 +251,9 @@ list<squarePair> CameraPose::matchSquares(squares_t *squares){
 	}
 	return pair_list;
 }
+/*
+ * Draws a line between the squarePairs & puts a tick at the line's midpoint
+ */
 void CameraPose::printCenters(list<squarePair> pairs){
 	list<squarePair>::iterator it;
 	cvLine(cameraImage, cvPoint(SCREEN_WIDTH/2,0), cvPoint(SCREEN_WIDTH/2,SCREEN_HEIGHT), CV_RGB(128,128,128), 2, CV_AA, 0);
@@ -260,6 +265,9 @@ void CameraPose::printCenters(list<squarePair> pairs){
 		cvLine(cameraImage, cvPoint(center,height-5), cvPoint(center,height+5), CV_RGB(255,0,0), 2, CV_AA, 0);
 	}
 }
+/*
+ * Finds the distance the midpoint between squares in from the middle of the image itself
+ */
 int CameraPose::getCenterError(list<squarePair> pairs){
 	list<squarePair>::iterator it;
 	int centers = 0; 
@@ -271,6 +279,15 @@ int CameraPose::getCenterError(list<squarePair> pairs){
 	else
 		return (centers/pairs.size()) - (SCREEN_WIDTH/2);
 	
+}
+
+/*
+ * Find the distance to the next cell based on where it finds squarePairs in the image
+ * -based onthe location and size of squarePairs
+ */
+int getCellError(list<squarePair> pairs){
+
+	return 0;
 }
 
 
