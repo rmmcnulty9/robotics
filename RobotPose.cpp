@@ -114,8 +114,8 @@ void RobotPose::initPose() {
  */
 bool RobotPose::strafeTo(int delta_x){
 	
-	int robot_speed = 6;
-
+	int robot_speed = 1;
+/*
 	//PID Controller code here
 	float PID_res = PID_camera->UpdatePID(delta_x, delta_x);
 	PID_res = abs(delta_x);
@@ -129,15 +129,15 @@ bool RobotPose::strafeTo(int delta_x){
 	else {
 		robot_speed = 5;
 	}
-
+*/
 	printf("%u DELTA: %d\n",pose_cam->image_ctr-1, delta_x);
 
 	//move the robot left or right
-	if((delta_x+CameraPose::STRAFE_EPSILON)<0){
-	//	robot->Move(RI_MOVE_FWD_LEFT, robot_speed);
+	if(delta_x < -1 * STRAFE_EPSILON){
+		robot->Move(RI_MOVE_FWD_LEFT, robot_speed);
 		printf("Moving Left\n");
-	}else if((delta_x-CameraPose::STRAFE_EPSILON)>0){
-	//	robot->Move(RI_MOVE_FWD_RIGHT, robot_speed);
+	}else if(delta_x > STRAFE_EPSILON){
+		robot->Move(RI_MOVE_FWD_RIGHT, robot_speed);
 		printf("Moving Right\n");
 	}else{
 		//Base case
@@ -162,34 +162,40 @@ void RobotPose::moveToCell(const int direction){
 		turnTo(pose_kalman.theta + 180.0* (M_PI/180.0));
 	}
 
-	//robot->Move(RI_MOVE_FORWARD, RI_FASTEST);
+	//Zero out WE to use a measurement to next cell
+	resetWEPose(0,0,pose_kalman.theta);
+	int kalman_cell_error = 0;
+	
+	do{
+		robot->Move(RI_MOVE_FORWARD, RI_FASTEST);
+		updatePosition(false);
+		printf("Kalman: %f,%f,%f\n", pose_we.x, pose_we.y, pose_we.theta * (180/M_PI));
+		//Calculate error to next cell
+		kalman_cell_error = sqrt(pose_kalman.x*pose_kalman.x + pose_kalman.y*pose_kalman.y)- CELL_DIMENSION_CM;
 
 
 	/*
 	 * Make sure we are centered in cell
 	 */
 
-	list<squarePair> pairs = pose_cam->updateCamera();
-	bool strafed = strafeTo(pose_cam->getCenterError(pairs));
-	//Reset WE if we strafed to prevent error in WE pose
-	if(strafed){
+		list<squarePair> pairs = pose_cam->updateCamera();
+		bool strafed = strafeTo(pose_cam->getCenterError(pairs));
+		//Reset WE if we strafed to prevent error in WE pose
+		if(strafed){
 
-		robot->getWheelEncoder(RI_WHEEL_LEFT);
-		robot->getWheelEncoder(RI_WHEEL_RIGHT);
-		robot->getWheelEncoder(RI_WHEEL_REAR);
-	}
+			robot->getWheelEncoder(RI_WHEEL_LEFT);
+			robot->getWheelEncoder(RI_WHEEL_RIGHT);
+			robot->getWheelEncoder(RI_WHEEL_REAR);
+		}
 	
-	/*
-	 * While WE and camera say we are not in the center of a cell
-	 * in center when the closed square is a certain size & location
-	 */
-	int camera_cell_error = pose_cam->getCellError(pairs);
-	int kalman_cell_error = sqrt(pose_kalman.x*pose_kalman.x + pose_kalman.y*pose_kalman.y)- RobotPose::CELL_DIMENSION_CM;
-	printf("Camera Cell Error: %d Kalman Cell Error: %d\n", camera_cell_error, kalman_cell_error);
-	//PID CODE???
-	if(false){
-		moveToCell(FORWARD);
-	}
+		/*
+		 * While WE and camera say we are not in the center of a cell
+		 * in center when the closed square is a certain size & location
+		 */
+		int camera_cell_error = pose_cam->getCellError(pairs);
+		printf("Camera Cell Error: %d Kalman Cell Error: %d\n", camera_cell_error, kalman_cell_error);
+	}while(kalman_cell_error < -25);
+
 }
 
 void RobotPose::moveTo(float x, float y) {
