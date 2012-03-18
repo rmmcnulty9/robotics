@@ -35,7 +35,7 @@ class CameraPose {
 	int getCenterError(list<squarePair> pairs);
 	int getCellError(list<squarePair> pairs);
 	int getTurnError(list<squarePair> pairs);
-	  
+	void removeOverlap(squares_t *squares);
 	unsigned int image_ctr;
 
 	private:
