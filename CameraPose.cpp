@@ -69,6 +69,7 @@ list<squarePair> CameraPose::updateCamera(){
 	
 	cvInRangeS(hsvImage, RC_YELLOW_LOW, RC_YELLOW_HIGH, yellow);
 	currentSquares = robot->findSquares(yellow, MIN_SQUARE);
+	removeOverlap(currentSquares);
 	drawSquares(currentSquares, CV_RGB(0,255,0));
 	yellowPairs = matchSquares(currentSquares, YELLOW);
 	printCenters(yellowPairs);
@@ -80,6 +81,7 @@ list<squarePair> CameraPose::updateCamera(){
 	cvOr(pinkLow, pinkHigh, filteredImage, NULL);
 	
 	currentSquares = robot->findSquares(filteredImage, MIN_SQUARE);
+	removeOverlap(currentSquares);
 	drawSquares(currentSquares, CV_RGB(255,0,0));
 	pinkPairs = matchSquares(currentSquares, PINK);
 	printCenters(pinkPairs);
@@ -172,7 +174,26 @@ bool compare_areas (squarePair first, squarePair second){
 	else return false;
 }
 
-
+void CameraPose::removeOverlap(squares_t *squares){
+	squares_t *current;
+	squares_t *last;
+	while(squares != NULL){
+		last = squares;
+		current = squares->next;
+		while(current != NULL){
+			
+			//Test if x and y values are close
+			if(abs(squares->center.y - current->center.y) < SCREEN_HEIGHT/18 
+				&& abs(squares->center.x - current->center.x) < SCREEN_WIDTH/18){
+				
+				last->next = current->next;
+				
+			}
+			current = current->next;
+		}
+		squares = squares->next;
+	}
+}
 /*
  * Find squares of same height and draw lines between them
  */
