@@ -122,7 +122,7 @@ list<squarePair> CameraPose::updateCamera(){
 	cvInRangeS(hsvImage, RC_YELLOW_LOW, RC_YELLOW_HIGH, yellow);
 	currentSquares = robot->findSquares(yellow, MIN_SQUARE);
 	drawSquares(currentSquares, CV_RGB(0,255,0));
-	yellowPairs = matchSquares(currentSquares);
+	yellowPairs = matchSquares(currentSquares, YELLOW);
 	printCenters(yellowPairs);
 
 
@@ -133,7 +133,7 @@ list<squarePair> CameraPose::updateCamera(){
 	
 	currentSquares = robot->findSquares(filteredImage, MIN_SQUARE);
 	drawSquares(currentSquares, CV_RGB(255,0,0));
-	pinkPairs = matchSquares(currentSquares);
+	pinkPairs = matchSquares(currentSquares, PINK);
 	printCenters(pinkPairs);
 
 	displayImages();
@@ -228,7 +228,7 @@ bool compare_areas (squarePair first, squarePair second){
 /*
  * Find squares of same height and draw lines between them
  */
-list<squarePair> CameraPose::matchSquares(squares_t *squares){
+list<squarePair> CameraPose::matchSquares(squares_t *squares, int color){
 	squares_t *tempSquares;
 	list <squarePair> pair_list;
 	squarePair temp_pair;
@@ -258,6 +258,7 @@ list<squarePair> CameraPose::matchSquares(squares_t *squares){
 					temp_pair.left = tempSquares;
 					temp_pair.right = squares;
 				}
+				temp_pair.color = color;
 				pair_list.push_back(temp_pair);
 				break;
 				
