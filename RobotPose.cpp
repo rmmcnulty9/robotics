@@ -118,7 +118,8 @@ bool RobotPose::strafeTo(int delta_x){
 
 	//PID Controller code here
 	
-/*	if(total_PID > 50.0){
+/*	
+	if(total_PID > 50.0){
 		robot_speed = 1;
 		velocity[0] = vel_1 * cos(pose_kalman.theta);
 		velocity[1] = vel_1 * sin(pose_kalman.theta);
@@ -145,11 +146,11 @@ bool RobotPose::strafeTo(int delta_x){
 
 	//move the robot left or right
 	if((delta_x+CameraPose::STRAFE_EPSILON)<0){
+		robot->Move(RI_MOVE_LEFT, robot_speed);
+		printf("Moving Left\n");
+	}else if((delta_x-CameraPose::STRAFE_EPSILON)>0){
 		robot->Move(RI_MOVE_RIGHT, robot_speed);
 		printf("Moving Right\n");
-	}else if((delta_x-CameraPose::STRAFE_EPSILON)>0){
-		robot->Move(RI_MOVE_LEFT, robot_speed);
-		printf("Move Left\n");
 	}else{
 		//Base case
 		return false;
