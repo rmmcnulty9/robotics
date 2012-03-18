@@ -304,24 +304,12 @@ void RobotPose::turnTo(float goal_theta) {
 	float velocity[3];
 	if(PID_res > 1.0){
 		robot_speed = 5;
-//		velocity[0] = 0.0;
-//		velocity[1] = 0.0;
-//		velocity[2] = vel_5;
-//		rovioKalmanFilterSetVelocity(&kf,velocity);
 	}
 	else if(PID_res < 1.0 && PID_res > 0.25){
 		robot_speed = 7;
-//		velocity[0] = 0.0;
-//		velocity[1] = 0.0;
-//		velocity[2] = vel_7;
-//		rovioKalmanFilterSetVelocity(&kf,velocity);
 	}
 	else {
 		robot_speed = 10;
-//		velocity[0] = 0.0;
-//		velocity[1] = 0.0;
-//		velocity[2] = vel_10;
-//		rovioKalmanFilterSetVelocity(&kf,velocity);
 	}
 	//Turn depending on error angle
 	if(error_theta==error_theta1){
@@ -346,7 +334,7 @@ void RobotPose::printRaw(){
 	int t_right = robot->getWheelEncoderTotals(RI_WHEEL_RIGHT);
 	int t_rear = robot->getWheelEncoderTotals(RI_WHEEL_REAR);
                
- 	int x = robot->X();
+	int x = robot->X();
 	int y = robot->Y();
 	float theta = robot->Theta();
                
