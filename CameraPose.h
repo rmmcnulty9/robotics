@@ -28,9 +28,7 @@ class CameraPose {
 	void displayImages();
 	list<squarePair> matchSquares(squares_t *squares, int color);
 	void drawSquares(squares_t *squares, CvScalar displayColor);
-//NOT USED RIGHT NOW
-//	void strafeTo(int delta_y);
-//	void moveTo();
+
 
 	void strafeTo(float delta_y);
 	void printCenters(list<squarePair> pairs);

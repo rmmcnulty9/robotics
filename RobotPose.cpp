@@ -117,31 +117,19 @@ bool RobotPose::strafeTo(int delta_x){
 	int robot_speed = 6;
 
 	//PID Controller code here
-	
-/*	
-	if(total_PID > 50.0){
+	float PID_res = PID_camera->UpdatePID(delta_x, delta_x);
+	PID_res = abs(delta_x);
+	if(PID_res > 50.0){
 		robot_speed = 1;
-		velocity[0] = vel_1 * cos(pose_kalman.theta);
-		velocity[1] = vel_1 * sin(pose_kalman.theta);
-		velocity[2] = 0.0;
-		rovioKalmanFilterSetVelocity(&kf,velocity);
 	}
-	else if(total_PID < 50.0 && total_PID > 25.0){
+	else if(PID_res < 50.0 && PID_res > 25.0){
 		robot_speed = 3;
 		float velocity [3];
-		velocity[0] = vel_3 * cos(pose_kalman.theta);
-		velocity[1] = vel_3 * sin(pose_kalman.theta);
-		velocity[2] = 0.0;
-		rovioKalmanFilterSetVelocity(&kf,velocity);
 	}
 	else {
 		robot_speed = 5;
-		velocity[0] = vel_5 * cos(pose_kalman.theta);
-		velocity[1] = vel_5 * sin(pose_kalman.theta);
-		velocity[2] = 0.0;
-		rovioKalmanFilterSetVelocity(&kf,velocity);
 	}
-*/
+
 	printf("%u DELTA: %d\n",pose_cam->image_ctr-1, delta_x);
 
 	//move the robot left or right
@@ -366,7 +354,7 @@ void RobotPose::updatePosition(bool turning=false){
 	//NSdata[0] = pose_ns.x;
 	//NSdata[1] = pose_ns.y;
 	//NSdata[2] = pose_ns.theta;
-	printf("Warning not passing NS data into Kalman Filter!\n");
+	//printf("Warning not passing NS data into Kalman Filter!\n");
 	NSdata[0] = pose_we.x;
 	NSdata[1] = pose_we.y;
 	NSdata[2] = pose_we.theta;
