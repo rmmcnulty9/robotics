@@ -14,6 +14,7 @@ using namespace std;
 typedef struct {
 	squares_t* left;
 	squares_t* right;
+	int color;
 } squarePair;
 
 
@@ -25,7 +26,7 @@ class CameraPose {
   
 	list<squarePair> updateCamera();
 	void displayImages();
-	list<squarePair> matchSquares(squares_t *squares);
+	list<squarePair> matchSquares(squares_t *squares, int color);
 	void drawSquares(squares_t *squares, CvScalar displayColor);
 //NOT USED RIGHT NOW
 //	void strafeTo(int delta_y);
@@ -51,6 +52,8 @@ class CameraPose {
 	static const int MIN_SQUARE = 200;
 	static const int SCREEN_WIDTH = 640;
 	static const int SCREEN_HEIGHT = 480;
+	static const int PINK = 0;
+	static const int YELLOW = 1;
   
 };
 
