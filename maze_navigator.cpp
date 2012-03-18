@@ -31,6 +31,7 @@ int main(int argv, char **argc)
 	 */
 	int ctr = 0;
 	while(!robot->IR_Detected() && ctr<=4){
+		printf("CELL %d =============\n", ctr);
 		robotPose.moveToCell(RobotPose::FORWARD);
 		ctr+=1;
 	}
