@@ -49,11 +49,14 @@ class CameraPose {
 	IplImage *pinkLow;
 	IplImage *yellow;
 	IplImage *filteredImage;
-	static const int MIN_SQUARE = 200;
+	static const int MIN_SQUARE = 400;
 	static const int SCREEN_WIDTH = 640;
 	static const int SCREEN_HEIGHT = 480;
 	static const int PINK = 0;
 	static const int YELLOW = 1;
+
+	static const int Y_CELL_CENTER_PINK = 168;
+	static const int Y_CELL_CENTER_YELLOW = 135;
   
 };
 
