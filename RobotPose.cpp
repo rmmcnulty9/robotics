@@ -146,10 +146,10 @@ bool RobotPose::strafeTo(int delta_x){
 
 	//move the robot left or right
 	if((delta_x+CameraPose::STRAFE_EPSILON)<0){
-		robot->Move(RI_MOVE_FWD_LEFT, robot_speed);
+	//	robot->Move(RI_MOVE_FWD_LEFT, robot_speed);
 		printf("Moving Left\n");
 	}else if((delta_x-CameraPose::STRAFE_EPSILON)>0){
-		robot->Move(RI_MOVE_FWD_RIGHT, robot_speed);
+	//	robot->Move(RI_MOVE_FWD_RIGHT, robot_speed);
 		printf("Moving Right\n");
 	}else{
 		//Base case

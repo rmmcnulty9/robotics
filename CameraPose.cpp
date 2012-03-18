@@ -298,6 +298,8 @@ int CameraPose::getCenterError(list<squarePair> pairs){
 	else{
 		list<squarePair>::iterator it = pairs.begin();
 		centers = (it->left->center.x + it->right->center.x)/2;
+		printf("Best Center L(%d,%d) R(%d,%d)\n",it->left->center.x,
+			it->left->center.y, it->right->center.x, it->right->center.y);
 		return centers - (SCREEN_WIDTH/2);
 	}
 	//	return (centers/pairs.size()) - (SCREEN_WIDTH/2);
