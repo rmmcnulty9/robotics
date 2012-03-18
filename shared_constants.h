@@ -31,7 +31,7 @@ const char* coef_filename = "fir_coef/s_72";
 const char* ns_theta_coef_filename = "fir_coef/s_75";
 
 const float MOVE_TO_EPSILON = 10.0;
-float TURN_TO_EPSILON = 25.0*(M_PI/180);
+float TURN_TO_EPSILON = 10.0*(M_PI/180);
 
 /*
  * PID Controller constants

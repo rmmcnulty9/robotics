@@ -134,10 +134,10 @@ bool RobotPose::strafeTo(int delta_x){
 
 	//move the robot left or right
 	if(delta_x < -1 * STRAFE_EPSILON){
-		robot->Move(RI_MOVE_LEFT, robot_speed);
+		robot->Move(RI_MOVE_FWD_LEFT, robot_speed);
 		printf("Moving Left\n");
 	}else if(delta_x > STRAFE_EPSILON){
-		robot->Move(RI_MOVE_RIGHT, robot_speed);
+		robot->Move(RI_MOVE_FWD_RIGHT, robot_speed);
 		printf("Moving Right\n");
 	}else{
 		//Base case
@@ -164,7 +164,7 @@ void RobotPose::moveToCell(const int direction){
 	}
 
 	//Zero out WE to use a measurement to next cell
-	resetWEPose(0,0,pose_kalman.theta);
+	//resetWEPose(0,0,pose_kalman.theta);
 	int kalman_cell_error = 0, camera_cell_error = 0;
 	do{
 		robot->Move(RI_MOVE_FORWARD, RI_FASTEST);
@@ -357,18 +357,18 @@ void RobotPose::updatePosition(bool turning=false){
 
 	//Pass through Kalman filter
 	float NSdata[3], WEdata[3], track[9];
-	//NSdata[0] = pose_ns.x;
-	//NSdata[1] = pose_ns.y;
-	//NSdata[2] = pose_ns.theta;
+	NSdata[0] = pose_ns.x;
+	NSdata[1] = pose_ns.y;
+	NSdata[2] = pose_ns.theta;
 	//printf("Warning not passing NS data into Kalman Filter!\n");
-	NSdata[0] = pose_we.x;
-	NSdata[1] = pose_we.y;
-	NSdata[2] = pose_we.theta;
+	//NSdata[0] = pose_we.x;
+	//NSdata[1] = pose_we.y;
+	//NSdata[2] = pose_we.theta;
 
 	WEdata[0] = pose_we.x;
 	WEdata[1] = pose_we.y;
 	WEdata[2] = pose_we.theta;
-	rovioKalmanFilter(&kf,NSdata, WEdata, track);
+	rovioKalmanFilter(&kf,NSdata, NSdata, track);
 
 	//return the filtered robot pose
 	pose_kalman.x = track[0];
@@ -411,7 +411,7 @@ bool RobotPose::updateWE(bool turning) {
 	if (!turning) {
 		dx_2 = dx * cos(pose_we.theta - M_PI_2) - dy * sin(pose_we.theta - M_PI_2);
 		dy_2 = dx * sin(pose_we.theta - M_PI_2) + dy * cos(pose_we.theta - M_PI_2);
-		printf("HERE %f %f %f - %f %f - %f %f - %d %d %d\n", pose_we.x, pose_we.y, pose_we.theta,dx, dy,  dx_2, dy_2, left, right, rear);
+	//	printf("HERE %f %f %f - %f %f - %f %f - %d %d %d\n", pose_we.x, pose_we.y, pose_we.theta,dx, dy,  dx_2, dy_2, left, right, rear);
 		pose_we.x += dx_2*we_to_cm;
 		pose_we.y += dy_2*we_to_cm;
 	}

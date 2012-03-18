@@ -187,8 +187,8 @@ list<squarePair> CameraPose::matchSquares(squares_t *squares, int color){
 		while(tempSquares != NULL){
 			
 			//Test if y values are close, if x values are far, and if centers in top half of screen
-			if(abs(squares->center.y - tempSquares->center.y) < SCREEN_HEIGHT/24 
-				&& abs(squares->center.x - tempSquares->center.x) > SCREEN_WIDTH/4
+			if(abs(squares->center.y - tempSquares->center.y) < SCREEN_HEIGHT/18 
+				&& abs(squares->center.x - tempSquares->center.x) > SCREEN_WIDTH/6
 				&& (squares->center.y) < SCREEN_HEIGHT * (3.0/5.0)
 				&& (tempSquares->center.y) < SCREEN_HEIGHT * (3.0/5.0)){
 				//Draw line
