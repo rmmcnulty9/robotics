@@ -117,7 +117,7 @@ bool RobotPose::strafeTo(int delta_x){
 	int robot_speed = 6;
 
 	//PID Controller code here
-	
+	/*
 	if(total_PID > 50.0){
 		robot_speed = 1;
 		velocity[0] = vel_1 * cos(pose_kalman.theta);
@@ -140,7 +140,7 @@ bool RobotPose::strafeTo(int delta_x){
 		velocity[2] = 0.0;
 		rovioKalmanFilterSetVelocity(&kf,velocity);
 	}
-
+  */
 	printf("%u DELTA: %d\n",pose_cam->image_ctr, delta_x);
 
 	//move the robot left or right
@@ -162,7 +162,7 @@ bool RobotPose::strafeTo(int delta_x){
 
 void RobotPose::moveToCell(const int direction){
 
-	pose_cam->updateCamera();
+	//pose_cam->updateCamera();
 	updatePosition(false);
 	if(direction == LEFT){
 		turnTo(pose_kalman.theta + 90.0* (M_PI/180.0));

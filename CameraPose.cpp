@@ -242,7 +242,7 @@ list<squarePair> CameraPose::matchSquares(squares_t *squares){
 			if(abs(squares->center.y - tempSquares->center.y) < SCREEN_HEIGHT/24 
 				&& abs(squares->center.x - tempSquares->center.x) > SCREEN_WIDTH/4
 				&& (squares->center.y) < SCREEN_HEIGHT * (3/5)
-				&& (tempSquares->center.y) < SCREEN_HEIGHT * (3/5){
+				&& (tempSquares->center.y) < SCREEN_HEIGHT * (3/5)){
 				//Draw line
 				pt1 = cvPoint(squares->center.x, squares->center.y);
 				pt2 = cvPoint(tempSquares->center.x, tempSquares->center.y);
