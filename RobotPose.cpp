@@ -134,15 +134,16 @@ bool RobotPose::strafeTo(int delta_x){
 
 	//move the robot left or right
 	if(delta_x < -1 * STRAFE_EPSILON){
-		robot->Move(RI_MOVE_FWD_LEFT, robot_speed);
+		robot->Move(RI_MOVE_LEFT, robot_speed);
 		printf("Moving Left\n");
 	}else if(delta_x > STRAFE_EPSILON){
-		robot->Move(RI_MOVE_FWD_RIGHT, robot_speed);
+		robot->Move(RI_MOVE_RIGHT, robot_speed);
 		printf("Moving Right\n");
 	}else{
 		//Base case
 		return false;
 	}
+	turnTo(M_PI_2);
 	//If we have gotten here there was a strafe
 	list<squarePair> pairs = pose_cam->updateCamera();
 	return (strafeTo(pose_cam->getCenterError(pairs)) || true);
@@ -164,12 +165,11 @@ void RobotPose::moveToCell(const int direction){
 
 	//Zero out WE to use a measurement to next cell
 	resetWEPose(0,0,pose_kalman.theta);
-	int kalman_cell_error = 0;
-	
+	int kalman_cell_error = 0, camera_cell_error = 0;
 	do{
 		robot->Move(RI_MOVE_FORWARD, RI_FASTEST);
 		updatePosition(false);
-		printf("Kalman: %f,%f,%f\n", pose_we.x, pose_we.y, pose_we.theta * (180/M_PI));
+		printf("Kalman: %f,%f,%f\n", pose_kalman.x, pose_kalman.y, pose_kalman.theta * (180/M_PI));
 		//Calculate error to next cell
 		kalman_cell_error = sqrt(pose_kalman.x*pose_kalman.x + pose_kalman.y*pose_kalman.y)- CELL_DIMENSION_CM;
 
@@ -183,18 +183,18 @@ void RobotPose::moveToCell(const int direction){
 		//Reset WE if we strafed to prevent error in WE pose
 		if(strafed){
 
-			robot->getWheelEncoder(RI_WHEEL_LEFT);
-			robot->getWheelEncoder(RI_WHEEL_RIGHT);
-			robot->getWheelEncoder(RI_WHEEL_REAR);
+		//	robot->getWheelEncoder(RI_WHEEL_LEFT);
+		//	robot->getWheelEncoder(RI_WHEEL_RIGHT);
+		//	robot->getWheelEncoder(RI_WHEEL_REAR);
 		}
 	
 		/*
 		 * While WE and camera say we are not in the center of a cell
 		 * in center when the closed square is a certain size & location
 		 */
-		int camera_cell_error = pose_cam->getCellError(pairs);
+		camera_cell_error = pose_cam->getCellError(pairs);
 		printf("Camera Cell Error: %d Kalman Cell Error: %d\n", camera_cell_error, kalman_cell_error);
-	}while(kalman_cell_error < -25);
+	}while(kalman_cell_error < -25 || camera_cell_error <25);
 
 }
 
@@ -282,12 +282,12 @@ void RobotPose::turnTo(float goal_theta) {
 	 */
 	float error_theta = error_theta1<error_theta2?error_theta1:error_theta2;
 	//Don't turn if error theta not large enough
+	printPoses();
 	if(error_theta>=(-TURN_TO_EPSILON) && error_theta<= (TURN_TO_EPSILON)){
 		 printf("Theta too small\n");
 		 return;
 	}
 
-	printPoses();
   
 	//Call PID for Theta
 	float PID_res = abs(PID_theta->UpdatePID(error_theta, pose_kalman.theta));
@@ -315,7 +315,6 @@ void RobotPose::turnTo(float goal_theta) {
 		robot->Move(RI_TURN_RIGHT, robot_speed);
 	}
 
-	printPoses();
 	turnTo(goal_theta);
 
 }
@@ -344,7 +343,7 @@ void RobotPose::updatePosition(bool turning=false){
 	robot->update();
 	updateNS();
 	updateWE(turning);
-
+	pose_we.theta = pose_ns.theta;
 	/*
 	 * If there is a weaker NS signal change the uncertainty - higher NS lower WE and lower prediction
 	 * No significant difference.
@@ -385,15 +384,15 @@ bool RobotPose::updateWE(bool turning) {
 	int rear = robot->getWheelEncoder(RI_WHEEL_REAR);
 	//Filter WE data ignoring the left and right values while turning
 	if(!turning){
-		left = firFilter(fir_left_we, left);
-		right = firFilter(fir_right_we, right);
+//		left = firFilter(fir_left_we, left);
+//		right = firFilter(fir_right_we, right);
 	}
 	rear = firFilter(fir_rear_we, rear);
 	//Transform data
 	float dy = ((left * sin(150.0 * M_PI/180.0)) + (right * sin(30.0 * M_PI/180.0)) + (rear * sin(90.0 * M_PI/180.0)))/3.0;
 	float dx = ((left * cos(150.0 * M_PI/180.0)) + (right * cos(30.0 * M_PI/180.0)))/2.0;
 
-	dx = 0.0; // I don't think we are supposed to move in this direction.
+	//dx = 0.0; // I don't think we are supposed to move in this direction.
 
 	float dtheta = (rear * we_to_rad);
 
@@ -411,6 +410,7 @@ bool RobotPose::updateWE(bool turning) {
 	if (!turning) {
 		dx_2 = dx * cos(pose_we.theta - M_PI_2) - dy * sin(pose_we.theta - M_PI_2);
 		dy_2 = dx * sin(pose_we.theta - M_PI_2) + dy * cos(pose_we.theta - M_PI_2);
+		printf("HERE %f %f %f - %f %f - %f %f - %d %d %d\n", pose_we.x, pose_we.y, pose_we.theta,dx, dy,  dx_2, dy_2, left, right, rear);
 		pose_we.x += dx_2*we_to_cm;
 		pose_we.y += dy_2*we_to_cm;
 	}
@@ -498,7 +498,8 @@ bool RobotPose::updateNS() {
  * Resets the pose for the WE. This is used when we change rooms to help with WE drift
  */
 void RobotPose::resetWEPose(float x, float y, float theta) {
-  
+ 
+	printf("RESETTING\n"); 
 	pose_we.x = x;
 	pose_we.y = y;
 	pose_we.theta = theta;
