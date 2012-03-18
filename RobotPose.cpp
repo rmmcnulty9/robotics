@@ -194,6 +194,7 @@ void RobotPose::moveToCell(const int direction){
 		 */
 		int camera_cell_error = pose_cam->getCellError(pairs);
 		printf("Camera Cell Error: %d Kalman Cell Error: %d\n", camera_cell_error, kalman_cell_error);
+		printf("Turn Error: %d\n", pose_cam->getTurnError(pairs));
 	}while(kalman_cell_error < -25);
 
 }

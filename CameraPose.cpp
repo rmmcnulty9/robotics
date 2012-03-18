@@ -259,7 +259,17 @@ int CameraPose::getCenterError(list<squarePair> pairs){
 	//	return (centers/pairs.size()) - (SCREEN_WIDTH/2);
 	
 }
-
+int CameraPose::getTurnError(list<squarePair> pairs){
+	list<squarePair>::iterator it;
+	if(pairs.size() == 0)
+		return 0;
+	else{
+		list<squarePair>::iterator it = pairs.begin();
+		int left_error = abs(it->left->center.x - SCREEN_WIDTH/2);
+		int right_error = abs(it->right->center.x - SCREEN_WIDTH/2);
+		return left_error - right_error;
+	}
+}
 /*
  * Find the distance to the next cell based on where it finds squarePairs in the image
  * -based onthe location and size of squarePairs

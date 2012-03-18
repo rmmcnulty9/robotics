@@ -34,7 +34,8 @@ class CameraPose {
 	void printCenters(list<squarePair> pairs);
 	int getCenterError(list<squarePair> pairs);
 	int getCellError(list<squarePair> pairs);
-
+	int getTurnError(list<squarePair> pairs);
+	  
 	unsigned int image_ctr;
 
 	private:
