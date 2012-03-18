@@ -64,7 +64,7 @@ RobotPose::RobotPose(RobotInterface *r){
 	PID_x = new PIDController(iMax,iMin,integral,proportional,derivative);
 	PID_y = new PIDController(iMax,iMin,integral,proportional,derivative);
 	PID_theta = new PIDController(iMax,iMin,integral,proportional,derivative);
-	
+	PID_camera = new PIDController(iMax,iMin,integral, proportional, derivative);	
 	//Create CameraPose object
 	pose_cam = new CameraPose(robot);
 }

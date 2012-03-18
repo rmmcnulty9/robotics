@@ -36,8 +36,8 @@ CameraPose::CameraPose(RobotInterface *r){
 
 	//Setup display windows
 	cvNamedWindow("Unfiltered", CV_WINDOW_AUTOSIZE);
-	cvNamedWindow("Filtered Pink High", CV_WINDOW_AUTOSIZE);
-	cvNamedWindow("Filtered Pink Low", CV_WINDOW_AUTOSIZE);
+	//cvNamedWindow("Filtered Pink High", CV_WINDOW_AUTOSIZE);
+	//cvNamedWindow("Filtered Pink Low", CV_WINDOW_AUTOSIZE);
 	cvNamedWindow("Filtered Yellow", CV_WINDOW_AUTOSIZE);
 	cvNamedWindow("Filtered", CV_WINDOW_AUTOSIZE);
 	//cvNamedWindow("All Filtered", CV_WINDOW_AUTOSIZE);
@@ -167,8 +167,8 @@ list<squarePair> CameraPose::updateCamera(){
 void CameraPose::displayImages(){
 	cvShowImage("Unfiltered", cameraImage);
 	cvShowImage("Filtered", filteredImage);
-	cvShowImage("Filtered Pink High", pinkHigh);
-	cvShowImage("Filtered Pink Low", pinkLow);
+	//cvShowImage("Filtered Pink High", pinkHigh);
+	//cvShowImage("Filtered Pink Low", pinkLow);
 	cvShowImage("Filtered Yellow", yellow);
 	//cvShowImage("Filtered All", filteredImage);
 	cvWaitKey(2000);
@@ -216,6 +216,16 @@ void CameraPose::drawSquares(squares_t *squares, CvScalar displayColor){
 }
 
 /*
+ * Comparison function for list sort to use
+ */
+bool compare_areas (squarePair first, squarePair second){
+
+	if((first.left->area + first.right->area) > (second.left->area + second.right->area)) return true;
+	else return false;
+}
+
+
+/*
  * Find squares of same height and draw lines between them
  */
 list<squarePair> CameraPose::matchSquares(squares_t *squares){
@@ -256,6 +266,8 @@ list<squarePair> CameraPose::matchSquares(squares_t *squares){
 		}
 		squares = squares->next;
 	}
+	//Sort the squarePairs largest area to smallest
+	pair_list.sort(compare_areas);
 	return pair_list;
 }
 /*
@@ -278,13 +290,17 @@ void CameraPose::printCenters(list<squarePair> pairs){
 int CameraPose::getCenterError(list<squarePair> pairs){
 	list<squarePair>::iterator it;
 	int centers = 0; 
-	for(it=pairs.begin(); it!=pairs.end(); it++){
-		centers += (it->left->center.x + it->right->center.x)/2;
-	}	
+	//for(it=pairs.begin(); it!=pairs.end(); it++){
+	//	centers += (it->left->center.x + it->right->center.x)/2;
+	//}	
 	if(pairs.size() == 0)
 		return 0;
-	else
-		return (centers/pairs.size()) - (SCREEN_WIDTH/2);
+	else{
+		list<squarePair>::iterator it = pairs.begin();
+		centers = (it->left->center.x + it->right->center.x)/2;
+		return centers - (SCREEN_WIDTH/2);
+	}
+	//	return (centers/pairs.size()) - (SCREEN_WIDTH/2);
 	
 }
 

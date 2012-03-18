@@ -67,6 +67,7 @@ class RobotPose {
   PIDController *PID_x;
   PIDController *PID_y;
   PIDController *PID_theta;
+  PIDController *PID_camera;
   int room_start;
   int room_cur;
   float theta_ns_trans;

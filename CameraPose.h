@@ -36,7 +36,7 @@ class CameraPose {
 	int getCenterError(list<squarePair> pairs);
 	int getCellError(list<squarePair> pairs);
 
-	static const float STRAFE_EPSILON = 5.0;	
+	static const float STRAFE_EPSILON = 12.0;	
 	unsigned int image_ctr;
 
 	private:
