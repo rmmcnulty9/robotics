@@ -134,16 +134,16 @@ bool RobotPose::strafeTo(int delta_x){
 
 	//move the robot left or right
 	if(delta_x < -1 * STRAFE_EPSILON){
-		robot->Move(RI_MOVE_FWD_LEFT, robot_speed);
+//		robot->Move(RI_MOVE_FWD_LEFT, robot_speed);
 		printf("Moving Left\n");
 	}else if(delta_x > STRAFE_EPSILON){
-		robot->Move(RI_MOVE_FWD_RIGHT, robot_speed);
+//		robot->Move(RI_MOVE_FWD_RIGHT, robot_speed);
 		printf("Moving Right\n");
 	}else{
 		//Base case
 		return false;
 	}
-	turnTo(M_PI_2);
+//	turnTo(M_PI_2);
 	//If we have gotten here there was a strafe
 	list<squarePair> pairs = pose_cam->updateCamera();
 	return (strafeTo(pose_cam->getCenterError(pairs)) || true);
@@ -151,7 +151,7 @@ bool RobotPose::strafeTo(int delta_x){
 
 
 void RobotPose::moveToCell(const int direction){
-
+	static unsigned int cell_number = 0;
 	//pose_cam->updateCamera();
 	updatePosition(false);
 	if(direction == LEFT){
@@ -167,11 +167,11 @@ void RobotPose::moveToCell(const int direction){
 	//resetWEPose(0,0,pose_kalman.theta);
 	int kalman_cell_error = 0, camera_cell_error = 0;
 	do{
-		robot->Move(RI_MOVE_FORWARD, RI_FASTEST);
+//		robot->Move(RI_MOVE_FORWARD, RI_FASTEST);
 		updatePosition(false);
 		printf("Kalman: %f,%f,%f\n", pose_kalman.x, pose_kalman.y, pose_kalman.theta * (180/M_PI));
 		//Calculate error to next cell
-		kalman_cell_error = sqrt(pose_kalman.x*pose_kalman.x + pose_kalman.y*pose_kalman.y)- CELL_DIMENSION_CM;
+		kalman_cell_error = sqrt(pose_kalman.x*pose_kalman.x + pose_kalman.y*pose_kalman.y)- (CELL_DIMENSION_CM * cell_number);
 
 
 	/*
@@ -181,12 +181,12 @@ void RobotPose::moveToCell(const int direction){
 		list<squarePair> pairs = pose_cam->updateCamera();
 		bool strafed = strafeTo(pose_cam->getCenterError(pairs));
 		//Reset WE if we strafed to prevent error in WE pose
-		if(strafed){
+//		if(strafed){
 
 		//	robot->getWheelEncoder(RI_WHEEL_LEFT);
 		//	robot->getWheelEncoder(RI_WHEEL_RIGHT);
 		//	robot->getWheelEncoder(RI_WHEEL_REAR);
-		}
+//		}
 	
 		/*
 		 * While WE and camera say we are not in the center of a cell
@@ -195,7 +195,7 @@ void RobotPose::moveToCell(const int direction){
 		camera_cell_error = pose_cam->getCellError(pairs);
 		printf("Camera Cell Error: %d Kalman Cell Error: %d\n", camera_cell_error, kalman_cell_error);
 		printf("Turn Error: %d\n", pose_cam->getTurnError(pairs));
-	}while(kalman_cell_error < -25 || camera_cell_error <25);
+	}while(kalman_cell_error < -25 || camera_cell_error > 25);
 
 }
 

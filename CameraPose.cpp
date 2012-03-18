@@ -268,12 +268,12 @@ int CameraPose::getCenterError(list<squarePair> pairs){
 	else{
 		list<squarePair>::iterator it = pairs.begin();
 		centers = (it->left->center.x + it->right->center.x)/2;
-		//printf("Best Center L(%d,%d) R(%d,%d) Color:%d\n",it->left->center.x,
-		//	it->left->center.y, it->right->center.x, it->right->center.y, it->color);
+		printf("Best Center L(%d,%d) R(%d,%d) Color:%d\n",it->left->center.x,
+			it->left->center.y, it->right->center.x, it->right->center.y, it->color);
 		if(pairs.size() > 1){
 			it++;
-		//	printf("Best Center L(%d,%d) R(%d,%d) Color:%d\n",it->left->center.x,
-		//		it->left->center.y, it->right->center.x, it->right->center.y, it->color);
+			printf("Best Center L(%d,%d) R(%d,%d) Color:%d\n",it->left->center.x,
+				it->left->center.y, it->right->center.x, it->right->center.y, it->color);
 		}
 		return centers - (SCREEN_WIDTH/2);
 	}
@@ -307,7 +307,7 @@ int CameraPose::getCellError(list<squarePair> pairs){
 
 	}
 	
-	return error;
+	return error/2;
 }
 
 
