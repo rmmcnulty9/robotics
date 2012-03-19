@@ -69,6 +69,7 @@ list<squarePair> CameraPose::updateCamera(){
 	
 	cvInRangeS(hsvImage, RC_YELLOW_LOW, RC_YELLOW_HIGH, yellow);
 	currentSquares = robot->findSquares(yellow, MIN_SQUARE);
+	currYellowSquares = currentSquares;
 	removeOverlap(currentSquares);
 	drawSquares(currentSquares, CV_RGB(0,255,0));
 	yellowPairs = matchSquares(currentSquares, YELLOW);
@@ -81,6 +82,7 @@ list<squarePair> CameraPose::updateCamera(){
 	cvOr(pinkLow, pinkHigh, filteredImage, NULL);
 	
 	currentSquares = robot->findSquares(filteredImage, MIN_SQUARE);
+	currPinkSquares = currentSquares;
 	removeOverlap(currentSquares);
 	drawSquares(currentSquares, CV_RGB(255,0,0));
 	pinkPairs = matchSquares(currentSquares, PINK);
@@ -268,27 +270,51 @@ int CameraPose::getCenterError(list<squarePair> pairs){
 	else{
 		list<squarePair>::iterator it = pairs.begin();
 		centers = (it->left->center.x + it->right->center.x)/2;
-		printf("Best Center L(%d,%d) R(%d,%d) Color:%d\n",it->left->center.x,
-			it->left->center.y, it->right->center.x, it->right->center.y, it->color);
+		//printf("Best Center L(%d,%d) R(%d,%d) Color:%d\n",it->left->center.x,
+		//	it->left->center.y, it->right->center.x, it->right->center.y, it->color);
 		if(pairs.size() > 1){
 			it++;
-			printf("Best Center L(%d,%d) R(%d,%d) Color:%d\n",it->left->center.x,
-				it->left->center.y, it->right->center.x, it->right->center.y, it->color);
+		//	printf("Best Center L(%d,%d) R(%d,%d) Color:%d\n",it->left->center.x,
+		//		it->left->center.y, it->right->center.x, it->right->center.y, it->color);
 		}
 		return centers - (SCREEN_WIDTH/2);
 	}
 	//	return (centers/pairs.size()) - (SCREEN_WIDTH/2);
 	
 }
+/*
+ * Returns the average center x position to be used for turning
+ */
+int CameraPose::getSquareSide(squares_t *squares){
+	if(squares == NULL)
+		return 0;
+	else{
+		squares_t * current = squares;
+		int center = 0;
+		int num = 0;
+		while(current->next != NULL){
+			center += current->center.x;
+			current = current->next;
+			num++;
+		}
+		if(num == 0)
+			return 0;
+		else
+			return center/num - SCREEN_WIDTH/2;
+	}
+}
 int CameraPose::getTurnError(list<squarePair> pairs){
 	list<squarePair>::iterator it;
-	if(pairs.size() == 0)
-		return 0;
+	if(pairs.size() == 0){
+		return getSquareSide(currYellowSquares) +
+			getSquareSide(currPinkSquares);
+	}
 	else{
 		list<squarePair>::iterator it = pairs.begin();
 		int left_error = abs(it->left->center.x - SCREEN_WIDTH/2);
 		int right_error = abs(it->right->center.x - SCREEN_WIDTH/2);
-		return left_error - right_error;
+		//return left_error - right_error;
+		return 0;
 	}
 }
 /*

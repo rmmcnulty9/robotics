@@ -36,6 +36,7 @@ class CameraPose {
 	int getCellError(list<squarePair> pairs);
 	int getTurnError(list<squarePair> pairs);
 	void removeOverlap(squares_t *squares);
+	int getSquareSide(squares_t *squares);
 	unsigned int image_ctr;
 
 	private:
@@ -47,6 +48,9 @@ class CameraPose {
 	IplImage *pinkLow;
 	IplImage *yellow;
 	IplImage *filteredImage;
+	squares_t* currPinkSquares;
+	squares_t* currYellowSquares;
+
 	static const int MIN_SQUARE = 400;
 	static const int SCREEN_WIDTH = 640;
 	static const int SCREEN_HEIGHT = 480;
