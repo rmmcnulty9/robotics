@@ -56,6 +56,7 @@ CameraPose::~CameraPose(){}
  * Updates robot and gets current image & manipulated them
  */
 list<squarePair> CameraPose::updateCamera(){
+  
 	// Update the robot's sensor information
 	robot->update();
 	// Get the current camera image
@@ -63,14 +64,16 @@ list<squarePair> CameraPose::updateCamera(){
 	// Convert to hsv
 	cvCvtColor(cameraImage, hsvImage, CV_BGR2HSV);
 	
+	turnError = 0;
+	
 	//Find and match yellow squares
 	squares_t * currentSquares;
 	list<squarePair> yellowPairs, pinkPairs;
 	
 	cvInRangeS(hsvImage, RC_YELLOW_LOW, RC_YELLOW_HIGH, yellow);
 	currentSquares = robot->findSquares(yellow, MIN_SQUARE);
-	currYellowSquares = currentSquares;
 	removeOverlap(currentSquares);
+	turnError += getSquareSide(currentSquares);
 	drawSquares(currentSquares, CV_RGB(0,255,0));
 	yellowPairs = matchSquares(currentSquares, YELLOW);
 	printCenters(yellowPairs);
@@ -82,8 +85,8 @@ list<squarePair> CameraPose::updateCamera(){
 	cvOr(pinkLow, pinkHigh, filteredImage, NULL);
 	
 	currentSquares = robot->findSquares(filteredImage, MIN_SQUARE);
-	currPinkSquares = currentSquares;
 	removeOverlap(currentSquares);
+	turnError += getSquareSide(currentSquares);
 	drawSquares(currentSquares, CV_RGB(255,0,0));
 	pinkPairs = matchSquares(currentSquares, PINK);
 	printCenters(pinkPairs);
@@ -123,7 +126,7 @@ void CameraPose::displayImages(){
 	//cvShowImage("Filtered Pink Low", pinkLow);
 	cvShowImage("Filtered Yellow", yellow);
 	//cvShowImage("Filtered All", filteredImage);
-	cvWaitKey(200);
+	cvWaitKey(100);
 }
 
 /*
@@ -306,8 +309,7 @@ int CameraPose::getSquareSide(squares_t *squares){
 int CameraPose::getTurnError(list<squarePair> pairs){
 	list<squarePair>::iterator it;
 	if(pairs.size() == 0){
-		return getSquareSide(currYellowSquares) +
-			getSquareSide(currPinkSquares);
+		return turnError;
 	}
 	else{
 		list<squarePair>::iterator it = pairs.begin();

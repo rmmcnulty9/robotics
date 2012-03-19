@@ -48,9 +48,7 @@ class CameraPose {
 	IplImage *pinkLow;
 	IplImage *yellow;
 	IplImage *filteredImage;
-	squares_t* currPinkSquares;
-	squares_t* currYellowSquares;
-
+	int turnError;
 	static const int MIN_SQUARE = 400;
 	static const int SCREEN_WIDTH = 640;
 	static const int SCREEN_HEIGHT = 480;

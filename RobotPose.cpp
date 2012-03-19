@@ -103,7 +103,18 @@ void RobotPose::initPose() {
 	//Assuming we are always facing along +y axis
 	pose_we.theta = M_PI_2;
 
+	float initialPose[3];
+	initialPose[0] = 0;
+	initialPose[1] = 0;
+	initialPose[2] = M_PI_2;
+	
+	float Velocity[3];
+	Velocity[0] = 0;
+	Velocity[1] = 0;
+	Velocity[2] = 0;
+	int deltat = 1;
 
+	initKalmanFilter(&kf, initialPose, Velocity, deltat);
 
 }
 
@@ -192,8 +203,8 @@ void RobotPose::moveToCell(const int direction){
 		
 		camera_cell_error = pose_cam->getCellError(pairs);
 		printf("Camera Error: %d\t Kalman Error: %d\t", camera_cell_error, kalman_cell_error);
-		printf("Turn Error: %d\n", pose_cam->getTurnError(pairs));
-	}while(abs(kalman_cell_error) > 15 || abs(camera_cell_error) > 15);
+		printf("Turn Error: %d\n", turnError);
+	}while((abs(kalman_cell_error) > 15 || abs(camera_cell_error) > 15) && !robot->IR_Detected());
 
 }
 
