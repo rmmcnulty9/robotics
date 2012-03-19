@@ -178,7 +178,7 @@ void RobotPose::moveToCell(const int direction){
 	if(direction == LEFT){
 		turnTo(pose_kalman.theta + 90.0* (M_PI/180.0));
 	}else if(direction == RIGHT){
-		turnTo(pose_kalman.theta - 90.0* (M_PI/180.0));
+		turnTo(0.0);
 	}	
 	else if(direction == BACKWARD){
 		turnTo(pose_kalman.theta + 180.0* (M_PI/180.0));
@@ -230,7 +230,7 @@ void RobotPose::moveToCell(const int direction){
 		printf("Camera Error: %d\t Kalman Error: %d\t", camera_cell_error, kalman_cell_error);
 		printf("Turn Error: %d\n", turnError);
 		updatePosition(false);
-	}while((abs(kalman_cell_error) > 15));
+	}while((abs(kalman_cell_error) > 15)&&!robot->IR_Detected());
 	
 	robot->Move(RI_MOVE_FORWARD, RI_FASTEST);
 	robot->Move(RI_MOVE_FORWARD, RI_FASTEST);
