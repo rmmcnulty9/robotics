@@ -207,6 +207,7 @@ void RobotPose::moveToCell(const int direction){
 		
 		//Turn if facing only one wall of squares
 		int turnError = pose_cam->getTurnError(pairs);
+		/*
 		if(turnError > 50){
 			robot->Move(RI_TURN_RIGHT_20DEG , RI_FASTEST);
 			//robot->Move(RI_STOP , RI_FASTEST);
@@ -215,6 +216,7 @@ void RobotPose::moveToCell(const int direction){
 			robot->Move(RI_TURN_LEFT_20DEG , RI_FASTEST);
 			//robot->Move(RI_STOP , RI_FASTEST);
 		}
+		*/
 
 		
 
@@ -222,12 +224,13 @@ void RobotPose::moveToCell(const int direction){
 		camera_cell_error = pose_cam->getCellError(pairs);
 		
 		//Print errors
-		printf("Kalman: %f,%f,%f, ", pose_kalman.x, pose_kalman.y, pose_kalman.theta * (180/M_PI));
+		//printf("Kalman: %f,%f,%f, ", pose_kalman.x, pose_kalman.y, pose_kalman.theta * (180/M_PI));
+		printPoses();
 		printf("\tDistance: %d\t", kalman_cell_error + CELL_DIMENSION_CM);
 		printf("Camera Error: %d\t Kalman Error: %d\t", camera_cell_error, kalman_cell_error);
 		printf("Turn Error: %d\n", turnError);
 		updatePosition(false);
-	}while((abs(kalman_cell_error) + abs(camera_cell_error) > 30));
+	}while((abs(kalman_cell_error) > 15));
 	
 	robot->Move(RI_MOVE_FORWARD, RI_FASTEST);
 	robot->Move(RI_MOVE_FORWARD, RI_FASTEST);

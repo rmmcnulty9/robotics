@@ -30,16 +30,19 @@ int main(int argv, char **argc)
 	 * Move forward down the hallway
 	 */
 	int ctr = 0;
-	while(ctr<=3){
+	while(ctr<=4){
 		printf("CELL %d ===============================================\n", ctr);
 		robotPose.moveToCell(RobotPose::FORWARD);
 		ctr++;
 	}
 	printf("CELL TURN %d ===============================================\n", ctr);
-	robotPose.moveToCell(RobotPose::RIGHT);
-        ctr++;
+	robot->Move(RI_TURN_RIGHT_20DEG , RI_FASTEST);
+	robot->Move(RI_TURN_RIGHT_20DEG , RI_FASTEST);
+	robot->Move(RI_TURN_RIGHT_20DEG , RI_FASTEST);
+	robot->Move(RI_TURN_RIGHT_20DEG , RI_FASTEST);
+
 	
-	while(!robot->IR_Detected() && ctr<=6){
+	while(!robot->IR_Detected() && ctr<=8){
 		printf("CELL %d ===============================================\n", ctr);
 		robotPose.moveToCell(RobotPose::FORWARD);
 		ctr++;

@@ -93,6 +93,7 @@ list<squarePair> CameraPose::updateCamera(){
 
 	displayImages();
 	
+	
 	//Save image
 	char file_name [256];
 	sprintf(file_name,"camera.%04d.jpg", image_ctr);
@@ -109,6 +110,7 @@ list<squarePair> CameraPose::updateCamera(){
 
 	sprintf(file_name,"pinkhigh.%04d.jpg", image_ctr);
 	cvSaveImage(file_name,pinkHigh);
+	
 	image_ctr+=1;
 	
 	//Return both yellow and pink pairs
