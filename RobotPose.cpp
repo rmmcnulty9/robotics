@@ -218,10 +218,11 @@ void RobotPose::moveToCell(const int direction){
 		printf("Turn Error: %d\n", turnError);
 		updatePosition(false);
 	}while((abs(kalman_cell_error) > 15 || abs(camera_cell_error) > 15) && !robot->IR_Detected());
+	
 	robot->Move(RI_MOVE_FORWARD, RI_FASTEST);
-		robot->Move(RI_MOVE_FORWARD, RI_FASTEST);
-		robot->Move(RI_MOVE_FORWARD, RI_FASTEST);
-		robot->Move(RI_MOVE_FORWARD, RI_FASTEST);
+	robot->Move(RI_MOVE_FORWARD, RI_FASTEST);
+	robot->Move(RI_MOVE_FORWARD, RI_FASTEST);
+	robot->Move(RI_MOVE_FORWARD, RI_FASTEST);
 
 }
 

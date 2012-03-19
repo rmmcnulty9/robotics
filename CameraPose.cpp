@@ -207,7 +207,6 @@ list<squarePair> CameraPose::matchSquares(squares_t *squares, int color){
 	list <squarePair> pair_list;
 	squarePair temp_pair;
 	temp_pair.left = NULL; temp_pair.right = NULL;
-	CvPoint pt1, pt2;
 	while(squares != NULL){
 		tempSquares = squares->next;
 		while(tempSquares != NULL){
@@ -217,10 +216,6 @@ list<squarePair> CameraPose::matchSquares(squares_t *squares, int color){
 				&& abs(squares->center.x - tempSquares->center.x) > SCREEN_WIDTH/6
 				&& (squares->center.y) < SCREEN_HEIGHT * (3.0/5.0)
 				&& (tempSquares->center.y) < SCREEN_HEIGHT * (3.0/5.0)){
-				//Draw line
-				pt1 = cvPoint(squares->center.x, squares->center.y);
-				pt2 = cvPoint(tempSquares->center.x, tempSquares->center.y);
-				cvLine(cameraImage, pt1, pt2, CV_RGB(0,0,255), 2, CV_AA, 0);
 				
 				//Record squares
 				int newArea = (squares->area + tempSquares->area)/2;
@@ -253,7 +248,14 @@ void CameraPose::printCenters(list<squarePair> pairs){
 	cvLine(cameraImage, cvPoint(SCREEN_WIDTH/2,0), cvPoint(SCREEN_WIDTH/2,SCREEN_HEIGHT), CV_RGB(128,128,128), 2, CV_AA, 0);
 	int center = 0; 
 	int height = 0;
+	CvPoint pt1, pt2;
+
 	for(it=pairs.begin(); it!=pairs.end(); it++){
+	  				
+		pt1 = cvPoint(it->left->center.x, it->left->center.y);
+		pt2 = cvPoint(it->right->center.x, it->right->center.y);
+		cvLine(cameraImage, pt1, pt2, CV_RGB(0,0,255), 2, CV_AA, 0);
+	  
 		center = (it->left->center.x + it->right->center.x)/2;
 		height = (it->left->center.y + it->right->center.y)/2;
 		cvLine(cameraImage, cvPoint(center,height-5), cvPoint(center,height+5), CV_RGB(255,0,0), 2, CV_AA, 0);
