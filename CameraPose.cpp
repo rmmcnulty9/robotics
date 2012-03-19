@@ -297,7 +297,7 @@ int CameraPose::getSquareSide(squares_t *squares){
 		squares_t * current = squares;
 		int center = 0;
 		int num = 0;
-		while(current->next != NULL){
+		while(current != NULL){
 			center += current->center.x;
 			current = current->next;
 			num++;

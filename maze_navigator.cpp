@@ -30,7 +30,7 @@ int main(int argv, char **argc)
 	 * Move forward down the hallway
 	 */
 	int ctr = 0;
-	while(!robot->IR_Detected() && ctr<=10){
+	while(ctr<=3){
 		printf("CELL %d ===============================================\n", ctr);
 		robotPose.moveToCell(RobotPose::FORWARD);
 		ctr++;
@@ -39,7 +39,7 @@ int main(int argv, char **argc)
 	robotPose.moveToCell(RobotPose::RIGHT);
         ctr++;
 	
-	while(!robot->IR_Detected() && ctr<=20){
+	while(!robot->IR_Detected() && ctr<=6){
 		printf("CELL %d ===============================================\n", ctr);
 		robotPose.moveToCell(RobotPose::FORWARD);
 		ctr++;
