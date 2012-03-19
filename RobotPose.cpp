@@ -146,8 +146,10 @@ bool RobotPose::strafeTo(int delta_x){
 	//move the robot left or right
 	if(delta_x < -1 * STRAFE_EPSILON){
 		robot->Move(RI_MOVE_FWD_LEFT, robot_speed);
+		robot->Move(RI_MOVE_FWD_LEFT, robot_speed);
 		printf("Moving Left\n");
 	}else if(delta_x > STRAFE_EPSILON){
+		robot->Move(RI_MOVE_FWD_RIGHT, robot_speed);
 		robot->Move(RI_MOVE_FWD_RIGHT, robot_speed);
 		printf("Moving Right\n");
 	}else{
@@ -182,6 +184,9 @@ void RobotPose::moveToCell(const int direction){
 	int kalman_cell_error = 0, camera_cell_error = 0;
 	do{
 		robot->Move(RI_MOVE_FORWARD, RI_FASTEST);
+		robot->Move(RI_MOVE_FORWARD, RI_FASTEST);
+		robot->Move(RI_MOVE_FORWARD, RI_FASTEST);
+		robot->Move(RI_MOVE_FORWARD, RI_FASTEST);
 		
 		//Calculate error to next cell using Kalman
 		kalman_cell_error = sqrt(pose_kalman.x*pose_kalman.x + pose_kalman.y*pose_kalman.y)- (CELL_DIMENSION_CM);
@@ -192,10 +197,14 @@ void RobotPose::moveToCell(const int direction){
 		
 		//Turn if facing only one wall of squares
 		int turnError = pose_cam->getTurnError(pairs);
-		if(turnError > 100)
+		if(turnError > 50){
 			robot->Move(RI_TURN_RIGHT_20DEG , RI_FASTEST);
-		else if(turnError < -100)
+			//robot->Move(RI_STOP , RI_FASTEST);
+		}
+		else if(turnError < -50){
 			robot->Move(RI_TURN_LEFT_20DEG , RI_FASTEST);
+			//robot->Move(RI_STOP , RI_FASTEST);
+		}
 
 		//Strafe based on pairs of squares
 		strafeTo(pose_cam->getCenterError(pairs));
@@ -209,6 +218,10 @@ void RobotPose::moveToCell(const int direction){
 		printf("Turn Error: %d\n", turnError);
 		updatePosition(false);
 	}while((abs(kalman_cell_error) > 15 || abs(camera_cell_error) > 15) && !robot->IR_Detected());
+	robot->Move(RI_MOVE_FORWARD, RI_FASTEST);
+		robot->Move(RI_MOVE_FORWARD, RI_FASTEST);
+		robot->Move(RI_MOVE_FORWARD, RI_FASTEST);
+		robot->Move(RI_MOVE_FORWARD, RI_FASTEST);
 
 }
 

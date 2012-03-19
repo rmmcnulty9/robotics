@@ -69,7 +69,7 @@ list<squarePair> CameraPose::updateCamera(){
 	//Find and match yellow squares
 	squares_t * currentSquares;
 	list<squarePair> yellowPairs, pinkPairs;
-	
+
 	cvInRangeS(hsvImage, RC_YELLOW_LOW, RC_YELLOW_HIGH, yellow);
 	currentSquares = robot->findSquares(yellow, MIN_SQUARE);
 	removeOverlap(currentSquares);
