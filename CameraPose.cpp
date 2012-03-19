@@ -328,16 +328,18 @@ int CameraPose::getTurnError(list<squarePair> pairs){
 int CameraPose::getCellError(list<squarePair> pairs){
 	list<squarePair>::iterator it = pairs.begin();
 	int error = 0;
-	if(it->color == PINK){
-		error += it->left->center.y - Y_CELL_CENTER_PINK;
-		error += it->right->center.y - Y_CELL_CENTER_PINK;
-	}else if(it->color == YELLOW){
-		error += it->left->center.y - Y_CELL_CENTER_YELLOW;
-		error += it->right->center.y - Y_CELL_CENTER_YELLOW;
-
+	if(pairs.size() == 0)
+		return 0;
+	else{
+		if(it->color == PINK){
+			error += it->left->center.y - Y_CELL_CENTER_PINK;
+			error += it->right->center.y - Y_CELL_CENTER_PINK;
+		}else if(it->color == YELLOW){
+			error += it->left->center.y - Y_CELL_CENTER_YELLOW;
+			error += it->right->center.y - Y_CELL_CENTER_YELLOW;
+		}
+		return error/2;
 	}
-	
-	return error/2;
 }
 
 

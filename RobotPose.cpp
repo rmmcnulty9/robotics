@@ -168,7 +168,8 @@ bool RobotPose::strafeTo(int delta_x){
 
 void RobotPose::moveToCell(const int direction){
 	static unsigned int cell_number = 0;
-	initPose();
+	int cell_start_x = pose_kalman.x;
+	int cell_start_y = pose_kalman.y;
 	updatePosition(false);
 	if(direction == LEFT){
 		turnTo(pose_kalman.theta + 90.0* (M_PI/180.0));
@@ -189,7 +190,9 @@ void RobotPose::moveToCell(const int direction){
 		robot->Move(RI_MOVE_FORWARD, RI_FASTEST);
 		
 		//Calculate error to next cell using Kalman
-		kalman_cell_error = sqrt(pose_kalman.x*pose_kalman.x + pose_kalman.y*pose_kalman.y)- (CELL_DIMENSION_CM);
+		int delta_x = cell_start_x - pose_kalman.x;
+		int delta_y = cell_start_y - pose_kalman.y;
+		kalman_cell_error = sqrt(delta_x*delta_x + delta_y*delta_y)- (CELL_DIMENSION_CM);
 
 
 
@@ -213,7 +216,8 @@ void RobotPose::moveToCell(const int direction){
 		camera_cell_error = pose_cam->getCellError(pairs);
 		
 		//Print errors
-		printf("Kalman: %f,%f,%f\n", pose_kalman.x, pose_kalman.y, pose_kalman.theta * (180/M_PI));
+		printf("Kalman: %f,%f,%f, ", pose_kalman.x, pose_kalman.y, pose_kalman.theta * (180/M_PI));
+		printf("\tDistance: %f\n", kalman_cell_error + CELL_DIMENSION_CM);
 		printf("Camera Error: %d\t Kalman Error: %d\t", camera_cell_error, kalman_cell_error);
 		printf("Turn Error: %d\n", turnError);
 		updatePosition(false);
@@ -310,9 +314,9 @@ void RobotPose::turnTo(float goal_theta) {
 	 */
 	float error_theta = error_theta1<error_theta2?error_theta1:error_theta2;
 	//Don't turn if error theta not large enough
-	printPoses();
+	//printPoses();
 	if(error_theta>=(-TURN_TO_EPSILON) && error_theta<= (TURN_TO_EPSILON)){
-		 printf("Theta too small\n");
+		 //printf("Theta too small\n");
 		 return;
 	}
 
@@ -320,7 +324,7 @@ void RobotPose::turnTo(float goal_theta) {
 	//Call PID for Theta
 	float PID_res = abs(PID_theta->UpdatePID(error_theta, pose_kalman.theta));
 	//Determine speed
-	printf("Theta PID: %f\n", PID_res);
+	//printf("Theta PID: %f\n", PID_res);
 
 	int robot_speed; 
 	float velocity[3];
@@ -335,11 +339,11 @@ void RobotPose::turnTo(float goal_theta) {
 	}
 	//Turn depending on error angle
 	if(error_theta==error_theta1){
-		printf("Turning Left \n", error_theta1*(180/M_PI), error_theta2*(180/M_PI));
+		printf("Turning Left %f, %f\n", error_theta1*(180/M_PI), error_theta2*(180/M_PI));
  		robot->Move(RI_TURN_LEFT, robot_speed);
 	}
 	else if(error_theta==error_theta2){
-		printf("Turning Right \n", error_theta1*(180/M_PI), error_theta2*(180/M_PI));
+		printf("Turning Right %f, %f\n", error_theta1*(180/M_PI), error_theta2*(180/M_PI));
 		robot->Move(RI_TURN_RIGHT, robot_speed);
 	}
 
