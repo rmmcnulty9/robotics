@@ -35,7 +35,7 @@ int main(int argv, char **argc)
 		robotPose.moveToCell(RobotPose::FORWARD);
 		ctr++;
 	}
-	printf("CELL %d ====================================\n", ctr);
+	printf("CELL TURN %d ====================================\n", ctr);
 	robotPose.moveToCell(RobotPose::RIGHT);
         ctr++;
 	

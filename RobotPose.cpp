@@ -182,30 +182,32 @@ void RobotPose::moveToCell(const int direction){
 	int kalman_cell_error = 0, camera_cell_error = 0;
 	do{
 		robot->Move(RI_MOVE_FORWARD, RI_FASTEST);
-		updatePosition(false);
-		printf("Kalman: %f,%f,%f\n", pose_kalman.x, pose_kalman.y, pose_kalman.theta * (180/M_PI));
-		//Calculate error to next cell
+		
+		//Calculate error to next cell using Kalman
 		kalman_cell_error = sqrt(pose_kalman.x*pose_kalman.x + pose_kalman.y*pose_kalman.y)- (CELL_DIMENSION_CM);
 
 
-	/*
-	 * Make sure we are centered in cell
-	 */
 
-	
 		list<squarePair> pairs = pose_cam->updateCamera();
+		
+		//Turn if facing only one wall of squares
 		int turnError = pose_cam->getTurnError(pairs);
 		if(turnError > 100)
 			robot->Move(RI_TURN_RIGHT_20DEG , RI_FASTEST);
 		else if(turnError < -100)
 			robot->Move(RI_TURN_LEFT_20DEG , RI_FASTEST);
 
-		bool strafed = strafeTo(pose_cam->getCenterError(pairs));
+		//Strafe based on pairs of squares
+		strafeTo(pose_cam->getCenterError(pairs));
 
-		
+		//Calculate error based on squares		
 		camera_cell_error = pose_cam->getCellError(pairs);
+		
+		//Print errors
+		printf("Kalman: %f,%f,%f\n", pose_kalman.x, pose_kalman.y, pose_kalman.theta * (180/M_PI));
 		printf("Camera Error: %d\t Kalman Error: %d\t", camera_cell_error, kalman_cell_error);
 		printf("Turn Error: %d\n", turnError);
+		updatePosition(false);
 	}while((abs(kalman_cell_error) > 15 || abs(camera_cell_error) > 15) && !robot->IR_Detected());
 
 }
