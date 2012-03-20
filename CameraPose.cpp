@@ -26,6 +26,7 @@ using namespace std;
 
 CameraPose::CameraPose(RobotInterface *r){
 	robot = r;
+	robot->Move(RI_HEAD_MIDDLE,1);
 	//Initializes images for storing most recent camera data
 	cameraImage = cvCreateImage(cvSize(SCREEN_WIDTH, SCREEN_HEIGHT), IPL_DEPTH_8U, 3);
 	hsvImage = cvCreateImage(cvSize(SCREEN_WIDTH, SCREEN_HEIGHT), IPL_DEPTH_8U, 3);
@@ -118,12 +119,12 @@ list<squarePair> CameraPose::updateCamera(){
 	static int retry_cnt = 0;
 	retry_cnt+=1;
 	if(yellowPairs.size()==0 && retry_cnt<3){
-	/*  if (retry_cnt==1){
-	    robot->Move(RI_MOVE_LEFT,1);
+	  if (retry_cnt==1){
+	    robot->Move(RI_MOVE_FWD_LEFT,1);
 	  }else if(retry_cnt==2){
-	    robot->Move(RI_MOVE_RIGHT,1);
+	    robot->Move(RI_MOVE_FWD_RIGHT,1);
 	  }
-	  */
+	  
 	  updateCamera();
 	}else retry_cnt = 0;
 	return yellowPairs;

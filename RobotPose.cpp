@@ -126,7 +126,7 @@ void RobotPose::initPose() {
  */
 bool RobotPose::strafeTo(int delta_x){
 	
-	int robot_speed = 1;
+	int robot_speed = 3;
 /*
 	//PID Controller code here
 	float PID_res = PID_camera->UpdatePID(delta_x, delta_x);
@@ -257,10 +257,15 @@ void RobotPose::moveTo(float x, float y) {
 	printf("Camera Turn Error: %d\n", turnError);
 	bool strafed = strafeTo(pose_cam->getCenterError(pairs));
 	//Correct direction to reach goal
-	//turnTo(goal_theta);  
+	turnTo(goal_theta);  
 	
 	//Determine errors in pose
 	float error_distance_x = pose_kalman.x - x;
+	
+	if(error_distance_x > MOVE_TO_EPSILON){
+	    strafeTo(error_distance_x);
+	}
+	
 	float error_distance_y = pose_kalman.y - y;
 	float error_distance = sqrt(error_distance_x * error_distance_x + error_distance_y * error_distance_y);
 
@@ -295,6 +300,7 @@ void RobotPose::moveTo(float x, float y) {
 		velocity[2] = 0.0;
 		rovioKalmanFilterSetVelocity(&kf,velocity);
 	}
+	
 
 	//Move unless within range of base
 	if (error_distance > MOVE_TO_EPSILON) {
@@ -308,7 +314,6 @@ void RobotPose::moveTo(float x, float y) {
 }
 
 void RobotPose::turnTo(float goal_theta) {
-
 
 	updatePosition(true);
 	printPoses();
@@ -346,23 +351,29 @@ void RobotPose::turnTo(float goal_theta) {
 	int robot_speed; 
 	float velocity[3];
 	if(PID_res > 1.0){
-		robot_speed = 4;
+		robot_speed = 5;
 	}
 	else if(PID_res < 1.0 && PID_res > 0.25){
-	      robot_speed = 5;
+	      robot_speed = 6;
 	}else {
-		robot_speed = 6;
+		robot_speed = 7;
 	}
 	//Turn depending on error angle
 	if(error_theta==error_theta1){
 		printf("Turning Left %f\n", error_theta1*(180/M_PI));
  		robot->Move(RI_TURN_LEFT, robot_speed);
+ 		robot->Move(RI_TURN_LEFT, robot_speed);
+ 		robot->Move(RI_STOP, robot_speed);
+		
 	}
 	else if(error_theta==error_theta2){
 		printf("Turning Right %f\n", error_theta2*(180/M_PI));
 		robot->Move(RI_TURN_RIGHT, robot_speed);
+		robot->Move(RI_TURN_RIGHT, robot_speed);
+ 		robot->Move(RI_STOP, robot_speed);
 	}
 
+	updatePosition(true);
 	turnTo(goal_theta);
 
 }
