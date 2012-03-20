@@ -252,10 +252,15 @@ void RobotPose::moveTo(float x, float y) {
  	//printf("kalman %f %f %f\n", pose_kalman.x, pose_kalman.y, pose_kalman.theta); 
 	printPoses();
     
-	list<squarePair> pairs = pose_cam->updateCamera();
-	int turnError = pose_cam->getTurnError(pairs);
-	printf("Camera Turn Error: %d\n", turnError);
-	bool strafed = strafeTo(pose_cam->getCenterError(pairs));
+	static int cam_update_flag = 0;
+	if(cam_update_flag==3){
+	  list<squarePair> pairs = pose_cam->updateCamera();
+	  int turnError = pose_cam->getTurnError(pairs);
+	  printf("Camera Turn Error: %d\n", turnError);
+	  bool strafed = strafeTo(pose_cam->getCenterError(pairs));
+	  cam_update_flag=0;
+	}
+	cam_update_flag+=1;
 	//Correct direction to reach goal
 	turnTo(goal_theta);  
 	
