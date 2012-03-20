@@ -38,8 +38,8 @@ CameraPose::CameraPose(RobotInterface *r){
 	cvNamedWindow("Unfiltered", CV_WINDOW_AUTOSIZE);
 	//cvNamedWindow("Filtered Pink High", CV_WINDOW_AUTOSIZE);
 	//cvNamedWindow("Filtered Pink Low", CV_WINDOW_AUTOSIZE);
-	cvNamedWindow("Filtered Yellow", CV_WINDOW_AUTOSIZE);
-	cvNamedWindow("Filtered", CV_WINDOW_AUTOSIZE);
+	//cvNamedWindow("Filtered Yellow", CV_WINDOW_AUTOSIZE);
+	//cvNamedWindow("Filtered", CV_WINDOW_AUTOSIZE);
 	//cvNamedWindow("All Filtered", CV_WINDOW_AUTOSIZE);
 
 	// Setup the camera
@@ -99,7 +99,7 @@ list<squarePair> CameraPose::updateCamera(){
 	sprintf(file_name,"camera.%04d.jpg", image_ctr);
 	cvSaveImage(file_name,cameraImage);
 
-	sprintf(file_name,"filtered.%04d.jpg", image_ctr);
+	/*sprintf(file_name,"filtered.%04d.jpg", image_ctr);
 	cvSaveImage(file_name,filteredImage);
 
 	sprintf(file_name,"yellow.%04d.jpg",image_ctr);
@@ -109,12 +109,23 @@ list<squarePair> CameraPose::updateCamera(){
 	cvSaveImage(file_name,pinkLow);
 
 	sprintf(file_name,"pinkhigh.%04d.jpg", image_ctr);
-	cvSaveImage(file_name,pinkHigh);
+	cvSaveImage(file_name,pinkHigh); */
 	
 	image_ctr+=1;
 	
 	//Return both yellow and pink pairs
 	yellowPairs.splice(yellowPairs.end(), pinkPairs);
+	static int retry_cnt = 0;
+	retry_cnt+=1;
+	if(yellowPairs.size()==0 && retry_cnt<3){
+	/*  if (retry_cnt==1){
+	    robot->Move(RI_MOVE_LEFT,1);
+	  }else if(retry_cnt==2){
+	    robot->Move(RI_MOVE_RIGHT,1);
+	  }
+	  */
+	  updateCamera();
+	}else retry_cnt = 0;
 	return yellowPairs;
   
 }
@@ -123,10 +134,10 @@ list<squarePair> CameraPose::updateCamera(){
  */
 void CameraPose::displayImages(){
 	cvShowImage("Unfiltered", cameraImage);
-	cvShowImage("Filtered", filteredImage);
+	//cvShowImage("Filtered", filteredImage);
 	//cvShowImage("Filtered Pink High", pinkHigh);
 	//cvShowImage("Filtered Pink Low", pinkLow);
-	cvShowImage("Filtered Yellow", yellow);
+	//cvShowImage("Filtered Yellow", yellow);
 	//cvShowImage("Filtered All", filteredImage);
 	cvWaitKey(100);
 }

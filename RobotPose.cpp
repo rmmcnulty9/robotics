@@ -160,7 +160,7 @@ bool RobotPose::strafeTo(int delta_x){
 
 	updatePosition(true);
 
-	//turnTo(M_PI_2);
+	turnTo(M_PI_2);
 
 	//If we have gotten here there was a strafe
 	//list<squarePair> pairs = pose_cam->updateCamera();
@@ -253,10 +253,11 @@ void RobotPose::moveTo(float x, float y) {
 	printPoses();
     
 	list<squarePair> pairs = pose_cam->updateCamera();
+	int turnError = pose_cam->getTurnError(pairs);
+	printf("Camera Turn Error: %d\n", turnError);
 	bool strafed = strafeTo(pose_cam->getCenterError(pairs));
-	
 	//Correct direction to reach goal
-	turnTo(goal_theta);  
+	//turnTo(goal_theta);  
 	
 	//Determine errors in pose
 	float error_distance_x = pose_kalman.x - x;
@@ -310,6 +311,8 @@ void RobotPose::turnTo(float goal_theta) {
 
 
 	updatePosition(true);
+	printPoses();
+	
 	/*
 	 * Calculate both thetas for turning left and right to get to goal_theta
 	 */
@@ -335,28 +338,28 @@ void RobotPose::turnTo(float goal_theta) {
 
   
 	//Call PID for Theta
-	float PID_res = abs(PID_theta->UpdatePID(error_theta, pose_kalman.theta));
+	float PID_res = PID_theta->UpdatePID(error_theta, pose_kalman.theta);
+	if(PID_res<0) PID_res = -PID_res;
 	//Determine speed
-	//printf("Theta PID: %f\n", PID_res);
+	printf("Theta PID: %f\n", PID_res);
 
 	int robot_speed; 
 	float velocity[3];
 	if(PID_res > 1.0){
-		robot_speed = 5;
+		robot_speed = 4;
 	}
 	else if(PID_res < 1.0 && PID_res > 0.25){
-		robot_speed = 7;
-	}
-	else {
-		robot_speed = 10;
+	      robot_speed = 5;
+	}else {
+		robot_speed = 6;
 	}
 	//Turn depending on error angle
 	if(error_theta==error_theta1){
-		printf("Turning Left %f, %f\n", error_theta1*(180/M_PI), error_theta2*(180/M_PI));
+		printf("Turning Left %f\n", error_theta1*(180/M_PI));
  		robot->Move(RI_TURN_LEFT, robot_speed);
 	}
 	else if(error_theta==error_theta2){
-		printf("Turning Right %f, %f\n", error_theta1*(180/M_PI), error_theta2*(180/M_PI));
+		printf("Turning Right %f\n", error_theta2*(180/M_PI));
 		robot->Move(RI_TURN_RIGHT, robot_speed);
 	}
 
@@ -412,7 +415,7 @@ void RobotPose::updatePosition(bool turning=false){
 	WEdata[0] = pose_we.x;
 	WEdata[1] = pose_we.y;
 	WEdata[2] = pose_we.theta;
-	rovioKalmanFilter(&kf,NSdata, NSdata, track);
+	rovioKalmanFilter(&kf,NSdata, WEdata, track);
 
 	//return the filtered robot pose
 	pose_kalman.x = track[0];
@@ -492,8 +495,9 @@ bool RobotPose::updateNS() {
 		//Translate
 		pose_start.x = x_2 - pose_start.x;
 		pose_start.y = y_2 - pose_start.y;
-		
 		room_cur = new_room;
+		for( int i=0;i<7;i++)
+		  updatePosition(false);
 	}
     
 	x = robot->X();
