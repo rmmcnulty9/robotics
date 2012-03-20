@@ -33,14 +33,15 @@ public:
 	~RobotPose();
   
 	void initPose();
-	void moveTo(float x, float y);
+	void moveTo(float x, float y, float goal_theta);
 
 	void turnTo(float theta);
 	void printRaw();
 	void printPoses();
 	void updatePosition(bool turning);
-	void resetWEPose(float x, float y, float theta);
+	void resetPose(float x, float y, float theta);
 	void changeWEScalingConstant(float we);
+	void changeUncertainty(float *uc);
   
 	// Camera functions
 	void moveToCell(const int direction);

@@ -239,11 +239,10 @@ void RobotPose::moveToCell(const int direction){
 
 }
 
-void RobotPose::moveTo(float x, float y) {
+void RobotPose::moveTo(float x, float y, float goal_theta) {
 	updatePosition(false);
 	//Determine how much robot needs to turn to reach goal
-	//float goal_theta = acos((x-pose_kalman.x)/sqrt((x-pose_kalman.x)*(x-pose_kalman.x)+(y-pose_kalman.y)*(y-pose_kalman.y)));
-	float goal_theta = M_PI_2;
+	
 	//if((y-pose_kalman.y)<=0.0) {
 	//	goal_theta = -goal_theta;
 	//}
@@ -256,7 +255,7 @@ void RobotPose::moveTo(float x, float y) {
 	if(cam_update_flag==3){
 	  list<squarePair> pairs = pose_cam->updateCamera();
 	  int turnError = pose_cam->getTurnError(pairs);
-	  printf("Camera Turn Error: %d\n", turnError);
+	///  printf("Camera Turn Error: %d\n", turnError);
 	  bool strafed = strafeTo(pose_cam->getCenterError(pairs));
 	  cam_update_flag=0;
 	}
@@ -265,13 +264,23 @@ void RobotPose::moveTo(float x, float y) {
 	turnTo(goal_theta);  
 	
 	//Determine errors in pose
-	float error_distance_x = pose_kalman.x - x;
+	float error_distance_x;
+	float error_distance_y;
 	
-	if(error_distance_x > MOVE_TO_EPSILON){
-	    strafeTo(error_distance_x);
+	if(goal_theta==0.0 || goal_theta==M_PI){
+	  error_distance_y = pose_kalman.x - x;
+	  error_distance_x = pose_kalman.y - y; 
+	}else{
+	  error_distance_x = pose_kalman.x - x;
+	  error_distance_y = pose_kalman.y - y; 
 	}
+	if(error_distance_x<0.0) error_distance_x = -error_distance_x;
+	if(error_distance_y<0.0) error_distance_y = -error_distance_y;
+	//error_distance_y = sin(pose_kalman.theta) * error_distance_y;
+	//error_distance_x = cos(pose_kalman.theta) * error_distance_x;
+
 	
-	float error_distance_y = pose_kalman.y - y;
+	
 	float error_distance = sqrt(error_distance_x * error_distance_x + error_distance_y * error_distance_y);
 
 	//Get PID
@@ -306,15 +315,17 @@ void RobotPose::moveTo(float x, float y) {
 		rovioKalmanFilterSetVelocity(&kf,velocity);
 	}
 	
-
+  printf("error dist x:%f error dist y:%f  = %f\n", error_distance_x, error_distance_y, error_distance);
 	//Move unless within range of base
-	if (error_distance > MOVE_TO_EPSILON) {
+	if (error_distance_y > MOVE_TO_EPSILON) {
 		robot->Move(RI_MOVE_FORWARD, robot_speed);
-		moveTo(x, y);
+		moveTo(x, y, goal_theta);
+	}else if(error_distance_x > MOVE_TO_EPSILON){
+	    strafeTo(error_distance_x);
 	}
 	else {
 		printf("ARRIVED! %f %f\n", x, y);
-		resetWEPose(pose_kalman.x, pose_kalman.y, pose_kalman.theta);
+		resetPose(pose_kalman.x, pose_kalman.y, pose_kalman.theta);
 	}
 }
 
@@ -356,26 +367,28 @@ void RobotPose::turnTo(float goal_theta) {
 	int robot_speed; 
 	float velocity[3];
 	if(PID_res > 1.0){
-		robot_speed = 5;
+		robot_speed = 3;
 	}
-	else if(PID_res < 1.0 && PID_res > 0.25){
-	      robot_speed = 6;
+	else if(PID_res < 1.0/* && PID_res > 0.25 */){
+	      robot_speed = 4;
 	}else {
-		robot_speed = 7;
+		robot_speed = 5;
 	}
 	//Turn depending on error angle
 	if(error_theta==error_theta1){
 		printf("Turning Left %f\n", error_theta1*(180/M_PI));
  		robot->Move(RI_TURN_LEFT, robot_speed);
  		robot->Move(RI_TURN_LEFT, robot_speed);
- 		robot->Move(RI_STOP, robot_speed);
+		robot->Move(RI_STOP, robot_speed);
+		
 		
 	}
 	else if(error_theta==error_theta2){
 		printf("Turning Right %f\n", error_theta2*(180/M_PI));
 		robot->Move(RI_TURN_RIGHT, robot_speed);
 		robot->Move(RI_TURN_RIGHT, robot_speed);
- 		robot->Move(RI_STOP, robot_speed);
+		robot->Move(RI_STOP, robot_speed);
+		
 	}
 
 	updatePosition(true);
@@ -562,7 +575,7 @@ bool RobotPose::updateNS() {
 /*
  * Resets the pose for the WE. This is used when we change rooms to help with WE drift
  */
-void RobotPose::resetWEPose(float x, float y, float theta) {
+void RobotPose::resetPose(float x, float y, float theta) {
  
 	printf("RESETTING\n"); 
 	pose_we.x = x;
@@ -574,6 +587,9 @@ void RobotPose::changeWEScalingConstant(float we) {
 	we_to_cm = we;
 }
 
+void RobotPose::changeUncertainty(float *uc){
+ rovioKalmanFilterSetUncertainty(&kf,uc); 
+}
 
 /*
  * Create a FIR filter, there is the option to supply an inital value
