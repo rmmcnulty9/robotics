@@ -12,7 +12,7 @@
 #include <math.h>
 #include <cstdio>
 #include "CameraPose.h"
-#include "shared_constants.h"
+//#include "shared_constants.h"
 #include "modified_color.h"
 #include <list>
 

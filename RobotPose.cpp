@@ -13,7 +13,7 @@
 #include <cstdio>
 #include "RobotPose.h"
 #include "PIDController.h"
-#include "shared_constants.h"
+//#include "shared_constants.h"
 #include <list>
 #include "CameraPose.h"
 
@@ -59,6 +59,7 @@ RobotPose::RobotPose(RobotInterface *r){
 	int deltat = 1;
 
 	initKalmanFilter(&kf, initialPose, Velocity, deltat);
+	rovioKalmanFilterSetUncertainty(&kf, uncertainty_weak_we);
 	
 	//Initialize PID controllers
 	PID_x = new PIDController(iMax,iMin,integral,proportional,derivative);
@@ -134,16 +135,17 @@ bool RobotPose::strafeTo(int delta_x){
 
 	//move the robot left or right
 	if(delta_x < -1 * STRAFE_EPSILON){
-//		robot->Move(RI_MOVE_FWD_LEFT, robot_speed);
+		robot->Move(RI_MOVE_FWD_LEFT, robot_speed);
 		printf("Moving Left\n");
 	}else if(delta_x > STRAFE_EPSILON){
-//		robot->Move(RI_MOVE_FWD_RIGHT, robot_speed);
+		robot->Move(RI_MOVE_FWD_RIGHT, robot_speed);
 		printf("Moving Right\n");
 	}else{
 		//Base case
 		return false;
 	}
-//	turnTo(M_PI_2);
+
+	updatePosition(true);
 	//If we have gotten here there was a strafe
 	list<squarePair> pairs = pose_cam->updateCamera();
 	return (strafeTo(pose_cam->getCenterError(pairs)) || true);
@@ -202,16 +204,19 @@ void RobotPose::moveToCell(const int direction){
 void RobotPose::moveTo(float x, float y) {
 	updatePosition(false);
 	//Determine how much robot needs to turn to reach goal
-	float goal_theta = acos((x-pose_kalman.x)/sqrt((x-pose_kalman.x)*(x-pose_kalman.x)+(y-pose_kalman.y)*(y-pose_kalman.y)));
-
-	if((y-pose_kalman.y)<=0.0) {
-		goal_theta = -goal_theta;
-	}
+	//float goal_theta = acos((x-pose_kalman.x)/sqrt((x-pose_kalman.x)*(x-pose_kalman.x)+(y-pose_kalman.y)*(y-pose_kalman.y)));
+	float goal_theta = M_PI_2;
+	//if((y-pose_kalman.y)<=0.0) {
+	//	goal_theta = -goal_theta;
+	//}
    
 	printf("GOAL: %f %f %f \n",x, y, goal_theta * 180/M_PI);
  	//printf("kalman %f %f %f\n", pose_kalman.x, pose_kalman.y, pose_kalman.theta); 
 	printPoses();
     
+	list<squarePair> pairs = pose_cam->updateCamera();
+	bool strafed = strafeTo(pose_cam->getCenterError(pairs));
+	
 	//Correct direction to reach goal
 	turnTo(goal_theta);  
 	
@@ -259,6 +264,7 @@ void RobotPose::moveTo(float x, float y) {
 	}
 	else {
 		printf("ARRIVED! %f %f\n", x, y);
+		resetWEPose(pose_kalman.x, pose_kalman.y, pose_kalman.theta);
 	}
 }
 
@@ -393,7 +399,7 @@ bool RobotPose::updateWE(bool turning) {
 	float dy = ((left * sin(150.0 * M_PI/180.0)) + (right * sin(30.0 * M_PI/180.0)) + (rear * sin(90.0 * M_PI/180.0)))/3.0;
 	float dx = ((left * cos(150.0 * M_PI/180.0)) + (right * cos(30.0 * M_PI/180.0)))/2.0;
 
-	//dx = 0.0; // I don't think we are supposed to move in this direction.
+	dx = 0.0; // I don't think we are supposed to move in this direction.
 
 	float dtheta = (rear * we_to_rad);
 

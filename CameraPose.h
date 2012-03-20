@@ -2,7 +2,7 @@
 #ifndef __CAMERA_POSE__
 #define __CAMERA_POSE__
 
-#include "shared_constants.h"
+//#include "shared_constants.h"
 #include "robot_if++.h"
 #include "modified_color.h"
 #include <list>
