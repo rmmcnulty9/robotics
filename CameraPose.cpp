@@ -56,6 +56,7 @@ CameraPose::~CameraPose(){}
  * Updates robot and gets current image & manipulated them
  */
 list<squarePair> CameraPose::updateCamera(){
+  
 	// Update the robot's sensor information
 	robot->update();
 	// Get the current camera image
@@ -63,13 +64,16 @@ list<squarePair> CameraPose::updateCamera(){
 	// Convert to hsv
 	cvCvtColor(cameraImage, hsvImage, CV_BGR2HSV);
 	
+	turnError = 0;
+	
 	//Find and match yellow squares
 	squares_t * currentSquares;
 	list<squarePair> yellowPairs, pinkPairs;
-	
+
 	cvInRangeS(hsvImage, RC_YELLOW_LOW, RC_YELLOW_HIGH, yellow);
 	currentSquares = robot->findSquares(yellow, MIN_SQUARE);
 	removeOverlap(currentSquares);
+	turnError += getSquareSide(currentSquares);
 	drawSquares(currentSquares, CV_RGB(0,255,0));
 	yellowPairs = matchSquares(currentSquares, YELLOW);
 	printCenters(yellowPairs);
@@ -82,11 +86,13 @@ list<squarePair> CameraPose::updateCamera(){
 	
 	currentSquares = robot->findSquares(filteredImage, MIN_SQUARE);
 	removeOverlap(currentSquares);
+	turnError += getSquareSide(currentSquares);
 	drawSquares(currentSquares, CV_RGB(255,0,0));
 	pinkPairs = matchSquares(currentSquares, PINK);
 	printCenters(pinkPairs);
 
 	displayImages();
+	
 	
 	//Save image
 	char file_name [256];
@@ -104,6 +110,7 @@ list<squarePair> CameraPose::updateCamera(){
 
 	sprintf(file_name,"pinkhigh.%04d.jpg", image_ctr);
 	cvSaveImage(file_name,pinkHigh);
+	
 	image_ctr+=1;
 	
 	//Return both yellow and pink pairs
@@ -121,7 +128,7 @@ void CameraPose::displayImages(){
 	//cvShowImage("Filtered Pink Low", pinkLow);
 	cvShowImage("Filtered Yellow", yellow);
 	//cvShowImage("Filtered All", filteredImage);
-	cvWaitKey(200);
+	cvWaitKey(100);
 }
 
 /*
@@ -202,7 +209,6 @@ list<squarePair> CameraPose::matchSquares(squares_t *squares, int color){
 	list <squarePair> pair_list;
 	squarePair temp_pair;
 	temp_pair.left = NULL; temp_pair.right = NULL;
-	CvPoint pt1, pt2;
 	while(squares != NULL){
 		tempSquares = squares->next;
 		while(tempSquares != NULL){
@@ -212,10 +218,6 @@ list<squarePair> CameraPose::matchSquares(squares_t *squares, int color){
 				&& abs(squares->center.x - tempSquares->center.x) > SCREEN_WIDTH/6
 				&& (squares->center.y) < SCREEN_HEIGHT * (3.0/5.0)
 				&& (tempSquares->center.y) < SCREEN_HEIGHT * (3.0/5.0)){
-				//Draw line
-				pt1 = cvPoint(squares->center.x, squares->center.y);
-				pt2 = cvPoint(tempSquares->center.x, tempSquares->center.y);
-				cvLine(cameraImage, pt1, pt2, CV_RGB(0,0,255), 2, CV_AA, 0);
 				
 				//Record squares
 				int newArea = (squares->area + tempSquares->area)/2;
@@ -248,7 +250,14 @@ void CameraPose::printCenters(list<squarePair> pairs){
 	cvLine(cameraImage, cvPoint(SCREEN_WIDTH/2,0), cvPoint(SCREEN_WIDTH/2,SCREEN_HEIGHT), CV_RGB(128,128,128), 2, CV_AA, 0);
 	int center = 0; 
 	int height = 0;
+	CvPoint pt1, pt2;
+
 	for(it=pairs.begin(); it!=pairs.end(); it++){
+	  				
+		pt1 = cvPoint(it->left->center.x, it->left->center.y);
+		pt2 = cvPoint(it->right->center.x, it->right->center.y);
+		cvLine(cameraImage, pt1, pt2, CV_RGB(0,0,255), 2, CV_AA, 0);
+	  
 		center = (it->left->center.x + it->right->center.x)/2;
 		height = (it->left->center.y + it->right->center.y)/2;
 		cvLine(cameraImage, cvPoint(center,height-5), cvPoint(center,height+5), CV_RGB(255,0,0), 2, CV_AA, 0);
@@ -268,27 +277,50 @@ int CameraPose::getCenterError(list<squarePair> pairs){
 	else{
 		list<squarePair>::iterator it = pairs.begin();
 		centers = (it->left->center.x + it->right->center.x)/2;
-		printf("Best Center L(%d,%d) R(%d,%d) Color:%d\n",it->left->center.x,
-			it->left->center.y, it->right->center.x, it->right->center.y, it->color);
+		//printf("Best Center L(%d,%d) R(%d,%d) Color:%d\n",it->left->center.x,
+		//	it->left->center.y, it->right->center.x, it->right->center.y, it->color);
 		if(pairs.size() > 1){
 			it++;
-			printf("Best Center L(%d,%d) R(%d,%d) Color:%d\n",it->left->center.x,
-				it->left->center.y, it->right->center.x, it->right->center.y, it->color);
+		//	printf("Best Center L(%d,%d) R(%d,%d) Color:%d\n",it->left->center.x,
+		//		it->left->center.y, it->right->center.x, it->right->center.y, it->color);
 		}
 		return centers - (SCREEN_WIDTH/2);
 	}
 	//	return (centers/pairs.size()) - (SCREEN_WIDTH/2);
 	
 }
+/*
+ * Returns the average center x position to be used for turning
+ */
+int CameraPose::getSquareSide(squares_t *squares){
+	if(squares == NULL)
+		return 0;
+	else{
+		squares_t * current = squares;
+		int center = 0;
+		int num = 0;
+		while(current != NULL){
+			center += current->center.x;
+			current = current->next;
+			num++;
+		}
+		if(num == 0)
+			return 0;
+		else
+			return center/num - SCREEN_WIDTH/2;
+	}
+}
 int CameraPose::getTurnError(list<squarePair> pairs){
 	list<squarePair>::iterator it;
-	if(pairs.size() == 0)
-		return 0;
+	if(pairs.size() == 0){
+		return turnError;
+	}
 	else{
 		list<squarePair>::iterator it = pairs.begin();
 		int left_error = abs(it->left->center.x - SCREEN_WIDTH/2);
 		int right_error = abs(it->right->center.x - SCREEN_WIDTH/2);
-		return left_error - right_error;
+		//return left_error - right_error;
+		return 0;
 	}
 }
 /*
@@ -298,16 +330,18 @@ int CameraPose::getTurnError(list<squarePair> pairs){
 int CameraPose::getCellError(list<squarePair> pairs){
 	list<squarePair>::iterator it = pairs.begin();
 	int error = 0;
-	if(it->color == PINK){
-		error += it->left->center.y - Y_CELL_CENTER_PINK;
-		error += it->right->center.y - Y_CELL_CENTER_PINK;
-	}else if(it->color == YELLOW){
-		error += it->left->center.y - Y_CELL_CENTER_YELLOW;
-		error += it->right->center.y - Y_CELL_CENTER_YELLOW;
-
+	if(pairs.size() == 0)
+		return 0;
+	else{
+		if(it->color == PINK){
+			error += it->left->center.y - Y_CELL_CENTER_PINK;
+			error += it->right->center.y - Y_CELL_CENTER_PINK;
+		}else if(it->color == YELLOW){
+			error += it->left->center.y - Y_CELL_CENTER_YELLOW;
+			error += it->right->center.y - Y_CELL_CENTER_YELLOW;
+		}
+		return error/2;
 	}
-	
-	return error/2;
 }
 
 

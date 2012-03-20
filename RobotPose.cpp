@@ -104,7 +104,18 @@ void RobotPose::initPose() {
 	//Assuming we are always facing along +y axis
 	pose_we.theta = M_PI_2;
 
+	float initialPose[3];
+	initialPose[0] = 0;
+	initialPose[1] = 0;
+	initialPose[2] = M_PI_2;
+	
+	float Velocity[3];
+	Velocity[0] = 0;
+	Velocity[1] = 0;
+	Velocity[2] = 0;
+	int deltat = 1;
 
+	initKalmanFilter(&kf, initialPose, Velocity, deltat);
 
 }
 
@@ -131,7 +142,7 @@ bool RobotPose::strafeTo(int delta_x){
 		robot_speed = 5;
 	}
 */
-	printf("%u DELTA: %d\n",pose_cam->image_ctr-1, delta_x);
+	printf("%u DELTA: %d\t",pose_cam->image_ctr-1, delta_x);
 
 	//move the robot left or right
 	if(delta_x < -1 * STRAFE_EPSILON){
@@ -142,24 +153,32 @@ bool RobotPose::strafeTo(int delta_x){
 		printf("Moving Right\n");
 	}else{
 		//Base case
+		printf("Centered\n");
 		return false;
 	}
 
+
 	updatePosition(true);
+
+	//turnTo(M_PI_2);
+
 	//If we have gotten here there was a strafe
-	list<squarePair> pairs = pose_cam->updateCamera();
-	return (strafeTo(pose_cam->getCenterError(pairs)) || true);
+	//list<squarePair> pairs = pose_cam->updateCamera();
+	//return (strafeTo(pose_cam->getCenterError(pairs)) || true);
+	
+	return true;
 }
 
 
 void RobotPose::moveToCell(const int direction){
 	static unsigned int cell_number = 0;
-	//pose_cam->updateCamera();
+	int cell_start_x = pose_kalman.x;
+	int cell_start_y = pose_kalman.y;
 	updatePosition(false);
 	if(direction == LEFT){
 		turnTo(pose_kalman.theta + 90.0* (M_PI/180.0));
 	}else if(direction == RIGHT){
-		turnTo(pose_kalman.theta - 90.0* (M_PI/180.0));
+		turnTo(0.0);
 	}	
 	else if(direction == BACKWARD){
 		turnTo(pose_kalman.theta + 180.0* (M_PI/180.0));
@@ -169,35 +188,54 @@ void RobotPose::moveToCell(const int direction){
 	//resetWEPose(0,0,pose_kalman.theta);
 	int kalman_cell_error = 0, camera_cell_error = 0;
 	do{
-//		robot->Move(RI_MOVE_FORWARD, RI_FASTEST);
-		updatePosition(false);
-		printf("Kalman: %f,%f,%f\n", pose_kalman.x, pose_kalman.y, pose_kalman.theta * (180/M_PI));
-		//Calculate error to next cell
-		kalman_cell_error = sqrt(pose_kalman.x*pose_kalman.x + pose_kalman.y*pose_kalman.y)- (CELL_DIMENSION_CM * cell_number);
+		robot->Move(RI_MOVE_FORWARD, RI_FASTEST);
+		robot->Move(RI_MOVE_FORWARD, RI_FASTEST);
+		robot->Move(RI_MOVE_FORWARD, RI_FASTEST);
+		robot->Move(RI_MOVE_FORWARD, RI_FASTEST);
+		
+		//Calculate error to next cell using Kalman
+		int delta_x = cell_start_x - pose_kalman.x;
+		int delta_y = cell_start_y - pose_kalman.y;
+		kalman_cell_error = sqrt(delta_x*delta_x + delta_y*delta_y)- (CELL_DIMENSION_CM);
 
 
-	/*
-	 * Make sure we are centered in cell
-	 */
 
 		list<squarePair> pairs = pose_cam->updateCamera();
-		bool strafed = strafeTo(pose_cam->getCenterError(pairs));
-		//Reset WE if we strafed to prevent error in WE pose
-//		if(strafed){
-
-		//	robot->getWheelEncoder(RI_WHEEL_LEFT);
-		//	robot->getWheelEncoder(RI_WHEEL_RIGHT);
-		//	robot->getWheelEncoder(RI_WHEEL_REAR);
-//		}
-	
+		
+		//Strafe based on pairs of squares
+		strafeTo(pose_cam->getCenterError(pairs));
+		
+		//Turn if facing only one wall of squares
+		int turnError = pose_cam->getTurnError(pairs);
 		/*
-		 * While WE and camera say we are not in the center of a cell
-		 * in center when the closed square is a certain size & location
-		 */
+		if(turnError > 50){
+			robot->Move(RI_TURN_RIGHT_20DEG , RI_FASTEST);
+			//robot->Move(RI_STOP , RI_FASTEST);
+		}
+		else if(turnError < -50){
+			robot->Move(RI_TURN_LEFT_20DEG , RI_FASTEST);
+			//robot->Move(RI_STOP , RI_FASTEST);
+		}
+		*/
+
+		
+
+		//Calculate error based on squares		
 		camera_cell_error = pose_cam->getCellError(pairs);
-		printf("Camera Cell Error: %d Kalman Cell Error: %d\n", camera_cell_error, kalman_cell_error);
-		printf("Turn Error: %d\n", pose_cam->getTurnError(pairs));
-	}while(kalman_cell_error < -25 || camera_cell_error > 25);
+		
+		//Print errors
+		//printf("Kalman: %f,%f,%f, ", pose_kalman.x, pose_kalman.y, pose_kalman.theta * (180/M_PI));
+		printPoses();
+		printf("\tDistance: %d\t", kalman_cell_error + CELL_DIMENSION_CM);
+		printf("Camera Error: %d\t Kalman Error: %d\t", camera_cell_error, kalman_cell_error);
+		printf("Turn Error: %d\n", turnError);
+		updatePosition(false);
+	}while((abs(kalman_cell_error) > 15)&&!robot->IR_Detected());
+	
+	robot->Move(RI_MOVE_FORWARD, RI_FASTEST);
+	robot->Move(RI_MOVE_FORWARD, RI_FASTEST);
+	robot->Move(RI_MOVE_FORWARD, RI_FASTEST);
+	robot->Move(RI_MOVE_FORWARD, RI_FASTEST);
 
 }
 
@@ -289,9 +327,9 @@ void RobotPose::turnTo(float goal_theta) {
 	 */
 	float error_theta = error_theta1<error_theta2?error_theta1:error_theta2;
 	//Don't turn if error theta not large enough
-	printPoses();
+	//printPoses();
 	if(error_theta>=(-TURN_TO_EPSILON) && error_theta<= (TURN_TO_EPSILON)){
-		 printf("Theta too small\n");
+		 //printf("Theta too small\n");
 		 return;
 	}
 
@@ -299,7 +337,7 @@ void RobotPose::turnTo(float goal_theta) {
 	//Call PID for Theta
 	float PID_res = abs(PID_theta->UpdatePID(error_theta, pose_kalman.theta));
 	//Determine speed
-	printf("Theta PID: %f\n", PID_res);
+	//printf("Theta PID: %f\n", PID_res);
 
 	int robot_speed; 
 	float velocity[3];
@@ -314,11 +352,11 @@ void RobotPose::turnTo(float goal_theta) {
 	}
 	//Turn depending on error angle
 	if(error_theta==error_theta1){
-		printf("Turning Left \n", error_theta1*(180/M_PI), error_theta2*(180/M_PI));
+		printf("Turning Left %f, %f\n", error_theta1*(180/M_PI), error_theta2*(180/M_PI));
  		robot->Move(RI_TURN_LEFT, robot_speed);
 	}
 	else if(error_theta==error_theta2){
-		printf("Turning Right \n", error_theta1*(180/M_PI), error_theta2*(180/M_PI));
+		printf("Turning Right %f, %f\n", error_theta1*(180/M_PI), error_theta2*(180/M_PI));
 		robot->Move(RI_TURN_RIGHT, robot_speed);
 	}
 

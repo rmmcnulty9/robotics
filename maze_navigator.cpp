@@ -29,13 +29,22 @@ int main(int argv, char **argc)
 	/*
 	 * Move forward down the hallway
 	 */
+	
 	int ctr = 0;
 	while(!robot->IR_Detected() && ctr<=4){
-		printf("CELL %d =============\n", ctr);
+		printf("CELL %d ===============================================\n", ctr);
 		robotPose.moveToCell(RobotPose::FORWARD);
-		ctr+=1;
+		ctr++;
 	}
-        
+	printf("CELL TURN %d ===============================================\n", ctr);
+	robotPose.moveToCell(RobotPose::RIGHT);
+
+	
+	while(!robot->IR_Detected() && ctr<=8){
+		printf("CELL %d ===============================================\n", ctr);
+		robotPose.moveToCell(RobotPose::FORWARD);
+		ctr++;
+	}
 
 	delete(robot);
 	return 0;
