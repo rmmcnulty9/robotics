@@ -31,6 +31,9 @@ int main(int argv, char **argc)
 	  //if(i==4){
 	  //  robotPose.changeUncertainty(uncertainty_weak_ns);
 	  //}
+	  if(i==5){
+	   robotPose.changeWEScalingConstant(9.0); 
+	  }
 	}
 	i-=1;
 	goal_theta = 0.0;

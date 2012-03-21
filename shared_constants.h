@@ -28,8 +28,8 @@ typedef struct {
 
 // Constants used for JOHNNY5
 //Low Charged
-float ns_x_to_cm[] = {0.0, 0.0, 1.0 / 35.0, 1.0 / 30.0, 1.0 / 34.0, 1.0 / 37.0};
-float ns_y_to_cm[] = {0.0, 0.0, 1.0 / 39.0, 1.0 / 37.0, 1.0 / 25.0, 1.0 / 42.0};
+float ns_x_to_cm[] = {0.0, 0.0, 1.0 / 35.0, 1.0 / 30.0, 1.0 / 34.0, 1.0 / 39.0};
+float ns_y_to_cm[] = {0.0, 0.0, 1.0 / 39.0, 1.0 / 37.0, 1.0 / 25.0, 1.0 / 43.0};
 float we_to_cm = 6.5; //0.5; 
 
 float uncertainty_weak_we [] = {.08, .08, .08, .04, .04, .04, .1, .1, .1};
