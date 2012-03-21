@@ -15,18 +15,32 @@ typedef struct {
 //North Star scalings for each room
 
 // Constants used for ROSIE
+
+//Fully Charged
+//float ns_x_to_cm[] = {0.0, 0.0, 1.0 / 37.0, 1.0 / 30.0, 1.0 / 34.0, 1.0 / 37.0};
+//float ns_y_to_cm[] = {0.0, 0.0, 1.0 / 43.0, 1.0 / 39.0, 1.0 / 25.0, 1.0 / 29.0};
+//float we_to_cm = 2.5; //0.5; 
+//Medium to Low Charged
 //float ns_x_to_cm[] = {0.0, 0.0, 1.0 / 35.0, 1.0 / 30.0, 1.0 / 34.0, 1.0 / 37.0};
 //float ns_y_to_cm[] = {0.0, 0.0, 1.0 / 39.0, 1.0 / 39.0, 1.0 / 25.0, 1.0 / 37.0};
+//float we_to_cm = 4.5; //0.5; 
 
 
 // Constants used for JOHNNY5
+//Low Charged
 float ns_x_to_cm[] = {0.0, 0.0, 1.0 / 35.0, 1.0 / 30.0, 1.0 / 34.0, 1.0 / 37.0};
-float ns_y_to_cm[] = {0.0, 0.0, 1.0 / 39.0, 1.0 / 39.0, 1.0 / 25.0, 1.0 / 39.0};
+float ns_y_to_cm[] = {0.0, 0.0, 1.0 / 39.0, 1.0 / 37.0, 1.0 / 25.0, 1.0 / 42.0};
+float we_to_cm = 6.5; //0.5; 
+
+float uncertainty_weak_we [] = {.08, .08, .08, .04, .04, .04, .1, .1, .1};
+float uncertainty_weak_ns [] = {.06, .06, .06, .07, .07, .07, .12, .12, .12};
+float uncertainty_weakest_ns [] = {.06, .06, .06, .1, .1, .1, .12, .12, .12};
 
 
 // Constants used for GORT
 // float ns_x_to_cm[] = {0.0, 0.0, 1.0 / 35.0, 1.0 / 30.0, 1.0 / 34.0, 1.0 / 37.0};
 // float ns_y_to_cm[] = {0.0, 0.0, 1.0 / 39.0, 1.0 / 39.0, 1.0 / 25.0, 1.0 / 39.0};
+//float we_to_cm = 4.5; //0.5; 
 
 //NS theta skew correction constants
 float ns_theta_offsets[] = {0.0, 0.0, 0.155946, M_PI_2, -0.101754, 1.488696};
@@ -35,7 +49,6 @@ float ns_theta_offsets[] = {0.0, 0.0, 0.155946, M_PI_2, -0.101754, 1.488696};
 float start_pose_thetas[] = {0.0, 0.0, 1.3554 - M_PI, -1.571900 - M_PI_2, 0.080450 - M_PI_2, -1.430050 - M_PI_2};
 
 const float we_to_rad = M_PI / -120.0;
-float we_to_cm = 5.5; //0.5; 
 const float robot_diameter_cm = 29.0;
 
 const char* coef_filename = "fir_coef/s_72";
@@ -72,8 +85,6 @@ const double derivative = 1.0;
  * Use different uncertainties when the NS signal is weak. No significant difference
  */
 //float uncertainty_default [] = {.05, .05, .05, .05, .05, .05, .05, .05, .05};
-float uncertainty_weak_we [] = {.07, .07, .07, .05, .05, .05, .12, .12, .12};
 
-float uncertainty_weak_ns [] = {.06, .06, .06, .07, .07, .07, .12, .12, .12};
 
 #endif

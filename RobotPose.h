@@ -45,7 +45,7 @@ public:
   
 	// Camera functions
 	void moveToCell(const int direction);
-	bool strafeTo(int delta_x);
+	bool strafeTo(int delta_x, float goal_theta);
 	
 	static const float STRAFE_EPSILON = 35.0;
 

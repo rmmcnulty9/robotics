@@ -124,7 +124,7 @@ void RobotPose::initPose() {
  * Function that will strafe a delta Y value positive = right, negative = left
  * delta_x's range is -320 to +320 and return whether there was a strafing done
  */
-bool RobotPose::strafeTo(int delta_x){
+bool RobotPose::strafeTo(int delta_x, float goal_theta){
 	
 	int robot_speed = 3;
 /*
@@ -160,7 +160,7 @@ bool RobotPose::strafeTo(int delta_x){
 
 	updatePosition(true);
 
-	turnTo(M_PI_2);
+	turnTo(goal_theta);
 
 	//If we have gotten here there was a strafe
 	//list<squarePair> pairs = pose_cam->updateCamera();
@@ -171,7 +171,10 @@ bool RobotPose::strafeTo(int delta_x){
 
 
 void RobotPose::moveToCell(const int direction){
-	static unsigned int cell_number = 0;
+  
+    printf("NOT SUPPORTED ANYMORE\n");
+    exit(-1);
+	/*static unsigned int cell_number = 0;
 	int cell_start_x = pose_kalman.x;
 	int cell_start_y = pose_kalman.y;
 	updatePosition(false);
@@ -207,7 +210,7 @@ void RobotPose::moveToCell(const int direction){
 		
 		//Turn if facing only one wall of squares
 		int turnError = pose_cam->getTurnError(pairs);
-		/*
+		
 		if(turnError > 50){
 			robot->Move(RI_TURN_RIGHT_20DEG , RI_FASTEST);
 			//robot->Move(RI_STOP , RI_FASTEST);
@@ -216,7 +219,7 @@ void RobotPose::moveToCell(const int direction){
 			robot->Move(RI_TURN_LEFT_20DEG , RI_FASTEST);
 			//robot->Move(RI_STOP , RI_FASTEST);
 		}
-		*/
+		
 
 		
 
@@ -236,7 +239,7 @@ void RobotPose::moveToCell(const int direction){
 	robot->Move(RI_MOVE_FORWARD, RI_FASTEST);
 	robot->Move(RI_MOVE_FORWARD, RI_FASTEST);
 	robot->Move(RI_MOVE_FORWARD, RI_FASTEST);
-
+      */
 }
 
 void RobotPose::moveTo(float x, float y, float goal_theta) {
@@ -256,7 +259,7 @@ void RobotPose::moveTo(float x, float y, float goal_theta) {
 	  list<squarePair> pairs = pose_cam->updateCamera();
 	  int turnError = pose_cam->getTurnError(pairs);
 	///  printf("Camera Turn Error: %d\n", turnError);
-	  bool strafed = strafeTo(pose_cam->getCenterError(pairs));
+	  bool strafed = strafeTo(pose_cam->getCenterError(pairs), goal_theta);
 	  cam_update_flag=0;
 	}
 	cam_update_flag+=1;
@@ -276,8 +279,6 @@ void RobotPose::moveTo(float x, float y, float goal_theta) {
 	}
 	if(error_distance_x<0.0) error_distance_x = -error_distance_x;
 	if(error_distance_y<0.0) error_distance_y = -error_distance_y;
-	//error_distance_y = sin(pose_kalman.theta) * error_distance_y;
-	//error_distance_x = cos(pose_kalman.theta) * error_distance_x;
 
 	
 	
@@ -321,11 +322,12 @@ void RobotPose::moveTo(float x, float y, float goal_theta) {
 		robot->Move(RI_MOVE_FORWARD, robot_speed);
 		moveTo(x, y, goal_theta);
 	}else if(error_distance_x > MOVE_TO_EPSILON){
-	    strafeTo(error_distance_x);
+	    strafeTo(error_distance_x, goal_theta);
 	}
 	else {
 		printf("ARRIVED! %f %f\n", x, y);
-		resetPose(pose_kalman.x, pose_kalman.y, pose_kalman.theta);
+		resetPose(x, y, goal_theta);
+		//resetPose(pose_kalman.x, pose_kalman.y, pose_kalman.theta);
 	}
 }
 
