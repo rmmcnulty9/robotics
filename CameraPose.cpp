@@ -36,7 +36,7 @@ CameraPose::CameraPose(RobotInterface *r){
 	yellow = cvCreateImage(cvSize(SCREEN_WIDTH, SCREEN_HEIGHT), IPL_DEPTH_8U, 1);
 
 	//Setup display windows
-	cvNamedWindow("Unfiltered", CV_WINDOW_AUTOSIZE);
+	//cvNamedWindow("Unfiltered", CV_WINDOW_AUTOSIZE);
 	//cvNamedWindow("Filtered Pink High", CV_WINDOW_AUTOSIZE);
 	//cvNamedWindow("Filtered Pink Low", CV_WINDOW_AUTOSIZE);
 	//cvNamedWindow("Filtered Yellow", CV_WINDOW_AUTOSIZE);
@@ -92,7 +92,7 @@ list<squarePair> CameraPose::updateCamera(){
 	pinkPairs = matchSquares(currentSquares, PINK);
 	printCenters(pinkPairs);
 
-	displayImages();
+	//displayImages();
 	
 	
 	//Save image
@@ -192,7 +192,9 @@ bool compare_areas (squarePair first, squarePair second){
 	if((first.left->area + first.right->area) > (second.left->area + second.right->area)) return true;
 	else return false;
 }
-
+/*
+ * Removes the squares that overlap by comparing the centers
+ */
 void CameraPose::removeOverlap(squares_t *squares){
 	squares_t *current;
 	squares_t *last;

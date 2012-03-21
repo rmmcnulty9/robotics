@@ -241,7 +241,9 @@ void RobotPose::moveToCell(const int direction){
 	robot->Move(RI_MOVE_FORWARD, RI_FASTEST);
       */
 }
-
+/*
+ * Move the robot to the given x,y,theta position
+ */
 void RobotPose::moveTo(float x, float y, float goal_theta) {
 	updatePosition(false);
 	//Determine how much robot needs to turn to reach goal
@@ -317,11 +319,12 @@ void RobotPose::moveTo(float x, float y, float goal_theta) {
 	}
 	
   printf("error dist x:%f error dist y:%f  = %f\n", error_distance_x, error_distance_y, error_distance);
-	//Move unless within range of base
+	//Move forward 
 	if (error_distance_y > MOVE_TO_EPSILON) {
 		robot->Move(RI_MOVE_FORWARD, robot_speed);
 		moveTo(x, y, goal_theta);
 	}else if(error_distance_x > MOVE_TO_EPSILON){
+	  //Move left or right via strafing
 	    strafeTo(error_distance_x, goal_theta);
 	}
 	else {
@@ -330,7 +333,9 @@ void RobotPose::moveTo(float x, float y, float goal_theta) {
 		//resetPose(pose_kalman.x, pose_kalman.y, pose_kalman.theta);
 	}
 }
-
+/*
+ * Turn to the given absolute theta angle
+ */
 void RobotPose::turnTo(float goal_theta) {
 
 	updatePosition(true);
@@ -417,7 +422,9 @@ void RobotPose::printPoses(){
 	printf("K: %f %f %f \t NS: %f %f %f \t WE: %f %f %f \t Signal: %d\n", pose_kalman.x, pose_kalman.y, pose_kalman.theta*180/M_PI,
 	pose_ns.x, pose_ns.y, pose_ns.theta*180/M_PI, pose_we.x, pose_we.y, pose_we.theta*180/M_PI, robot->NavStrengthRaw());
 }
-
+/*
+ * Calls update pose functions for WE and NS & updates the kalman
+ */
 void RobotPose::updatePosition(bool turning=false){
 	robot->update();
 	updateNS();
@@ -454,7 +461,9 @@ void RobotPose::updatePosition(bool turning=false){
 	pose_kalman.theta = track[2];
 
 }
-
+/*
+ * Get data from WE filter it and translate,rotate, and scale
+ */
 bool RobotPose::updateWE(bool turning) {
 	float dx_2, dy_2;
   
@@ -496,6 +505,9 @@ bool RobotPose::updateWE(bool turning) {
 	return true;
 }
 
+/*
+ * Get data from NS filter it and translate,rotate, and scale
+ */
 bool RobotPose::updateNS() {
  
 	//Get initial data
@@ -588,7 +600,9 @@ void RobotPose::resetPose(float x, float y, float theta) {
 void RobotPose::changeWEScalingConstant(float we) {
 	we_to_cm = we;
 }
-
+/*
+ * Accessor for changing the Uncertainty in Kalman filter
+ */
 void RobotPose::changeUncertainty(float *uc){
  rovioKalmanFilterSetUncertainty(&kf,uc); 
 }
