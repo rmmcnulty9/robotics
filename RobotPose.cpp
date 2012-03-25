@@ -1,6 +1,7 @@
 /*
  * RobotPose Class
- *  Used to collect, filter, and interpret camera data
+ *  Used to collect, filter, and interpret robot NS and WE data
+ *  and move robot around maze
  *   Written by Greg Seaman, Adam Park, and Ryan McNulty
  */
 
@@ -142,16 +143,18 @@ bool RobotPose::strafeTo(int delta_x, float goal_theta){
 		robot_speed = 5;
 	}
 */
-	printf("%u DELTA: %d\t",pose_cam->image_ctr-1, delta_x);
+	//printf("%u DELTA: %d\t",pose_cam->image_ctr-1, delta_x);
 
 	//move the robot left or right
 	if(delta_x < -1 * STRAFE_EPSILON){
 		robot->Move(RI_MOVE_FWD_LEFT, robot_speed);
 		printf("Moving Left\n");
-	}else if(delta_x > STRAFE_EPSILON){
+	}
+	else if(delta_x > STRAFE_EPSILON){
 		robot->Move(RI_MOVE_FWD_RIGHT, robot_speed);
 		printf("Moving Right\n");
-	}else{
+	}
+	else{
 		//Base case
 		printf("Centered\n");
 		return false;
@@ -160,6 +163,7 @@ bool RobotPose::strafeTo(int delta_x, float goal_theta){
 
 	updatePosition(true);
 
+	//Make sure robot's theta is still correct
 	turnTo(goal_theta);
 
 	//If we have gotten here there was a strafe
@@ -169,7 +173,10 @@ bool RobotPose::strafeTo(int delta_x, float goal_theta){
 	return true;
 }
 
-
+/*
+ * Function that will be used to move one cell 
+ * in one of the cardinal directions
+ */
 void RobotPose::moveToCell(const int direction){
   
     printf("NOT SUPPORTED ANYMORE\n");
@@ -241,30 +248,31 @@ void RobotPose::moveToCell(const int direction){
 	robot->Move(RI_MOVE_FORWARD, RI_FASTEST);
       */
 }
+
 /*
  * Move the robot to the given x,y,theta position
  */
 void RobotPose::moveTo(float x, float y, float goal_theta) {
 	updatePosition(false);
-	//Determine how much robot needs to turn to reach goal
 	
 	//if((y-pose_kalman.y)<=0.0) {
 	//	goal_theta = -goal_theta;
 	//}
    
-	printf("GOAL: %f %f %f \n",x, y, goal_theta * 180/M_PI);
- 	//printf("kalman %f %f %f\n", pose_kalman.x, pose_kalman.y, pose_kalman.theta); 
+	//printf("GOAL: %f %f %f \n",x, y, goal_theta * 180/M_PI);
+	//printf("kalman %f %f %f\n", pose_kalman.x, pose_kalman.y, pose_kalman.theta); 
 	printPoses();
     
+	//Only update camera once every three sensor updates
 	static int cam_update_flag = 0;
 	if(cam_update_flag==3){
-	  list<squarePair> pairs = pose_cam->updateCamera();
-	  int turnError = pose_cam->getTurnError(pairs);
-	///  printf("Camera Turn Error: %d\n", turnError);
-	  bool strafed = strafeTo(pose_cam->getCenterError(pairs), goal_theta);
-	  cam_update_flag=0;
+		list<squarePair> pairs = pose_cam->updateCamera();
+		int turnError = pose_cam->getTurnError(pairs);
+		bool strafed = strafeTo(pose_cam->getCenterError(pairs), goal_theta);
+		cam_update_flag=0;
 	}
 	cam_update_flag+=1;
+	
 	//Correct direction to reach goal
 	turnTo(goal_theta);  
 	
@@ -273,17 +281,15 @@ void RobotPose::moveTo(float x, float y, float goal_theta) {
 	float error_distance_y;
 	
 	if(goal_theta==0.0 || goal_theta==M_PI){
-	  error_distance_y = pose_kalman.x - x;
-	  error_distance_x = pose_kalman.y - y; 
+		error_distance_y = pose_kalman.x - x;
+		error_distance_x = pose_kalman.y - y; 
 	}else{
-	  error_distance_x = pose_kalman.x - x;
-	  error_distance_y = pose_kalman.y - y; 
+		error_distance_x = pose_kalman.x - x;
+		error_distance_y = pose_kalman.y - y; 
 	}
 	if(error_distance_x<0.0) error_distance_x = -error_distance_x;
 	if(error_distance_y<0.0) error_distance_y = -error_distance_y;
-
-	
-	
+	//Total error from next cell
 	float error_distance = sqrt(error_distance_x * error_distance_x + error_distance_y * error_distance_y);
 
 	//Get PID
@@ -318,21 +324,24 @@ void RobotPose::moveTo(float x, float y, float goal_theta) {
 		rovioKalmanFilterSetVelocity(&kf,velocity);
 	}
 	
-  printf("error dist x:%f error dist y:%f  = %f\n", error_distance_x, error_distance_y, error_distance);
-	//Move forward 
+	printf("error dist x:%f error dist y:%f  = %f\n", error_distance_x, error_distance_y, error_distance);
+	//Move forward if error in robot's y
 	if (error_distance_y > MOVE_TO_EPSILON) {
 		robot->Move(RI_MOVE_FORWARD, robot_speed);
 		moveTo(x, y, goal_theta);
-	}else if(error_distance_x > MOVE_TO_EPSILON){
-	  //Move left or right via strafing
-	    strafeTo(error_distance_x, goal_theta);
 	}
+	//Move left or right via strafing if error in robot's x
+	else if(error_distance_x > MOVE_TO_EPSILON){
+		strafeTo(error_distance_x, goal_theta);
+	}
+	//Robot has reached destination
 	else {
 		printf("ARRIVED! %f %f\n", x, y);
 		resetPose(x, y, goal_theta);
 		//resetPose(pose_kalman.x, pose_kalman.y, pose_kalman.theta);
 	}
 }
+
 /*
  * Turn to the given absolute theta angle
  */
@@ -403,6 +412,9 @@ void RobotPose::turnTo(float goal_theta) {
 
 }
 
+/*
+ * Print all raw censor data
+ */
 void RobotPose::printRaw(){
 	int d_left = robot->getWheelEncoder(RI_WHEEL_LEFT);
 	int d_right = robot->getWheelEncoder(RI_WHEEL_RIGHT);
@@ -417,11 +429,16 @@ void RobotPose::printRaw(){
                
 	printf("%d %d %f %d %d %d %d %d %d\n", x, y, theta, d_left, d_right, d_rear, t_left, t_right, t_rear);
 }
+
+/*
+ * Print all interpreted pose data
+ */
 void RobotPose::printPoses(){
 
 	printf("K: %f %f %f \t NS: %f %f %f \t WE: %f %f %f \t Signal: %d\n", pose_kalman.x, pose_kalman.y, pose_kalman.theta*180/M_PI,
 	pose_ns.x, pose_ns.y, pose_ns.theta*180/M_PI, pose_we.x, pose_we.y, pose_we.theta*180/M_PI, robot->NavStrengthRaw());
 }
+
 /*
  * Calls update pose functions for WE and NS & updates the kalman
  */
