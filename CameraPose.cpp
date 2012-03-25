@@ -227,7 +227,7 @@ void CameraPose::removeOverlap(squares_t *squares){
 }
 
 /*
- * Find squares of same height and draw lines between them
+ * Find squares of same height and draw lines between them in specified color
  */
 list<squarePair> CameraPose::matchSquares(squares_t *squares, int color){
 	squares_t *tempSquares;

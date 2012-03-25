@@ -1,14 +1,16 @@
 /*
- * Some shared Constants/Structs across this Rob
- * */
+ * Shared constants header
+ *  Used to define constants affecting robot navigation
+ *   Written by Greg Seaman, Adam Park, and Ryan McNulty
+ */
 #include <math.h>
+#ifndef __CONSTANTS__
+#define __CONSTANTS__
 
- #ifndef __CONSTANTS__
- #define __CONSTANTS__
 typedef struct {
-    float x;
-    float y;
-    float theta;
+	float x;
+	float y;
+	float theta;
 } pose;
 
 
@@ -51,9 +53,11 @@ float start_pose_thetas[] = {0.0, 0.0, 1.3554 - M_PI, -1.571900 - M_PI_2, 0.0804
 const float we_to_rad = M_PI / -120.0;
 const float robot_diameter_cm = 29.0;
 
+//Fir filter constant files
 const char* coef_filename = "fir_coef/s_72";
 const char* ns_theta_coef_filename = "fir_coef/s_75";
 
+//Thresholds for movement
 const float MOVE_TO_EPSILON = 10.0;
 float TURN_TO_EPSILON = 10.0*(M_PI/180);
 
