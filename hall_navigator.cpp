@@ -32,12 +32,13 @@ int main(int argv, char **argc)
 	  //  robotPose.changeUncertainty(uncertainty_weak_ns);
 	  //}
 	  if(i==5){
-	   robotPose.changeWEScalingConstant(9.0); 
+	   robotPose.changeWEScalingConstant(20.0); 
 	  }
 	}
+		   robotPose.changeWEScalingConstant(9.0); 
 	i-=1;
 	goal_theta = 0.0;
-	for(;j<=3;j++){
+	for(;j<=4;j++){
 	  robotPose.moveTo(j*65.0,i*65.0, goal_theta);
 	  printf("\n\n CELL %d %d\n\n",i,j);
 	  if(j==1){
