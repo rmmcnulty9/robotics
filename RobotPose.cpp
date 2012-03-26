@@ -105,6 +105,11 @@ void RobotPose::initPose() {
 	//Assuming we are always facing along +y axis
 	pose_we.theta = M_PI_2;
 
+	pose_goal.x = 0;
+	pose_goal.y = 0;
+	pose_goal.theta = M_PI_2;
+	
+	
 	float initialPose[3];
 	initialPose[0] = 0;
 	initialPose[1] = 0;
@@ -179,74 +184,30 @@ bool RobotPose::strafeTo(int delta_x, float goal_theta){
  */
 void RobotPose::moveToCell(const int direction){
   
-    printf("NOT SUPPORTED ANYMORE\n");
-    exit(-1);
-	/*static unsigned int cell_number = 0;
-	int cell_start_x = pose_kalman.x;
-	int cell_start_y = pose_kalman.y;
-	updatePosition(false);
+	//Turn in correct direction
 	if(direction == LEFT){
-		turnTo(pose_kalman.theta + 90.0* (M_PI/180.0));
-	}else if(direction == RIGHT){
-		turnTo(0.0);
+		pose_goal.theta -= M_PI_2;
+	}
+	else if(direction == RIGHT){
+		pose_goal.theta += M_PI_2;
 	}	
 	else if(direction == BACKWARD){
-		turnTo(pose_kalman.theta + 180.0* (M_PI/180.0));
+		pose_goal.theta += M_PI;
 	}
 
-	//Zero out WE to use a measurement to next cell
-	//resetWEPose(0,0,pose_kalman.theta);
-	int kalman_cell_error = 0, camera_cell_error = 0;
-	do{
-		robot->Move(RI_MOVE_FORWARD, RI_FASTEST);
-		robot->Move(RI_MOVE_FORWARD, RI_FASTEST);
-		robot->Move(RI_MOVE_FORWARD, RI_FASTEST);
-		robot->Move(RI_MOVE_FORWARD, RI_FASTEST);
-		
-		//Calculate error to next cell using Kalman
-		int delta_x = cell_start_x - pose_kalman.x;
-		int delta_y = cell_start_y - pose_kalman.y;
-		kalman_cell_error = sqrt(delta_x*delta_x + delta_y*delta_y)- (CELL_DIMENSION_CM);
-
-
-
-		list<squarePair> pairs = pose_cam->updateCamera();
-		
-		//Strafe based on pairs of squares
-		strafeTo(pose_cam->getCenterError(pairs));
-		
-		//Turn if facing only one wall of squares
-		int turnError = pose_cam->getTurnError(pairs);
-		
-		if(turnError > 50){
-			robot->Move(RI_TURN_RIGHT_20DEG , RI_FASTEST);
-			//robot->Move(RI_STOP , RI_FASTEST);
-		}
-		else if(turnError < -50){
-			robot->Move(RI_TURN_LEFT_20DEG , RI_FASTEST);
-			//robot->Move(RI_STOP , RI_FASTEST);
-		}
-		
-
-		
-
-		//Calculate error based on squares		
-		camera_cell_error = pose_cam->getCellError(pairs);
-		
-		//Print errors
-		//printf("Kalman: %f,%f,%f, ", pose_kalman.x, pose_kalman.y, pose_kalman.theta * (180/M_PI));
-		printPoses();
-		printf("\tDistance: %d\t", kalman_cell_error + CELL_DIMENSION_CM);
-		printf("Camera Error: %d\t Kalman Error: %d\t", camera_cell_error, kalman_cell_error);
-		printf("Turn Error: %d\n", turnError);
-		updatePosition(false);
-	}while((abs(kalman_cell_error) > 15)&&!robot->IR_Detected());
+	//Normalize theta in -pi to pi
+	if(pose_goal.theta > M_PI)
+		pose_goal.theta -= M_PI;
+	else if(pose_goal.theta < -M_PI)
+		pose_goal.theta += M_PI;
 	
-	robot->Move(RI_MOVE_FORWARD, RI_FASTEST);
-	robot->Move(RI_MOVE_FORWARD, RI_FASTEST);
-	robot->Move(RI_MOVE_FORWARD, RI_FASTEST);
-	robot->Move(RI_MOVE_FORWARD, RI_FASTEST);
-      */
+	//Increment cell values
+	pose_goal.x += cos(pose_goal.theta)*65;
+	pose_goal.y += sin(pose_goal.theta)*65;
+	
+	//MoveTo handles all movement
+	moveTo(pose_goal.x, pose_goal.y, pose_goal.theta);
+
 }
 
 /*

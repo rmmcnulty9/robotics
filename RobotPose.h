@@ -74,6 +74,7 @@ private:
 	pose pose_start;
 	pose pose_we;
 	pose pose_ns;
+	pose pose_goal;
 
 	PIDController *PID_x;
 	PIDController *PID_y;
@@ -83,6 +84,7 @@ private:
 	int room_cur;
 	float theta_ns_trans;
   
+
 
 	//FIR Filters
 	filter *fir_left_we;
