@@ -164,7 +164,7 @@ bool RobotPose::strafeTo(int delta_x, float goal_theta){
 
 	//If we have gotten here there was a strafe
 	//list<squarePair> pairs = pose_cam->updateCamera();
-	//return (strafeTo(pose_cam->getCenterError(pairs)) || true);
+	//return (strafeTo(pose_cam->getCenterError(pairs), goal_theta) || true);
 	
 	return true;
 }

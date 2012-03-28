@@ -32,7 +32,8 @@ int main(int argv, char **argc)
 	  //  robotPose.changeUncertainty(uncertainty_weak_ns);
 	  //}
 	  if(i==5){
-	   robotPose.changeWEScalingConstant(9.0); 
+	  // robotPose.changeWEScalingConstant(9.0); 
+	   robotPose.changeUncertainty(uncertainty_weakest_we); 
 	  }
 	}
 	i-=1;

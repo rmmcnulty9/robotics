@@ -75,9 +75,9 @@ list<squarePair> CameraPose::updateCamera(){
 	currentSquares = robot->findSquares(yellow, MIN_SQUARE);
 	removeOverlap(currentSquares);
 	turnError += getSquareSide(currentSquares);
-	drawSquares(currentSquares, CV_RGB(0,255,0));
+	//drawSquares(currentSquares, CV_RGB(0,255,0));
 	yellowPairs = matchSquares(currentSquares, YELLOW);
-	printCenters(yellowPairs);
+	//printCenters(yellowPairs);
 
 
 	//Find and match pink squares
@@ -88,19 +88,19 @@ list<squarePair> CameraPose::updateCamera(){
 	currentSquares = robot->findSquares(filteredImage, MIN_SQUARE);
 	removeOverlap(currentSquares);
 	turnError += getSquareSide(currentSquares);
-	drawSquares(currentSquares, CV_RGB(255,0,0));
+	//drawSquares(currentSquares, CV_RGB(255,0,0));
 	pinkPairs = matchSquares(currentSquares, PINK);
-	printCenters(pinkPairs);
+	//printCenters(pinkPairs);
 
 	//displayImages();
 	
 	
 	//Save image
-	char file_name [256];
+	/*char file_name [256];
 	sprintf(file_name,"camera.%04d.jpg", image_ctr);
 	cvSaveImage(file_name,cameraImage);
 
-	/*sprintf(file_name,"filtered.%04d.jpg", image_ctr);
+	sprintf(file_name,"filtered.%04d.jpg", image_ctr);
 	cvSaveImage(file_name,filteredImage);
 
 	sprintf(file_name,"yellow.%04d.jpg",image_ctr);
