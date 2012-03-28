@@ -182,28 +182,32 @@ bool RobotPose::strafeTo(int delta_x, float goal_theta){
  * Function that will be used to move one cell 
  * in one of the cardinal directions
  */
-void RobotPose::moveToCell(const int direction){
-  
+void RobotPose::moveToCell(int x, int y){
+	//float goal_theta = acos((CELL_DIMENSION_CM*x-pose_kalman.x)/sqrt((CELL_DIMENSION_CM*x-pose_kalman.x)*(CELL_DIMENSION_CM*x-pose_kalman.x)
+	//	+ (CELL_DIMENSION_CM*y-pose_kalman.y)*(CELL_DIMENSION_CM*y-pose_kalman.y)));
+	float diff_x = pose_goal.x - CELL_DIMENSION_CM*x;
+	float diff_y = pose_goal.y - CELL_DIMENSION_CM*y;
+	
 	//Turn in correct direction
-	if(direction == LEFT){
-		pose_goal.theta -= M_PI_2;
+	if(diff_x > 0 && diff_y == 0){
+		pose_goal.theta = 0.0;
 	}
-	else if(direction == RIGHT){
-		pose_goal.theta += M_PI_2;
+	else if(diff_x > 0 && diff_y == 0){
+		pose_goal.theta = M_PI;
 	}	
-	else if(direction == BACKWARD){
-		pose_goal.theta += M_PI;
+	else if(diff_x == 0 && diff_y > 0){
+		pose_goal.theta = M_PI_2;
 	}
-
-	//Normalize theta in -pi to pi
-	if(pose_goal.theta > M_PI)
-		pose_goal.theta -= M_PI;
-	else if(pose_goal.theta < -M_PI)
-		pose_goal.theta += M_PI;
+	else if(diff_x == 0 && diff_y < 0){
+		pose_goal.theta = -M_PI_2;
+	}
+	else{
+		printf("Wrong coordinates %f, %f", diff_x, diff_y);
+	}
 	
 	//Increment cell values
-	pose_goal.x += cos(pose_goal.theta)*65;
-	pose_goal.y += sin(pose_goal.theta)*65;
+	pose_goal.x = CELL_DIMENSION_CM*x;
+	pose_goal.y = CELL_DIMENSION_CM*y;
 	
 	//MoveTo handles all movement
 	moveTo(pose_goal.x, pose_goal.y, pose_goal.theta);

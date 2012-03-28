@@ -48,17 +48,11 @@ public:
 	void changeUncertainty(float *uc);
   
 	// Camera functions
-	void moveToCell(const int direction);
+	void moveToCell(int x, int y);
 	bool strafeTo(int delta_x, float goal_theta);
 	
 	//Constant to set strafing threshold
 	static const float STRAFE_EPSILON = 35.0;
-
-	//Direction constants for moveToCell
-	static const int LEFT = 1;
-	static const int RIGHT = 2;
-	static const int FORWARD = 3;
-	static const int BACKWARD = 4;
 	
 	//Cell size constants
 	static const int CELL_DIMENSION_CM = 65;
