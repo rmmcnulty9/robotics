@@ -12,7 +12,6 @@
 #include <math.h>
 #include <cstdio>
 #include "CameraPose.h"
-//#include "shared_constants.h"
 #include "modified_color.h"
 #include <list>
 
@@ -27,6 +26,7 @@ using namespace std;
 CameraPose::CameraPose(RobotInterface *r){
 	robot = r;
 	robot->Move(RI_HEAD_MIDDLE,1);
+	
 	//Initializes images for storing most recent camera data
 	cameraImage = cvCreateImage(cvSize(SCREEN_WIDTH, SCREEN_HEIGHT), IPL_DEPTH_8U, 3);
 	hsvImage = cvCreateImage(cvSize(SCREEN_WIDTH, SCREEN_HEIGHT), IPL_DEPTH_8U, 3);
@@ -54,7 +54,7 @@ CameraPose::~CameraPose(){}
 
 
 /*
- * Updates robot and gets current image & manipulated them
+ * Updates robot and gets current image & manipulates them
  */
 list<squarePair> CameraPose::updateCamera(){
   
@@ -67,12 +67,14 @@ list<squarePair> CameraPose::updateCamera(){
 	
 	turnError = 0;
 	
-	//Find and match yellow squares
+	//Process squares
 	squares_t * currentSquares;
-	list<squarePair> yellowPairs, pinkPairs;
-
+	list<squarePair> yellowPairs, pinkPairs, allPairs;
+	
+	//Filter and find yellow squares
 	cvInRangeS(hsvImage, RC_YELLOW_LOW, RC_YELLOW_HIGH, yellow);
 	currentSquares = robot->findSquares(yellow, MIN_SQUARE);
+	//Match and display yellow squares
 	removeOverlap(currentSquares);
 	turnError += getSquareSide(currentSquares);
 	//drawSquares(currentSquares, CV_RGB(0,255,0));
@@ -80,12 +82,12 @@ list<squarePair> CameraPose::updateCamera(){
 	//printCenters(yellowPairs);
 
 
-	//Find and match pink squares
+	//Filter and find pink squares
 	cvInRangeS(hsvImage, RC_PINK1_LOW, RC_PINK1_HIGH, pinkLow);
 	cvInRangeS(hsvImage, RC_PINK2_LOW, RC_PINK2_HIGH, pinkHigh);
 	cvOr(pinkLow, pinkHigh, filteredImage, NULL);
-	
 	currentSquares = robot->findSquares(filteredImage, MIN_SQUARE);
+	//Match and display pink squares
 	removeOverlap(currentSquares);
 	turnError += getSquareSide(currentSquares);
 	//drawSquares(currentSquares, CV_RGB(255,0,0));
@@ -116,20 +118,27 @@ list<squarePair> CameraPose::updateCamera(){
 	
 	//Return both yellow and pink pairs
 	yellowPairs.splice(yellowPairs.end(), pinkPairs);
-	static int retry_cnt = 0;
-	retry_cnt+=1;
-	if(yellowPairs.size()==0 && retry_cnt<3){
-	  if (retry_cnt==1){
-	    robot->Move(RI_MOVE_FWD_LEFT,1);
-	  }else if(retry_cnt==2){
-	    robot->Move(RI_MOVE_FWD_RIGHT,1);
-	  }
-	  
-	  updateCamera();
-	}else retry_cnt = 0;
-	return yellowPairs;
+	allPairs = yellowPairs;
+	
+	//If no pairs found strafe left then right to search for more
+	static int retry_count = 0;
+	retry_count+=1;
+	if(allPairs.size()==0 && retry_count<3){
+		if (retry_count==1){
+			robot->Move(RI_MOVE_FWD_LEFT,1);
+		}
+		else if(retry_count==2){
+			robot->Move(RI_MOVE_FWD_RIGHT,1);
+		}
+		updateCamera();
+	}
+	else 
+		retry_count = 0;
+	
+	return allPairs;
   
 }
+
 /*
  * Displays current images - filtered and unfiltered
  */
@@ -185,13 +194,14 @@ void CameraPose::drawSquares(squares_t *squares, CvScalar displayColor){
 }
 
 /*
- * Comparison function for list sort to use
+ * Comparison function by area for list sort to use
  */
 bool compare_areas (squarePair first, squarePair second){
 
 	if((first.left->area + first.right->area) > (second.left->area + second.right->area)) return true;
 	else return false;
 }
+
 /*
  * Removes the squares that overlap by comparing the centers
  */
@@ -215,8 +225,9 @@ void CameraPose::removeOverlap(squares_t *squares){
 		squares = squares->next;
 	}
 }
+
 /*
- * Find squares of same height and draw lines between them
+ * Find squares of same height and draw lines between them in specified color
  */
 list<squarePair> CameraPose::matchSquares(squares_t *squares, int color){
 	squares_t *tempSquares;
@@ -227,7 +238,7 @@ list<squarePair> CameraPose::matchSquares(squares_t *squares, int color){
 		tempSquares = squares->next;
 		while(tempSquares != NULL){
 			
-			//Test if y values are close, if x values are far, and if centers in top half of screen
+			//Test if y values are close, if x values are far, and if centers in top 3/5 of screen
 			if(abs(squares->center.y - tempSquares->center.y) < SCREEN_HEIGHT/15 
 				&& abs(squares->center.x - tempSquares->center.x) > SCREEN_WIDTH/6
 				&& (squares->center.y) < SCREEN_HEIGHT * (3.0/5.0)
@@ -256,6 +267,7 @@ list<squarePair> CameraPose::matchSquares(squares_t *squares, int color){
 	pair_list.sort(compare_areas);
 	return pair_list;
 }
+
 /*
  * Draws a line between the squarePairs & puts a tick at the line's midpoint
  */
@@ -267,42 +279,39 @@ void CameraPose::printCenters(list<squarePair> pairs){
 	CvPoint pt1, pt2;
 
 	for(it=pairs.begin(); it!=pairs.end(); it++){
-	  				
+		//Draw connecting line
 		pt1 = cvPoint(it->left->center.x, it->left->center.y);
 		pt2 = cvPoint(it->right->center.x, it->right->center.y);
 		cvLine(cameraImage, pt1, pt2, CV_RGB(0,0,255), 2, CV_AA, 0);
-	  
+		//Draw midpoint
 		center = (it->left->center.x + it->right->center.x)/2;
 		height = (it->left->center.y + it->right->center.y)/2;
 		cvLine(cameraImage, cvPoint(center,height-5), cvPoint(center,height+5), CV_RGB(255,0,0), 2, CV_AA, 0);
 	}
 }
+
 /*
- * Finds the distance the midpoint between squares in from the middle of the image itself
+ * For the largest pair of squares,
+ * Return the distance their midpoint is from the screen's center
  */
 int CameraPose::getCenterError(list<squarePair> pairs){
 	list<squarePair>::iterator it;
 	int centers = 0; 
-	//for(it=pairs.begin(); it!=pairs.end(); it++){
-	//	centers += (it->left->center.x + it->right->center.x)/2;
-	//}	
+	
 	if(pairs.size() == 0)
 		return 0;
 	else{
 		list<squarePair>::iterator it = pairs.begin();
 		centers = (it->left->center.x + it->right->center.x)/2;
-		//printf("Best Center L(%d,%d) R(%d,%d) Color:%d\n",it->left->center.x,
-		//	it->left->center.y, it->right->center.x, it->right->center.y, it->color);
 		if(pairs.size() > 1){
 			it++;
-		//	printf("Best Center L(%d,%d) R(%d,%d) Color:%d\n",it->left->center.x,
-		//		it->left->center.y, it->right->center.x, it->right->center.y, it->color);
 		}
 		return centers - (SCREEN_WIDTH/2);
 	}
 	//	return (centers/pairs.size()) - (SCREEN_WIDTH/2);
 	
 }
+
 /*
  * Returns the average center x position to be used for turning
  */
@@ -324,6 +333,10 @@ int CameraPose::getSquareSide(squares_t *squares){
 			return center/num - SCREEN_WIDTH/2;
 	}
 }
+
+/*
+ * Returns the turn error if pairs are found
+ */
 int CameraPose::getTurnError(list<squarePair> pairs){
 	list<squarePair>::iterator it;
 	if(pairs.size() == 0){
@@ -337,9 +350,10 @@ int CameraPose::getTurnError(list<squarePair> pairs){
 		return 0;
 	}
 }
+
 /*
  * Find the distance to the next cell based on where it finds squarePairs in the image
- * -based onthe location and size of squarePairs
+ * -based on the location and size of squarePairs
  */
 int CameraPose::getCellError(list<squarePair> pairs){
 	list<squarePair>::iterator it = pairs.begin();

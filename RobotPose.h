@@ -1,8 +1,11 @@
 /*
- * RobotPose Class
- *  Used to collect, filter, and interpret camera data
+ * RobotPose Header
+ *  Used to define functions and constants 
+ *  to collect, filter, and interpret robot NS and WE data
+ *  and move robot around maze
  *   Written by Greg Seaman, Adam Park, and Ryan McNulty
  */
+
 
 #ifndef __ROBOT_POSE__
 #define __ROBOT_POSE__
@@ -18,6 +21,7 @@ extern "C" {
 	#include "Kalman/kalmanFilterDef.h"
 }
 
+//Struct for FIR filter
 typedef struct {
 	float coefficients[30]; //WARNING SHOULD NOT HAVE MORE THAN 30 TAPS/COEF!!!
 	int next_sample;
@@ -47,12 +51,16 @@ public:
 	void moveToCell(const int direction);
 	bool strafeTo(int delta_x, float goal_theta);
 	
+	//Constant to set strafing threshold
 	static const float STRAFE_EPSILON = 35.0;
 
+	//Direction constants for moveToCell
 	static const int LEFT = 1;
 	static const int RIGHT = 2;
 	static const int FORWARD = 3;
 	static const int BACKWARD = 4;
+	
+	//Cell size constants
 	static const int CELL_DIMENSION_CM = 65;
 	static const int CELL_EPSILON_CM = 3;
 
@@ -66,6 +74,7 @@ private:
 	pose pose_start;
 	pose pose_we;
 	pose pose_ns;
+	pose pose_goal;
 
 	PIDController *PID_x;
 	PIDController *PID_y;
@@ -75,6 +84,7 @@ private:
 	int room_cur;
 	float theta_ns_trans;
   
+
 
 	//FIR Filters
 	filter *fir_left_we;

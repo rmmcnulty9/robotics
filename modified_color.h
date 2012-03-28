@@ -1,4 +1,8 @@
-/* Colors used by OpenCV */
+/*
+ * Modified color header
+ *  Changes made to standard colors to aid in filtering
+ *   Written by Greg Seaman, Adam Park, and Ryan McNulty
+ */
 
 #ifndef __RC_COLORS_H__
 #define __RC_COLORS_H__
@@ -6,7 +10,7 @@
 #define RC_LOW(x)	cvScalar(x - 5, 100, 100, 0)
 #define RC_HIGH(x) 	cvScalar(x + 5, 255, 255, 0)
 
-/* Pink */
+/* Pink modified to capture both low and high end hues*/
 #define RC_PINK1	0
 #define RC_PINK1_LOW	cvScalar(0.0, 90.0, 90.0, 0.0)
 #define RC_PINK1_HIGH	cvScalar(25.0 / 2.0, 255.0, 255.0, 0.0)
@@ -15,7 +19,7 @@
 #define RC_PINK2_LOW	cvScalar(300.0 / 2.0, 90.0, 90.0, 0.0)
 #define RC_PINK2_HIGH	cvScalar(359.0 / 2.0, 255.0, 255.0, 0.0)
 
-/* Yellow */
+/* Yellow modified for better filtering*/
 #define RC_YELLOW	68/2
 #define RC_YELLOW_LOW	RC_LOW(RC_YELLOW)
 #define RC_YELLOW_HIGH	RC_HIGH(RC_YELLOW)

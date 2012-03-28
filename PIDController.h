@@ -1,3 +1,8 @@
+/*
+ * PIDController Header
+ *  Used for the PID controller
+ *   Written by Greg Seaman, Adam Park, and Ryan McNulty
+ */
 
 #ifndef __PID_CONTROLLER__
 #define __PID_CONTROLLER__

@@ -1,6 +1,7 @@
 /*
  * RobotPose Class
- *  Used to collect, filter, and interpret camera data
+ *  Used to collect, filter, and interpret robot NS and WE data
+ *  and move robot around maze
  *   Written by Greg Seaman, Adam Park, and Ryan McNulty
  */
 
@@ -104,6 +105,11 @@ void RobotPose::initPose() {
 	//Assuming we are always facing along +y axis
 	pose_we.theta = M_PI_2;
 
+	pose_goal.x = 0;
+	pose_goal.y = 0;
+	pose_goal.theta = M_PI_2;
+	
+	
 	float initialPose[3];
 	initialPose[0] = 0;
 	initialPose[1] = 0;
@@ -142,16 +148,18 @@ bool RobotPose::strafeTo(int delta_x, float goal_theta){
 		robot_speed = 5;
 	}
 */
-	printf("%u DELTA: %d\t",pose_cam->image_ctr-1, delta_x);
+	//printf("%u DELTA: %d\t",pose_cam->image_ctr-1, delta_x);
 
 	//move the robot left or right
 	if(delta_x < -1 * STRAFE_EPSILON){
 		robot->Move(RI_MOVE_FWD_LEFT, robot_speed);
 		printf("Moving Left\n");
-	}else if(delta_x > STRAFE_EPSILON){
+	}
+	else if(delta_x > STRAFE_EPSILON){
 		robot->Move(RI_MOVE_FWD_RIGHT, robot_speed);
 		printf("Moving Right\n");
-	}else{
+	}
+	else{
 		//Base case
 		printf("Centered\n");
 		return false;
@@ -160,6 +168,7 @@ bool RobotPose::strafeTo(int delta_x, float goal_theta){
 
 	updatePosition(true);
 
+	//Make sure robot's theta is still correct
 	turnTo(goal_theta);
 
 	//If we have gotten here there was a strafe
@@ -169,102 +178,62 @@ bool RobotPose::strafeTo(int delta_x, float goal_theta){
 	return true;
 }
 
-
+/*
+ * Function that will be used to move one cell 
+ * in one of the cardinal directions
+ */
 void RobotPose::moveToCell(const int direction){
   
-    printf("NOT SUPPORTED ANYMORE\n");
-    exit(-1);
-	/*static unsigned int cell_number = 0;
-	int cell_start_x = pose_kalman.x;
-	int cell_start_y = pose_kalman.y;
-	updatePosition(false);
+	//Turn in correct direction
 	if(direction == LEFT){
-		turnTo(pose_kalman.theta + 90.0* (M_PI/180.0));
-	}else if(direction == RIGHT){
-		turnTo(0.0);
+		pose_goal.theta -= M_PI_2;
+	}
+	else if(direction == RIGHT){
+		pose_goal.theta += M_PI_2;
 	}	
 	else if(direction == BACKWARD){
-		turnTo(pose_kalman.theta + 180.0* (M_PI/180.0));
+		pose_goal.theta += M_PI;
 	}
 
-	//Zero out WE to use a measurement to next cell
-	//resetWEPose(0,0,pose_kalman.theta);
-	int kalman_cell_error = 0, camera_cell_error = 0;
-	do{
-		robot->Move(RI_MOVE_FORWARD, RI_FASTEST);
-		robot->Move(RI_MOVE_FORWARD, RI_FASTEST);
-		robot->Move(RI_MOVE_FORWARD, RI_FASTEST);
-		robot->Move(RI_MOVE_FORWARD, RI_FASTEST);
-		
-		//Calculate error to next cell using Kalman
-		int delta_x = cell_start_x - pose_kalman.x;
-		int delta_y = cell_start_y - pose_kalman.y;
-		kalman_cell_error = sqrt(delta_x*delta_x + delta_y*delta_y)- (CELL_DIMENSION_CM);
-
-
-
-		list<squarePair> pairs = pose_cam->updateCamera();
-		
-		//Strafe based on pairs of squares
-		strafeTo(pose_cam->getCenterError(pairs));
-		
-		//Turn if facing only one wall of squares
-		int turnError = pose_cam->getTurnError(pairs);
-		
-		if(turnError > 50){
-			robot->Move(RI_TURN_RIGHT_20DEG , RI_FASTEST);
-			//robot->Move(RI_STOP , RI_FASTEST);
-		}
-		else if(turnError < -50){
-			robot->Move(RI_TURN_LEFT_20DEG , RI_FASTEST);
-			//robot->Move(RI_STOP , RI_FASTEST);
-		}
-		
-
-		
-
-		//Calculate error based on squares		
-		camera_cell_error = pose_cam->getCellError(pairs);
-		
-		//Print errors
-		//printf("Kalman: %f,%f,%f, ", pose_kalman.x, pose_kalman.y, pose_kalman.theta * (180/M_PI));
-		printPoses();
-		printf("\tDistance: %d\t", kalman_cell_error + CELL_DIMENSION_CM);
-		printf("Camera Error: %d\t Kalman Error: %d\t", camera_cell_error, kalman_cell_error);
-		printf("Turn Error: %d\n", turnError);
-		updatePosition(false);
-	}while((abs(kalman_cell_error) > 15)&&!robot->IR_Detected());
+	//Normalize theta in -pi to pi
+	if(pose_goal.theta > M_PI)
+		pose_goal.theta -= M_PI;
+	else if(pose_goal.theta < -M_PI)
+		pose_goal.theta += M_PI;
 	
-	robot->Move(RI_MOVE_FORWARD, RI_FASTEST);
-	robot->Move(RI_MOVE_FORWARD, RI_FASTEST);
-	robot->Move(RI_MOVE_FORWARD, RI_FASTEST);
-	robot->Move(RI_MOVE_FORWARD, RI_FASTEST);
-      */
+	//Increment cell values
+	pose_goal.x += cos(pose_goal.theta)*65;
+	pose_goal.y += sin(pose_goal.theta)*65;
+	
+	//MoveTo handles all movement
+	moveTo(pose_goal.x, pose_goal.y, pose_goal.theta);
+
 }
+
 /*
  * Move the robot to the given x,y,theta position
  */
 void RobotPose::moveTo(float x, float y, float goal_theta) {
 	updatePosition(false);
-	//Determine how much robot needs to turn to reach goal
 	
 	//if((y-pose_kalman.y)<=0.0) {
 	//	goal_theta = -goal_theta;
 	//}
    
-	printf("GOAL: %f %f %f \n",x, y, goal_theta * 180/M_PI);
- 	//printf("kalman %f %f %f\n", pose_kalman.x, pose_kalman.y, pose_kalman.theta); 
+	//printf("GOAL: %f %f %f \n",x, y, goal_theta * 180/M_PI);
+	//printf("kalman %f %f %f\n", pose_kalman.x, pose_kalman.y, pose_kalman.theta); 
 	printPoses();
     
+	//Only update camera once every three sensor updates
 	static int cam_update_flag = 0;
 	if(cam_update_flag==3){
-	  list<squarePair> pairs = pose_cam->updateCamera();
-	  int turnError = pose_cam->getTurnError(pairs);
-	///  printf("Camera Turn Error: %d\n", turnError);
-	  bool strafed = strafeTo(pose_cam->getCenterError(pairs), goal_theta);
-	  cam_update_flag=0;
+		list<squarePair> pairs = pose_cam->updateCamera();
+		int turnError = pose_cam->getTurnError(pairs);
+		bool strafed = strafeTo(pose_cam->getCenterError(pairs), goal_theta);
+		cam_update_flag=0;
 	}
 	cam_update_flag+=1;
+	
 	//Correct direction to reach goal
 	turnTo(goal_theta);  
 	
@@ -273,17 +242,15 @@ void RobotPose::moveTo(float x, float y, float goal_theta) {
 	float error_distance_y;
 	
 	if(goal_theta==0.0 || goal_theta==M_PI){
-	  error_distance_y = pose_kalman.x - x;
-	  error_distance_x = pose_kalman.y - y; 
+		error_distance_y = pose_kalman.x - x;
+		error_distance_x = pose_kalman.y - y; 
 	}else{
-	  error_distance_x = pose_kalman.x - x;
-	  error_distance_y = pose_kalman.y - y; 
+		error_distance_x = pose_kalman.x - x;
+		error_distance_y = pose_kalman.y - y; 
 	}
 	if(error_distance_x<0.0) error_distance_x = -error_distance_x;
 	if(error_distance_y<0.0) error_distance_y = -error_distance_y;
-
-	
-	
+	//Total error from next cell
 	float error_distance = sqrt(error_distance_x * error_distance_x + error_distance_y * error_distance_y);
 
 	//Get PID
@@ -318,21 +285,24 @@ void RobotPose::moveTo(float x, float y, float goal_theta) {
 		rovioKalmanFilterSetVelocity(&kf,velocity);
 	}
 	
-  printf("error dist x:%f error dist y:%f  = %f\n", error_distance_x, error_distance_y, error_distance);
-	//Move forward 
+	printf("error dist x:%f error dist y:%f  = %f\n", error_distance_x, error_distance_y, error_distance);
+	//Move forward if error in robot's y
 	if (error_distance_y > MOVE_TO_EPSILON) {
 		robot->Move(RI_MOVE_FORWARD, robot_speed);
 		moveTo(x, y, goal_theta);
-	}else if(error_distance_x > MOVE_TO_EPSILON){
-	  //Move left or right via strafing
-	    strafeTo(error_distance_x, goal_theta);
 	}
+	//Move left or right via strafing if error in robot's x
+	else if(error_distance_x > MOVE_TO_EPSILON){
+		strafeTo(error_distance_x, goal_theta);
+	}
+	//Robot has reached destination
 	else {
 		printf("ARRIVED! %f %f\n", x, y);
 		resetPose(x, y, goal_theta);
 		//resetPose(pose_kalman.x, pose_kalman.y, pose_kalman.theta);
 	}
 }
+
 /*
  * Turn to the given absolute theta angle
  */
@@ -403,6 +373,9 @@ void RobotPose::turnTo(float goal_theta) {
 
 }
 
+/*
+ * Print all raw censor data
+ */
 void RobotPose::printRaw(){
 	int d_left = robot->getWheelEncoder(RI_WHEEL_LEFT);
 	int d_right = robot->getWheelEncoder(RI_WHEEL_RIGHT);
@@ -417,11 +390,16 @@ void RobotPose::printRaw(){
                
 	printf("%d %d %f %d %d %d %d %d %d\n", x, y, theta, d_left, d_right, d_rear, t_left, t_right, t_rear);
 }
+
+/*
+ * Print all interpreted pose data
+ */
 void RobotPose::printPoses(){
 
 	printf("K: %f %f %f \t NS: %f %f %f \t WE: %f %f %f \t Signal: %d\n", pose_kalman.x, pose_kalman.y, pose_kalman.theta*180/M_PI,
 	pose_ns.x, pose_ns.y, pose_ns.theta*180/M_PI, pose_we.x, pose_we.y, pose_we.theta*180/M_PI, robot->NavStrengthRaw());
 }
+
 /*
  * Calls update pose functions for WE and NS & updates the kalman
  */

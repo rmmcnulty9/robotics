@@ -1,5 +1,14 @@
+/*
+ * PIDController Class
+ *  Used for the PID controller
+ *   Written by Greg Seaman, Adam Park, and Ryan McNulty
+ */
+
 #include "PIDController.h"
 
+/*
+ * Initializes the PID controller
+ */
 PIDController::PIDController(double iMaxStart, double iMinStart, double iGainStart, double pGainStart, double dGainStart){
 	iMax = iMaxStart;
 	iMin = iMinStart;
@@ -12,6 +21,9 @@ PIDController::PIDController(double iMaxStart, double iMinStart, double iGainSta
 }
 PIDController::~PIDController(){}
 
+/*
+ * Updates the PID controller
+ */
 double PIDController::UpdatePID(double error, double position)
 {
 	double pTerm, dTerm, iTerm;
