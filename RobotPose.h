@@ -33,7 +33,7 @@ typedef struct {
 class RobotPose {
   
 public:
-	RobotPose(RobotInterface *r);
+	RobotPose(RobotInterface *r, int player);
 	~RobotPose();
   
 	void initPose();

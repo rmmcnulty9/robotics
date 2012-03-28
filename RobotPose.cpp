@@ -25,7 +25,7 @@ extern "C" {
 /*
  * Constructor definition for RobotPose class
  */
-RobotPose::RobotPose(RobotInterface *r){
+RobotPose::RobotPose(RobotInterface *r, int player){
 	robot = r;
 	
 	//Create all six FIR filters
@@ -51,7 +51,17 @@ RobotPose::RobotPose(RobotInterface *r){
 	float initialPose[3];
 	initialPose[0] = 0;
 	initialPose[1] = 0;
-	initialPose[2] = M_PI_2;
+	//Set up initial direction and goal (as current cell) based on which player
+	if(player == 1){
+		initialPose[2] = -M_PI_2;
+		pose_goal.x = 0;
+		pose_goal.y = CELL_DIMENSION_CM * 2;
+	}
+	else if(player == 2){
+		initialPose[2] = M_PI_2;
+		pose_goal.x = CELL_DIMENSION_CM * 6;
+		pose_goal.y = CELL_DIMENSION_CM * 2;
+	}
 	
 	float Velocity[3];
 	Velocity[0] = 0;
@@ -105,9 +115,6 @@ void RobotPose::initPose() {
 	//Assuming we are always facing along +y axis
 	pose_we.theta = M_PI_2;
 
-	pose_goal.x = 0;
-	pose_goal.y = 0;
-	pose_goal.theta = M_PI_2;
 	
 	
 	float initialPose[3];
