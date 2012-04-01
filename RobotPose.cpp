@@ -57,8 +57,8 @@ RobotPose::RobotPose(RobotInterface *r, char* p){
 		
 		current_cell.x = 0.0;
 		current_cell.y = 2.0;
-		pose_goal.x = 0.0;
-		pose_goal.y = CELL_DIMENSION_CM * 2.0;
+		//pose_goal.x = 0.0;
+		//pose_goal.y = CELL_DIMENSION_CM * 2.0;
 		current_cell.theta = -M_PI_2;
 		printf("Player 1\n");
 	}
@@ -66,8 +66,8 @@ RobotPose::RobotPose(RobotInterface *r, char* p){
 		player = 2;
 		current_cell.x = 6;
 		current_cell.y = 2;
-		pose_goal.x = CELL_DIMENSION_CM * 6.0;
-		pose_goal.y = CELL_DIMENSION_CM * 2.0;		
+		//pose_goal.x = CELL_DIMENSION_CM * 6.0;
+		//pose_goal.y = CELL_DIMENSION_CM * 2.0;		
 		current_cell.theta = M_PI_2;
 		printf("Player 2\n");
 	}
@@ -228,7 +228,7 @@ void RobotPose::moveToCell(int x, int y){
 	
 	//MoveTo handles all movement
 	printf("\n================================\nMoving to cell (%d,%d)\nGoal: %f,%f,%f\n================================\n\n",
-		x,y,diff_x, diff_y, pose_goal.theta*(180/M_PI));
+		x,y,pose_goal.x, pose_goal.y, pose_goal.theta*(180/M_PI));
 	moveTo(pose_goal.x, pose_goal.y, pose_goal.theta);
 	current_cell.x = x;
 	current_cell.y = y;
@@ -454,9 +454,9 @@ void RobotPose::updatePosition(bool turning=false){
 	//NSdata[1] = pose_we.y;
 	//NSdata[2] = pose_we.theta;
 
-	WEdata[0] = pose_we.x;
-	WEdata[1] = pose_we.y;
-	WEdata[2] = pose_we.theta;
+	WEdata[0] = pose_ns.x;
+	WEdata[1] = pose_ns.y;
+	WEdata[2] = pose_ns.theta;
 	rovioKalmanFilter(&kf,NSdata, WEdata, track);
 
 	//return the filtered robot pose
