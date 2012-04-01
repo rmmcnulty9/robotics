@@ -199,19 +199,19 @@ void RobotPose::moveToCell(int x, int y){
 	
 	//Turn in correct direction
 	if(diff_x > 0 && diff_y == 0){
-		pose_goal.theta = 0.0;
-	}
-	else if(diff_x > 0 && diff_y == 0){
-		pose_goal.theta = M_PI;
-	}	
-	else if(diff_x == 0 && diff_y > 0){
 		pose_goal.theta = M_PI_2;
 	}
-	else if(diff_x == 0 && diff_y < 0){
+	else if(diff_x < 0 && diff_y == 0){
 		pose_goal.theta = -M_PI_2;
+	}	
+	else if(diff_x == 0 && diff_y > 0){
+		pose_goal.theta = 0;
+	}
+	else if(diff_x == 0 && diff_y < 0){
+		pose_goal.theta = M_PI;
 	}
 	else{
-		printf("Wrong coordinates %f, %f", diff_x, diff_y);
+		printf("Wrong coordinates %f, %f\n", diff_x, diff_y);
 	}
 	
 	//Increment cell values
@@ -219,6 +219,8 @@ void RobotPose::moveToCell(int x, int y){
 	pose_goal.y = CELL_DIMENSION_CM*y;
 	
 	//MoveTo handles all movement
+	printf("\n================================\nMoving to cell (%d,%d)\nGoal: %f,%f,%f\n================================\n\n",
+		x,y,pose_goal.x, pose_goal.y, pose_goal.theta*(180/M_PI));
 	moveTo(pose_goal.x, pose_goal.y, pose_goal.theta);
 
 }
@@ -352,7 +354,7 @@ void RobotPose::turnTo(float goal_theta) {
 	float PID_res = PID_theta->UpdatePID(error_theta, pose_kalman.theta);
 	if(PID_res<0) PID_res = -PID_res;
 	//Determine speed
-	printf("Theta PID: %f\n", PID_res);
+	//printf("Theta PID: %f\n", PID_res);
 
 	int robot_speed; 
 	float velocity[3];
