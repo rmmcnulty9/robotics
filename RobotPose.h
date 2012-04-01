@@ -69,6 +69,7 @@ private:
 	pose pose_we;
 	pose pose_ns;
 	pose pose_goal;
+	pose current_cell;
 
 	PIDController *PID_x;
 	PIDController *PID_y;

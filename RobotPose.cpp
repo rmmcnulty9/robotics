@@ -54,16 +54,21 @@ RobotPose::RobotPose(RobotInterface *r, char* p){
 	//Set up initial direction and goal (as current cell) based on which player
 	if(strcmp(p,"1") == 0){
 		player = 1;
-		initialPose[2] = -M_PI_2;
-		pose_goal.x = 0;
-		pose_goal.y = CELL_DIMENSION_CM * 2;
+		
+		current_cell.x = 0.0;
+		current_cell.y = 2.0;
+		pose_goal.x = 0.0;
+		pose_goal.y = CELL_DIMENSION_CM * 2.0;
+		current_cell.theta = -M_PI_2;
 		printf("Player 1\n");
 	}
 	else if(strcmp(p,"2") == 0){
 		player = 2;
-		initialPose[2] = M_PI_2;
-		pose_goal.x = CELL_DIMENSION_CM * 6;
-		pose_goal.y = CELL_DIMENSION_CM * 2;
+		current_cell.x = 6;
+		current_cell.y = 2;
+		pose_goal.x = CELL_DIMENSION_CM * 6.0;
+		pose_goal.y = CELL_DIMENSION_CM * 2.0;		
+		current_cell.theta = M_PI_2;
 		printf("Player 2\n");
 	}
 	
@@ -116,15 +121,14 @@ void RobotPose::initPose() {
 
 	pose_we.x = 0.0;
 	pose_we.y = 0.0;
-	//Assuming we are always facing along +y axis
-	pose_we.theta = M_PI_2;
+	pose_we.theta = pose_ns.theta;
 
 	
 	
 	float initialPose[3];
 	initialPose[0] = 0;
 	initialPose[1] = 0;
-	initialPose[2] = M_PI_2;
+	initialPose[2] = pose_ns.theta;
 	
 	float Velocity[3];
 	Velocity[0] = 0;
@@ -196,8 +200,10 @@ bool RobotPose::strafeTo(int delta_x, float goal_theta){
 void RobotPose::moveToCell(int x, int y){
 	//float goal_theta = acos((CELL_DIMENSION_CM*x-pose_kalman.x)/sqrt((CELL_DIMENSION_CM*x-pose_kalman.x)*(CELL_DIMENSION_CM*x-pose_kalman.x)
 	//	+ (CELL_DIMENSION_CM*y-pose_kalman.y)*(CELL_DIMENSION_CM*y-pose_kalman.y)));
-	float diff_x = pose_goal.x - CELL_DIMENSION_CM*x;
-	float diff_y = pose_goal.y - CELL_DIMENSION_CM*y;
+	
+
+	float diff_x = current_cell.x - x;
+	float diff_y = current_cell.y - y;
 	
 	//Turn in correct direction
 	if(diff_x > 0 && diff_y == 0){
@@ -217,13 +223,15 @@ void RobotPose::moveToCell(int x, int y){
 	}
 	
 	//Increment cell values
-	pose_goal.x = CELL_DIMENSION_CM*x;
-	pose_goal.y = CELL_DIMENSION_CM*y;
+	pose_goal.x += CELL_DIMENSION_CM*diff_x;
+	pose_goal.y += CELL_DIMENSION_CM*diff_y;
 	
 	//MoveTo handles all movement
 	printf("\n================================\nMoving to cell (%d,%d)\nGoal: %f,%f,%f\n================================\n\n",
-		x,y,pose_goal.x, pose_goal.y, pose_goal.theta*(180/M_PI));
+		x,y,diff_x, diff_y, pose_goal.theta*(180/M_PI));
 	moveTo(pose_goal.x, pose_goal.y, pose_goal.theta);
+	current_cell.x = x;
+	current_cell.y = y;
 
 }
 
