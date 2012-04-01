@@ -15,36 +15,23 @@ extern "C" {
 int main(int argv, char **argc)
 {
 	// Make sure we have a valid command line argument
-	if(argv <= 1) {
+	if(argv <= 2) {
 		std::cout << "Usage: robot_test <address of robot> " << std::endl;
 		exit(-1);
 	}
     
 	// Setup the robot
 	RobotInterface *robot = new RobotInterface(argc[1],0);
-	RobotPose robotPose(robot);
+	RobotPose robotPose(robot, argc[2]);
 	robot->Move(RI_HEAD_MIDDLE, RI_FASTEST);
 
-
+	
 	/*
 	 * Move forward down the hallway
 	 */
-	
-	int ctr = 0;
-	while(!robot->IR_Detected() && ctr<=4){
-		printf("CELL %d ===============================================\n", ctr);
-		robotPose.moveToCell(RobotPose::FORWARD);
-		ctr++;
-	}
-	printf("CELL TURN %d ===============================================\n", ctr);
-	robotPose.moveToCell(RobotPose::RIGHT);
+	robotPose.moveToCell(0,1);
+	robotPose.moveToCell(0,0);
 
-	
-	while(!robot->IR_Detected() && ctr<=8){
-		printf("CELL %d ===============================================\n", ctr);
-		robotPose.moveToCell(RobotPose::FORWARD);
-		ctr++;
-	}
 
 	delete(robot);
 	return 0;
