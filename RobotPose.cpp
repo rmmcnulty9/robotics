@@ -309,6 +309,7 @@ void RobotPose::moveTo(float x, float y, float goal_theta) {
 	//Move left or right via strafing if error in robot's x
 	else if(error_distance_x > MOVE_TO_EPSILON){
 		strafeTo(error_distance_x, goal_theta);
+		moveTo(x, y, goal_theta);
 	}
 	//Robot has reached destination
 	else {

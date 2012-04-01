@@ -29,8 +29,9 @@ int main(int argv, char **argc)
 	/*
 	 * Move forward down the hallway
 	 */
-	robotPose.moveToCell(0,1);
-	robotPose.moveToCell(0,0);
+	robotPose.moveToCell(5,2);
+	robotPose.moveToCell(4,2);
+	robotPose.moveToCell(4,1);
 
 
 	delete(robot);
