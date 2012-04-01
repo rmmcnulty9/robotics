@@ -76,6 +76,7 @@ private:
 	PIDController *PID_camera;
 	int room_start;
 	int room_cur;
+	int player;
 	float theta_ns_trans;
   
 

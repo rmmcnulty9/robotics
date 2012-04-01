@@ -25,7 +25,7 @@ extern "C" {
 /*
  * Constructor definition for RobotPose class
  */
-RobotPose::RobotPose(RobotInterface *r, char* player){
+RobotPose::RobotPose(RobotInterface *r, char* p){
 	robot = r;
 	
 	//Create all six FIR filters
@@ -52,13 +52,15 @@ RobotPose::RobotPose(RobotInterface *r, char* player){
 	initialPose[0] = 0;
 	initialPose[1] = 0;
 	//Set up initial direction and goal (as current cell) based on which player
-	if(strcmp(player,"1") == 0){
+	if(strcmp(p,"1") == 0){
+		player = 1;
 		initialPose[2] = -M_PI_2;
 		pose_goal.x = 0;
 		pose_goal.y = CELL_DIMENSION_CM * 2;
 		printf("Player 1\n");
 	}
-	else if(strcmp(player,"2") == 0){
+	else if(strcmp(p,"2") == 0){
+		player = 2;
 		initialPose[2] = M_PI_2;
 		pose_goal.x = CELL_DIMENSION_CM * 6;
 		pose_goal.y = CELL_DIMENSION_CM * 2;
