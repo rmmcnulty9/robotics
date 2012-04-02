@@ -38,7 +38,7 @@ public:
   
 	void initPose();
 	void moveTo(float x, float y, float goal_theta);
-
+	void centerInCell();
 	void turnTo(float theta);
 	void printRaw();
 	void printPoses();
@@ -49,10 +49,12 @@ public:
   
 	// Camera functions
 	void moveToCell(int x, int y);
-	bool strafeTo(int delta_x, float goal_theta);
+	bool strafeTo(int delta_x);
 	
 	//Constant to set strafing threshold
 	static const float STRAFE_EPSILON = 35.0;
+	static const int CENTER_EPSILON = 20;
+	static const int SIDE_EPSILON = 20;
 	
 	//Cell size constants
 	static const int CELL_DIMENSION_CM = 65;
@@ -69,6 +71,7 @@ private:
 	pose pose_we;
 	pose pose_ns;
 	pose pose_goal;
+	pose current_cell;
 
 	PIDController *PID_x;
 	PIDController *PID_y;

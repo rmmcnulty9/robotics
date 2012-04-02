@@ -54,16 +54,21 @@ RobotPose::RobotPose(RobotInterface *r, char* p){
 	//Set up initial direction and goal (as current cell) based on which player
 	if(strcmp(p,"1") == 0){
 		player = 1;
-		initialPose[2] = -M_PI_2;
-		pose_goal.x = 0;
-		pose_goal.y = CELL_DIMENSION_CM * 2;
+		
+		current_cell.x = 0.0;
+		current_cell.y = 2.0;
+		//pose_goal.x = 0.0;
+		//pose_goal.y = CELL_DIMENSION_CM * 2.0;
+		current_cell.theta = -M_PI_2;
 		printf("Player 1\n");
 	}
 	else if(strcmp(p,"2") == 0){
 		player = 2;
-		initialPose[2] = M_PI_2;
-		pose_goal.x = CELL_DIMENSION_CM * 6;
-		pose_goal.y = CELL_DIMENSION_CM * 2;
+		current_cell.x = 6;
+		current_cell.y = 2;
+		//pose_goal.x = CELL_DIMENSION_CM * 6.0;
+		//pose_goal.y = CELL_DIMENSION_CM * 2.0;		
+		current_cell.theta = M_PI_2;
 		printf("Player 2\n");
 	}
 	
@@ -116,15 +121,14 @@ void RobotPose::initPose() {
 
 	pose_we.x = 0.0;
 	pose_we.y = 0.0;
-	//Assuming we are always facing along +y axis
-	pose_we.theta = M_PI_2;
+	pose_we.theta = pose_ns.theta;
 
 	
 	
 	float initialPose[3];
 	initialPose[0] = 0;
 	initialPose[1] = 0;
-	initialPose[2] = M_PI_2;
+	initialPose[2] = pose_ns.theta;
 	
 	float Velocity[3];
 	Velocity[0] = 0;
@@ -141,7 +145,7 @@ void RobotPose::initPose() {
  * Function that will strafe a delta Y value positive = right, negative = left
  * delta_x's range is -320 to +320 and return whether there was a strafing done
  */
-bool RobotPose::strafeTo(int delta_x, float goal_theta){
+bool RobotPose::strafeTo(int delta_x){
 	
 	int robot_speed = 3;
 /*
@@ -179,8 +183,7 @@ bool RobotPose::strafeTo(int delta_x, float goal_theta){
 
 	updatePosition(true);
 
-	//Make sure robot's theta is still correct
-	turnTo(goal_theta);
+
 
 	//If we have gotten here there was a strafe
 	//list<squarePair> pairs = pose_cam->updateCamera();
@@ -196,8 +199,10 @@ bool RobotPose::strafeTo(int delta_x, float goal_theta){
 void RobotPose::moveToCell(int x, int y){
 	//float goal_theta = acos((CELL_DIMENSION_CM*x-pose_kalman.x)/sqrt((CELL_DIMENSION_CM*x-pose_kalman.x)*(CELL_DIMENSION_CM*x-pose_kalman.x)
 	//	+ (CELL_DIMENSION_CM*y-pose_kalman.y)*(CELL_DIMENSION_CM*y-pose_kalman.y)));
-	float diff_x = pose_goal.x - CELL_DIMENSION_CM*x;
-	float diff_y = pose_goal.y - CELL_DIMENSION_CM*y;
+	
+
+	float diff_x = current_cell.x - x;
+	float diff_y = current_cell.y - y;
 	
 	//Turn in correct direction
 	if(diff_x > 0 && diff_y == 0){
@@ -217,14 +222,58 @@ void RobotPose::moveToCell(int x, int y){
 	}
 	
 	//Increment cell values
-	pose_goal.x = CELL_DIMENSION_CM*x;
-	pose_goal.y = CELL_DIMENSION_CM*y;
+	pose_goal.x += CELL_DIMENSION_CM*diff_x;
+	pose_goal.y += CELL_DIMENSION_CM*diff_y;
 	
 	//MoveTo handles all movement
 	printf("\n================================\nMoving to cell (%d,%d)\nGoal: %f,%f,%f\n================================\n\n",
 		x,y,pose_goal.x, pose_goal.y, pose_goal.theta*(180/M_PI));
 	moveTo(pose_goal.x, pose_goal.y, pose_goal.theta);
+	current_cell.x = x;
+	current_cell.y = y;
+	centerInCell();
 
+}
+
+/*
+ * Center robot once kalman determines in next cell
+ */
+void RobotPose::centerInCell(){
+  	list<squarePair> pairs = pose_cam->updateCamera();
+	int centerError = pose_cam->getCenterError(pairs);
+	int turnError = pose_cam->getTurnError(pairs);
+	int cellError = pose_cam->getCellError(pairs);
+
+	printf("Centering: centerError %d, turnError %d, cellError %d\n", centerError, turnError, cellError);
+	//If robot sees a pair of squares
+	if(pairs.size() > 0){
+		strafeTo(centerError);
+		if(cellError > CENTER_EPSILON){
+			robot->Move(RI_MOVE_FORWARD, 5);
+		}
+		else if(cellError < -CENTER_EPSILON){
+			robot->Move(RI_MOVE_BACKWARD, 5);
+		}
+		centerInCell();
+	}
+	//Else if robot only sees unconnected squares
+	else if(turnError != 0){
+		if(turnError > SIDE_EPSILON){
+			robot->Move(RI_TURN_RIGHT, 5);
+		}
+		else if(turnError < -SIDE_EPSILON){
+			robot->Move(RI_TURN_LEFT, 5);
+		}
+		centerInCell();
+	}
+	//Else robot sees no squares
+	else{
+		float searchTheta = pose_goal.theta + M_PI_2;
+		if(searchTheta > M_PI)
+			searchTheta -= M_PI;
+		turnTo(searchTheta);
+		centerInCell();
+	}
 }
 
 /*
@@ -246,7 +295,7 @@ void RobotPose::moveTo(float x, float y, float goal_theta) {
 	if(cam_update_flag==3){
 		list<squarePair> pairs = pose_cam->updateCamera();
 		int turnError = pose_cam->getTurnError(pairs);
-		bool strafed = strafeTo(pose_cam->getCenterError(pairs), goal_theta);
+		bool strafed = strafeTo(pose_cam->getCenterError(pairs));
 		cam_update_flag=0;
 	}
 	cam_update_flag+=1;
@@ -310,7 +359,7 @@ void RobotPose::moveTo(float x, float y, float goal_theta) {
 	}
 	//Move left or right via strafing if error in robot's x
 	else if(error_distance_x > MOVE_TO_EPSILON){
-		strafeTo(error_distance_x, goal_theta);
+		strafeTo(error_distance_x);
 		moveTo(x, y, goal_theta);
 	}
 	//Robot has reached destination
@@ -446,9 +495,9 @@ void RobotPose::updatePosition(bool turning=false){
 	//NSdata[1] = pose_we.y;
 	//NSdata[2] = pose_we.theta;
 
-	WEdata[0] = pose_we.x;
-	WEdata[1] = pose_we.y;
-	WEdata[2] = pose_we.theta;
+	WEdata[0] = pose_ns.x;
+	WEdata[1] = pose_ns.y;
+	WEdata[2] = pose_ns.theta;
 	rovioKalmanFilter(&kf,NSdata, WEdata, track);
 
 	//return the filtered robot pose

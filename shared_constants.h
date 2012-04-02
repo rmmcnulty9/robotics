@@ -64,7 +64,7 @@ const char* coef_filename = "fir_coef/s_72";
 const char* ns_theta_coef_filename = "fir_coef/s_75";
 
 //Thresholds for movement
-const float MOVE_TO_EPSILON = 10.0;
+const float MOVE_TO_EPSILON = 20.0;
 float TURN_TO_EPSILON = 10.0*(M_PI/180);
 
 /*
