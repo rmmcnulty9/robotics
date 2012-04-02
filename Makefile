@@ -33,6 +33,10 @@ RobotPose: RobotPose.cpp
 CameraPose: CameraPose.cpp
 	g++ ${CFLAGS} -c CameraPose.cpp
 
+maze_strategy: maze_strategy.cpp
+	g++ ${CFLAGS} -c maze_strategy.cpp
+	g++ ${CFLAGS} -o maze_strategy maze_strategy.o ${CPP_LIB_FLAGS}
+
 #simulator: simulator.c
 #	gcc ${CFLAGS} -c simulator.c
 #	gcc ${CFLAGS} -o simulator simulator.o ${LIB_FLAGS} ${LIB_LINK}
