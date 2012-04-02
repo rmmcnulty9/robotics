@@ -38,7 +38,7 @@ public:
   
 	void initPose();
 	void moveTo(float x, float y, float goal_theta);
-
+	void centerInCell();
 	void turnTo(float theta);
 	void printRaw();
 	void printPoses();

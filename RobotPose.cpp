@@ -232,7 +232,19 @@ void RobotPose::moveToCell(int x, int y){
 	moveTo(pose_goal.x, pose_goal.y, pose_goal.theta);
 	current_cell.x = x;
 	current_cell.y = y;
+	centerInCell();
 
+}
+
+/*
+ * Center robot once kalman determines in next cell
+ */
+void RobotPose::centerInCell(){
+	//If robot sees a pair of squares
+	
+	//Else if robot only sees unconnected squares
+	
+	//Else if robot sees no squares
 }
 
 /*
