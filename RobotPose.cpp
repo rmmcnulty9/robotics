@@ -240,13 +240,37 @@ void RobotPose::moveToCell(int x, int y){
  */
 void RobotPose::centerInCell(){
   	list<squarePair> pairs = pose_cam->updateCamera();
+	int centerError = pose_cam->getCenterError(pairs)
 	int turnError = pose_cam->getTurnError(pairs);
-	bool strafed = strafeTo(pose_cam->getCenterError(pairs));
+	int cellError = pose_cam->getCellError(pairs);
+
+	printf("Centering: centerError %d, turnError %d, cellError %d\n", centerError, turnError, cellError);
 	//If robot sees a pair of squares
-	
+	if(pairs.size() > 0){
+		strafeTo(centerError);
+		if(cellError > CENTER_EPSILON){
+			robot->Move(RI_MOVE_FORWARD, 5);
+		}
+		else if(cellError < -CENTER_EPSILON){
+			robot->Move(RI_MOVE_BACKWARD, 5);
+		}
+		centerInCell();
+	}
 	//Else if robot only sees unconnected squares
-	
-	//Else if robot sees no squares
+	else if(turnError != 0){
+		if(turnError > SIDE_EPSILON){
+			robot->Move(RI_TURN_RIGHT, 5);
+		}
+		else if(turnError < -SIDE_EPSILON){
+			robot->Move(RI_TURN_LEFT, 5);
+		}
+		centerInCell();
+	}
+	//Else robot sees no squares
+	else{
+		turnTo(pose_goal.theta + M_PI_2);
+		centerInCell();
+	}
 }
 
 /*

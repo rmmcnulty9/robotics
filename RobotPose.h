@@ -53,6 +53,8 @@ public:
 	
 	//Constant to set strafing threshold
 	static const float STRAFE_EPSILON = 35.0;
+	static const int CENTER_EPSILON = 20;
+	static const int SIDE_EPSILON = 20;
 	
 	//Cell size constants
 	static const int CELL_DIMENSION_CM = 65;
