@@ -96,6 +96,7 @@ void r2_get_moves() {
 void r1_move() {
     if (r1_move >= r1_num_moves) { // if there are no moves left, generate more
 	r1_get_moves();
+	r1_move();
     }
     else {
 	move(R1); // try to make a move
@@ -106,6 +107,7 @@ void r1_move() {
 void r2_move() {
     if (r2_move >= r2_num_moves) {
 	r2_get_moves();
+	r2_move();
     }
     else {
 	move(R2);
@@ -118,6 +120,13 @@ void move(int robot) {
 	if (valid_move(r1_pos[0], r1_pos[1], r1_moves_x[r1_move], r1_moves_y[r1_move], r2_pos[0], r2_pos[1])) {
 	    r1_pos[0] = r1_moves_x[r1_move];
 	    r1_pos[1] = r1_moves_y[r1_move];
+	    
+	    if (maze[r1_pos[1]][r1_pos[0]] > 0) {
+		moves_left--;
+		r1_score += maze[r1_pos[1]][r1_pos[0]];
+		maze[r1_pos[1]][r1_pos[0]] = 0;
+	    }
+	    
 	    r1_move++;
 	}
 	else { // give up and try generating new moves
@@ -129,6 +138,13 @@ void move(int robot) {
 	if (valid_move(r2_pos[0], r2_pos[1], r2_moves_x[r2_move], r2_moves_y[r2_move], r1_pos[0], r1_pos[1])) {
 	    r2_pos[0] = r2_moves_x[r2_move];
 	    r2_pos[1] = r2_moves_y[r2_move];
+	    
+	    if (maze[r2_pos[1]][r2_pos[0]] > 0) {
+		moves_left--;
+		r2_score += maze[r2_pos[1]][r2_pos[0]];
+		maze[r2_pos[1]][r2_pos[0]] = 0;
+	    }
+	    
 	    r2_move++;
 	}
 	else {
