@@ -268,7 +268,10 @@ void RobotPose::centerInCell(){
 	}
 	//Else robot sees no squares
 	else{
-		turnTo(pose_goal.theta + M_PI_2);
+		float searchTheta = pose_goal.theta + M_PI_2;
+		if(searchTheta > M_PI)
+			searchTheta -= M_PI;
+		turnTo(searchTheta);
 		centerInCell();
 	}
 }
