@@ -240,7 +240,7 @@ void RobotPose::moveToCell(int x, int y){
  */
 void RobotPose::centerInCell(){
   	list<squarePair> pairs = pose_cam->updateCamera();
-	int centerError = pose_cam->getCenterError(pairs)
+	int centerError = pose_cam->getCenterError(pairs);
 	int turnError = pose_cam->getTurnError(pairs);
 	int cellError = pose_cam->getCellError(pairs);
 
