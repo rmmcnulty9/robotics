@@ -77,9 +77,9 @@ list<squarePair> CameraPose::updateCamera(){
 	//Match and display yellow squares
 	removeOverlap(currentSquares);
 	turnError += getSquareSide(currentSquares);
-	//drawSquares(currentSquares, CV_RGB(0,255,0));
+	drawSquares(currentSquares, CV_RGB(0,255,0));
 	yellowPairs = matchSquares(currentSquares, YELLOW);
-	//printCenters(yellowPairs);
+	printCenters(yellowPairs);
 
 
 	//Filter and find pink squares
@@ -90,9 +90,9 @@ list<squarePair> CameraPose::updateCamera(){
 	//Match and display pink squares
 	removeOverlap(currentSquares);
 	turnError += getSquareSide(currentSquares);
-	//drawSquares(currentSquares, CV_RGB(255,0,0));
+	drawSquares(currentSquares, CV_RGB(255,0,0));
 	pinkPairs = matchSquares(currentSquares, PINK);
-	//printCenters(pinkPairs);
+	printCenters(pinkPairs);
 
 	//displayImages();
 	

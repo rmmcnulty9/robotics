@@ -49,7 +49,7 @@ public:
   
 	// Camera functions
 	void moveToCell(int x, int y);
-	bool strafeTo(int delta_x, float goal_theta);
+	bool strafeTo(int delta_x);
 	
 	//Constant to set strafing threshold
 	static const float STRAFE_EPSILON = 35.0;

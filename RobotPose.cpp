@@ -145,7 +145,7 @@ void RobotPose::initPose() {
  * Function that will strafe a delta Y value positive = right, negative = left
  * delta_x's range is -320 to +320 and return whether there was a strafing done
  */
-bool RobotPose::strafeTo(int delta_x, float goal_theta){
+bool RobotPose::strafeTo(int delta_x){
 	
 	int robot_speed = 3;
 /*
@@ -183,8 +183,7 @@ bool RobotPose::strafeTo(int delta_x, float goal_theta){
 
 	updatePosition(true);
 
-	//Make sure robot's theta is still correct
-	turnTo(goal_theta);
+
 
 	//If we have gotten here there was a strafe
 	//list<squarePair> pairs = pose_cam->updateCamera();
@@ -240,6 +239,9 @@ void RobotPose::moveToCell(int x, int y){
  * Center robot once kalman determines in next cell
  */
 void RobotPose::centerInCell(){
+  	list<squarePair> pairs = pose_cam->updateCamera();
+	int turnError = pose_cam->getTurnError(pairs);
+	bool strafed = strafeTo(pose_cam->getCenterError(pairs));
 	//If robot sees a pair of squares
 	
 	//Else if robot only sees unconnected squares
@@ -266,7 +268,7 @@ void RobotPose::moveTo(float x, float y, float goal_theta) {
 	if(cam_update_flag==3){
 		list<squarePair> pairs = pose_cam->updateCamera();
 		int turnError = pose_cam->getTurnError(pairs);
-		bool strafed = strafeTo(pose_cam->getCenterError(pairs), goal_theta);
+		bool strafed = strafeTo(pose_cam->getCenterError(pairs));
 		cam_update_flag=0;
 	}
 	cam_update_flag+=1;
@@ -330,7 +332,7 @@ void RobotPose::moveTo(float x, float y, float goal_theta) {
 	}
 	//Move left or right via strafing if error in robot's x
 	else if(error_distance_x > MOVE_TO_EPSILON){
-		strafeTo(error_distance_x, goal_theta);
+		strafeTo(error_distance_x);
 		moveTo(x, y, goal_theta);
 	}
 	//Robot has reached destination
