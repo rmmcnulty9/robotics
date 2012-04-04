@@ -103,6 +103,7 @@ void RobotPose::initPose() {
 		pose_ns.theta = firFilter(fir_theta_ns,(robot->Theta()-pose_start.theta));
 	}
 	printf("Starting theta: %f\n", (180/M_PI)*pose_ns.theta);
+	printf("Starting room: %d\n", room_cur);
 	pose_ns.x = 0.0;
 	pose_ns.y = 0.0;
 
@@ -214,8 +215,8 @@ void RobotPose::moveToCell(int x, int y){
 	}
 	
 	//Increment cell values
-	pose_goal.x += CELL_DIMENSION_CM*diff_y;
-	pose_goal.y += CELL_DIMENSION_CM*diff_x;
+	pose_goal.x = pose_kalman.x + CELL_DIMENSION_CM*diff_y;
+	pose_goal.y = pose_kalman.y + CELL_DIMENSION_CM*diff_x;
 	
 	//MoveTo handles all movement
 	printf("\n================================\nMoving to cell (%d,%d)\nGoal: %f,%f,%f\n================================\n\n",
@@ -288,11 +289,12 @@ void RobotPose::moveTo(float x, float y, float goal_theta) {
     
 	//Only update camera once every three sensor updates
 	static int cam_update_flag = 0;
-	if(cam_update_flag==3){
+	if(cam_update_flag==1){
 		list<squarePair> pairs = pose_cam->updateCamera();
 		int turnError = pose_cam->getTurnError(pairs);
 		bool strafed = strafeTo(pose_cam->getCenterError(pairs));
 		cam_update_flag=0;
+		printf("Square height error: %d\n", pose_cam->getCellError(pairs));
 	}
 	cam_update_flag+=1;
 	

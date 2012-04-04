@@ -24,8 +24,11 @@ int main(int argv, char **argc)
 	RobotInterface *robot = new RobotInterface(argc[1],0);
 	RobotPose robotPose(robot, argc[2]);
 	robot->Move(RI_HEAD_MIDDLE, RI_FASTEST);
-
-	
+	/*
+	while(true){
+	robotPose.updatePosition(false);
+	robotPose.printPoses();
+	}*/
 	/*
 	 * Move forward down the hallway
 	 */

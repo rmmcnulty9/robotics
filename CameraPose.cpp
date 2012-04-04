@@ -98,10 +98,10 @@ list<squarePair> CameraPose::updateCamera(){
 	
 	
 	//Save image
-	/*char file_name [256];
+	char file_name [256];
 	sprintf(file_name,"camera.%04d.jpg", image_ctr);
 	cvSaveImage(file_name,cameraImage);
-
+	/*
 	sprintf(file_name,"filtered.%04d.jpg", image_ctr);
 	cvSaveImage(file_name,filteredImage);
 
@@ -115,7 +115,7 @@ list<squarePair> CameraPose::updateCamera(){
 	cvSaveImage(file_name,pinkHigh); */
 	
 	image_ctr+=1;
-	
+	printf("Image %d\n", image_ctr);
 	//Return both yellow and pink pairs
 	yellowPairs.splice(yellowPairs.end(), pinkPairs);
 	allPairs = yellowPairs;
