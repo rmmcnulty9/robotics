@@ -37,14 +37,14 @@ int main(int argv, char **argc)
 	robotPose.moveToCell(4,1);
 	*/
 	
-	/*
+	
 	//Robot 1
 	robotPose.moveToCell(0,3);
 	robotPose.moveToCell(0,4);
 	robotPose.moveToCell(1,4);
-	*/
 	
-	robotPose.centerInCell();
+	
+	//robotPose.centerInCell();
 
 	delete(robot);
 	return 0;

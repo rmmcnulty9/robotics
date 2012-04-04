@@ -214,8 +214,8 @@ void RobotPose::moveToCell(int x, int y){
 	}
 	
 	//Increment cell values
-	pose_goal.x += CELL_DIMENSION_CM*diff_x;
-	pose_goal.y += CELL_DIMENSION_CM*diff_y;
+	pose_goal.x += CELL_DIMENSION_CM*diff_y;
+	pose_goal.y += CELL_DIMENSION_CM*diff_x;
 	
 	//MoveTo handles all movement
 	printf("\n================================\nMoving to cell (%d,%d)\nGoal: %f,%f,%f\n================================\n\n",
@@ -459,10 +459,10 @@ void RobotPose::printRaw(){
  */
 void RobotPose::printPoses(){
 
-	//printf("K: %f %f %f \t NS: %f %f %f \t WE: %f %f %f \t Signal: %d\n", pose_kalman.x, pose_kalman.y, pose_kalman.theta*180/M_PI,
-	//pose_ns.x, pose_ns.y, pose_ns.theta*180/M_PI, pose_we.x, pose_we.y, pose_we.theta*180/M_PI, robot->NavStrengthRaw());
-	printf("K: %f %f %f \t NS: %f %f %f \t Signal: %d\n", pose_kalman.x, pose_kalman.y, pose_kalman.theta*180/M_PI,
-	pose_ns.x, pose_ns.y, pose_ns.theta*180/M_PI, robot->NavStrengthRaw());
+	printf("K: %f %f %f \t NS: %f %f %f \t WE: %f %f %f \t Signal: %d\n", pose_kalman.x, pose_kalman.y, pose_kalman.theta*180/M_PI,
+	pose_ns.x, pose_ns.y, pose_ns.theta*180/M_PI, pose_we.x, pose_we.y, pose_we.theta*180/M_PI, robot->NavStrengthRaw());
+	//printf("K: %f %f %f \t NS: %f %f %f \t Signal: %d\n", pose_kalman.x, pose_kalman.y, pose_kalman.theta*180/M_PI,
+	//pose_ns.x, pose_ns.y, pose_ns.theta*180/M_PI, robot->NavStrengthRaw());
 
 }
 
@@ -493,8 +493,8 @@ void RobotPose::updatePosition(bool turning=false){
 	//NSdata[1] = pose_we.y;
 	//NSdata[2] = pose_we.theta;
 
-	WEdata[0] = pose_ns.x;
-	WEdata[1] = pose_ns.y;
+	WEdata[0] = pose_we.x;
+	WEdata[1] = pose_we.y;
 	WEdata[2] = pose_ns.theta;
 	rovioKalmanFilter(&kf,NSdata, WEdata, track);
 
@@ -508,6 +508,7 @@ void RobotPose::updatePosition(bool turning=false){
  * Get data from WE filter it and translate,rotate, and scale
  */
 bool RobotPose::updateWE(bool turning) {
+	pose_we.theta = pose_ns.theta;
 	float dx_2, dy_2;
   
 	int left = robot->getWheelEncoder(RI_WHEEL_LEFT);
@@ -525,9 +526,9 @@ bool RobotPose::updateWE(bool turning) {
 
 	dx = 0.0; // I don't think we are supposed to move in this direction.
 
-	float dtheta = (rear * we_to_rad);
+	//float dtheta = (rear * we_to_rad);
 
-	pose_we.theta += dtheta;
+	//pose_we.theta += dtheta;
 
 	//Normalizing the theta between PI and -PI
 	if (pose_we.theta>M_PI) {
