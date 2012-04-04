@@ -94,7 +94,7 @@ list<squarePair> CameraPose::updateCamera(){
 	pinkPairs = matchSquares(currentSquares, PINK);
 	printCenters(pinkPairs);
 
-	//displayImages();
+	displayImages();
 	
 	
 	//Save image
@@ -121,6 +121,7 @@ list<squarePair> CameraPose::updateCamera(){
 	allPairs = yellowPairs;
 	
 	//If no pairs found strafe left then right to search for more
+	/*
 	static int retry_count = 0;
 	retry_count+=1;
 	if(allPairs.size()==0 && retry_count<3){
@@ -134,7 +135,7 @@ list<squarePair> CameraPose::updateCamera(){
 	}
 	else 
 		retry_count = 0;
-	
+	*/
 	return allPairs;
   
 }

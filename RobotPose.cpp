@@ -260,9 +260,10 @@ void RobotPose::centerInCell(){
 	}
 	//Else robot sees no squares
 	else{
-		float searchTheta = pose_goal.theta + M_PI_2;
+		float searchTheta = pose_kalman.theta + M_PI/4;
 		if(searchTheta > M_PI)
 			searchTheta -= M_PI;
+		printf("Search theta: %f\n", (180/M_PI)*searchTheta);
 		turnTo(searchTheta);
 		centerInCell();
 	}
@@ -343,7 +344,7 @@ void RobotPose::moveTo(float x, float y, float goal_theta) {
 		rovioKalmanFilterSetVelocity(&kf,velocity);
 	}
 	
-	printf("error dist x:%f error dist y:%f  = %f\n", error_distance_x, error_distance_y, error_distance);
+	//printf("Error x:%f \tError y:%f \tTotal: %f\n", error_distance_x, error_distance_y, error_distance);
 	//Move forward if error in robot's y
 	if (error_distance_y > MOVE_TO_EPSILON) {
 		robot->Move(RI_MOVE_FORWARD, robot_speed);
@@ -455,8 +456,11 @@ void RobotPose::printRaw(){
  */
 void RobotPose::printPoses(){
 
-	printf("K: %f %f %f \t NS: %f %f %f \t WE: %f %f %f \t Signal: %d\n", pose_kalman.x, pose_kalman.y, pose_kalman.theta*180/M_PI,
-	pose_ns.x, pose_ns.y, pose_ns.theta*180/M_PI, pose_we.x, pose_we.y, pose_we.theta*180/M_PI, robot->NavStrengthRaw());
+	//printf("K: %f %f %f \t NS: %f %f %f \t WE: %f %f %f \t Signal: %d\n", pose_kalman.x, pose_kalman.y, pose_kalman.theta*180/M_PI,
+	//pose_ns.x, pose_ns.y, pose_ns.theta*180/M_PI, pose_we.x, pose_we.y, pose_we.theta*180/M_PI, robot->NavStrengthRaw());
+	printf("K: %f %f %f \t NS: %f %f %f \t Signal: %d\n", pose_kalman.x, pose_kalman.y, pose_kalman.theta*180/M_PI,
+	pose_ns.x, pose_ns.y, pose_ns.theta*180/M_PI, robot->NavStrengthRaw());
+
 }
 
 /*
