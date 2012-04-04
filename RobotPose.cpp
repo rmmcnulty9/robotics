@@ -44,13 +44,7 @@ RobotPose::RobotPose(RobotInterface *r, char* p){
 	* */
 	initPose();
 
-	/*
-	* Initialize Kalman filter
-	* */
 
-	float initialPose[3];
-	initialPose[0] = 0;
-	initialPose[1] = 0;
 	//Set up initial direction and goal (as current cell) based on which player
 	if(strcmp(p,"1") == 0){
 		player = 1;
@@ -72,15 +66,7 @@ RobotPose::RobotPose(RobotInterface *r, char* p){
 		printf("Player 2\n");
 	}
 	
-	float Velocity[3];
-	Velocity[0] = 0;
-	Velocity[1] = 0;
-	Velocity[2] = 0;
-	int deltat = 1;
 
-	initKalmanFilter(&kf, initialPose, Velocity, deltat);
-	rovioKalmanFilterSetUncertainty(&kf, uncertainty_weak_we);
-	
 	//Initialize PID controllers
 	PID_x = new PIDController(iMax,iMin,integral,proportional,derivative);
 	PID_y = new PIDController(iMax,iMin,integral,proportional,derivative);
@@ -116,6 +102,7 @@ void RobotPose::initPose() {
 	for(int i=0;i<30;i++){
 		pose_ns.theta = firFilter(fir_theta_ns,(robot->Theta()-pose_start.theta));
 	}
+	printf("Starting theta: %f\n", (180/M_PI)*pose_ns.theta);
 	pose_ns.x = 0.0;
 	pose_ns.y = 0.0;
 
@@ -123,8 +110,12 @@ void RobotPose::initPose() {
 	pose_we.y = 0.0;
 	pose_we.theta = pose_ns.theta;
 
-	
-	
+	//pose_kalman.theta = pose_ns.theta;
+	/*
+	* Initialize Kalman filter
+	* 
+	*/
+
 	float initialPose[3];
 	initialPose[0] = 0;
 	initialPose[1] = 0;
@@ -137,6 +128,7 @@ void RobotPose::initPose() {
 	int deltat = 1;
 
 	initKalmanFilter(&kf, initialPose, Velocity, deltat);
+	rovioKalmanFilterSetUncertainty(&kf, uncertainty_weak_we);
 
 }
 
@@ -474,7 +466,6 @@ void RobotPose::updatePosition(bool turning=false){
 	robot->update();
 	updateNS();
 	updateWE(turning);
-	pose_we.theta = pose_ns.theta;
 	/*
 	 * If there is a weaker NS signal change the uncertainty - higher NS lower WE and lower prediction
 	 * No significant difference.
@@ -490,7 +481,7 @@ void RobotPose::updatePosition(bool turning=false){
 	NSdata[0] = pose_ns.x;
 	NSdata[1] = pose_ns.y;
 	NSdata[2] = pose_ns.theta;
-	//printf("Warning not passing NS data into Kalman Filter!\n");
+	//printf("Warning not passing WE data into Kalman Filter!\n");
 	//NSdata[0] = pose_we.x;
 	//NSdata[1] = pose_we.y;
 	//NSdata[2] = pose_we.theta;
@@ -649,7 +640,7 @@ void RobotPose::changeWEScalingConstant(float we) {
  * Accessor for changing the Uncertainty in Kalman filter
  */
 void RobotPose::changeUncertainty(float *uc){
- rovioKalmanFilterSetUncertainty(&kf,uc); 
+	rovioKalmanFilterSetUncertainty(&kf,uc); 
 }
 
 /*
