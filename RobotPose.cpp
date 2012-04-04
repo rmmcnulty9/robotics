@@ -302,27 +302,19 @@ void RobotPose::moveTo(float x, float y, float goal_theta) {
 	turnTo(goal_theta);  
 	
 	//Determine errors in pose
-	float error_distance_x;
-	float error_distance_y;
-	
+	float error_distance;
+	float total_PID;
 	if(goal_theta==0.0 || goal_theta==M_PI){
-		error_distance_y = pose_kalman.x - x;
-		error_distance_x = pose_kalman.y - y; 
+		error_distance = pose_kalman.x - x;
+		total_PID = PID_y->UpdatePID(error_distance, pose_kalman.x);
 	}else{
-		error_distance_x = pose_kalman.x - x;
-		error_distance_y = pose_kalman.y - y; 
+		error_distance = pose_kalman.y - y;
+		total_PID = PID_y->UpdatePID(error_distance, pose_kalman.y);
 	}
-	if(error_distance_x<0.0) error_distance_x = -error_distance_x;
-	if(error_distance_y<0.0) error_distance_y = -error_distance_y;
-	//Total error from next cell
-	float error_distance = sqrt(error_distance_x * error_distance_x + error_distance_y * error_distance_y);
 
-	//Get PID
-	float PID_xres = PID_x->UpdatePID(error_distance_x, pose_kalman.x);
-	float PID_yres = PID_y->UpdatePID(error_distance_y, pose_kalman.y);
+
   
 	//Calculate speed based on PID
-	float total_PID = abs(sqrt(PID_xres * PID_xres + PID_yres * PID_yres));
 	int robot_speed;
 	float velocity[3];
 	//Set robot's current speed and set new kalman velocity
@@ -349,17 +341,18 @@ void RobotPose::moveTo(float x, float y, float goal_theta) {
 		rovioKalmanFilterSetVelocity(&kf,velocity);
 	}
 	
-	//printf("Error x:%f \tError y:%f \tTotal: %f\n", error_distance_x, error_distance_y, error_distance);
+	printf("Error %f\n", error_distance);
 	//Move forward if error in robot's y
-	if (error_distance_y > MOVE_TO_EPSILON) {
+	
+	if (abs(error_distance) > MOVE_TO_EPSILON) {
 		robot->Move(RI_MOVE_FORWARD, robot_speed);
 		moveTo(x, y, goal_theta);
 	}
 	//Move left or right via strafing if error in robot's x
-	else if(error_distance_x > MOVE_TO_EPSILON){
+	/*else if(error_distance_x > MOVE_TO_EPSILON){
 		strafeTo(error_distance_x);
 		moveTo(x, y, goal_theta);
-	}
+	}*/
 	//Robot has reached destination
 	else {
 		printf("ARRIVED! %f %f\n", x, y);
