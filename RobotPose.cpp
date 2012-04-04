@@ -237,8 +237,11 @@ void RobotPose::centerInCell(){
 	int cellError = pose_cam->getCellError(pairs);
 
 	printf("Centering: centerError %d, turnError %d, cellError %d\n", centerError, turnError, cellError);
-	//If robot sees a pair of squares
-	if(pairs.size() > 0){
+	if(pairs.size() > 0 && abs(cellError) < CENTER_EPSILON && abs(centerError) < STRAFE_EPSILON){
+		printf("Centered in cell!\n");
+	}	
+	//If robot sees a pair of squares not centered
+	else if(pairs.size() > 0){
 		strafeTo(centerError);
 		if(cellError > CENTER_EPSILON){
 			robot->Move(RI_MOVE_FORWARD, 5);
