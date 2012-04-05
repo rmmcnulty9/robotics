@@ -38,7 +38,11 @@ int main(int argv, char **argc)
 	robotPose.moveToCell(5,2);
 	robotPose.moveToCell(4,2);
 	robotPose.moveToCell(4,1);
-	
+	robotPose.moveToCell(4,0);
+	robotPose.moveToCell(3,0);
+	robotPose.moveToCell(2,0);
+	robotPose.moveToCell(2,1);
+
 	
 	/*
 	//Robot 1

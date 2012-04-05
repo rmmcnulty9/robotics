@@ -54,7 +54,7 @@ public:
 	static const float MOVE_TO_EPSILON = 10.0;
 	static const float TURN_TO_EPSILON = 15.0*(M_PI/180);
 	//Constant to set strafing threshold
-	static const float STRAFE_EPSILON = 50.0;
+	static const float STRAFE_EPSILON = 45.0;
 	static const int CENTER_EPSILON = 15;
 	static const int SIDE_EPSILON = 25;
 	

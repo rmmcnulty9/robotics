@@ -133,7 +133,7 @@ void RobotPose::initPose() {
 	int deltat = 1;
 
 	initKalmanFilter(&kf, initialPose, Velocity, deltat);
-	rovioKalmanFilterSetUncertainty(&kf, uncertainty_weak_we);
+	rovioKalmanFilterSetUncertainty(&kf, uncertainty_weakest_we);
 
 }
 
@@ -173,7 +173,7 @@ bool RobotPose::strafeTo(int delta_x){
 	}
 	else{
 		//Base case
-		printf("Centered\n");
+		//printf("Centered\n");
 		return false;
 	}
 
@@ -217,18 +217,19 @@ void RobotPose::moveToCell(int x, int y){
 	else{
 		printf("Wrong coordinates %f, %f\n", diff_x, diff_y);
 	}
-	
+	turnTo(pose_goal.theta);
 	//Increment cell values
 	pose_goal.x = pose_kalman.x + CELL_DIMENSION_CM*diff_y;
 	pose_goal.y = pose_kalman.y + CELL_DIMENSION_CM*diff_x;
 	
 	//MoveTo handles all movement
-	printf("\n================================\nMoving to cell (%d,%d)\nGoal: %f,%f,%f\n================================\n\n",
+	printf("\n====================================\nMoving to cell (%d,%d)\nGoal: %f,%f,%f\n====================================\n\n",
 		x,y,pose_goal.x, pose_goal.y, pose_goal.theta*(180/M_PI));
 	moveTo(pose_goal.x, pose_goal.y, pose_goal.theta);
 	current_cell.x = x;
 	current_cell.y = y;
 	centeringCount = 0;
+	printf("\n**************************\nCentering in cell (%d,%d)\n**************************\n\n",x,y);
 	centerInCell();
 
 }
@@ -311,7 +312,7 @@ void RobotPose::moveTo(float x, float y, float goal_theta) {
 		int turnError = pose_cam->getTurnError(pairs);
 		bool strafed = strafeTo(pose_cam->getCenterError(pairs));
 		cam_update_flag=0;
-		printf("Square height error: %d\n", pose_cam->getCellError(pairs));
+		//printf("Square height error: %d\n", pose_cam->getCellError(pairs));
 	}
 	cam_update_flag+=1;
 	
@@ -473,8 +474,8 @@ void RobotPose::printRaw(){
  */
 void RobotPose::printPoses(){
 
-	printf("K: %f %f %f \t NS: %f %f %f \t WE: %f %f %f \t Signal: %d\n", pose_kalman.x, pose_kalman.y, pose_kalman.theta*180/M_PI,
-	pose_ns.x, pose_ns.y, pose_ns.theta*180/M_PI, pose_we.x, pose_we.y, pose_we.theta*180/M_PI, robot->NavStrengthRaw());
+	printf("K: %f %f %f \t NS: %f %f %f \t WE: %f %f %f\n", pose_kalman.x, pose_kalman.y, pose_kalman.theta*180/M_PI,
+	pose_ns.x, pose_ns.y, pose_ns.theta*180/M_PI, pose_we.x, pose_we.y, pose_we.theta*180/M_PI);
 	//printf("K: %f %f %f \t NS: %f %f %f \t Signal: %d\n", pose_kalman.x, pose_kalman.y, pose_kalman.theta*180/M_PI,
 	//pose_ns.x, pose_ns.y, pose_ns.theta*180/M_PI, robot->NavStrengthRaw());
 
