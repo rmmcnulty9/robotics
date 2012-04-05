@@ -50,11 +50,13 @@ public:
 	// Camera functions
 	void moveToCell(int x, int y);
 	bool strafeTo(int delta_x);
-	
+	//Thresholds for movement
+	static const float MOVE_TO_EPSILON = 10.0;
+	static const float TURN_TO_EPSILON = 15.0*(M_PI/180);
 	//Constant to set strafing threshold
 	static const float STRAFE_EPSILON = 35.0;
-	static const int CENTER_EPSILON = 20;
-	static const int SIDE_EPSILON = 20;
+	static const int CENTER_EPSILON = 25;
+	static const int SIDE_EPSILON = 25;
 	
 	//Cell size constants
 	static const int CELL_DIMENSION_CM = 65;

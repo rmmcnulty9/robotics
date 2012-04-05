@@ -6,7 +6,9 @@
  */
 
 #include <robot_if++.h>
+#include <cstdlib>
 #include <iostream>
+#include <ctime>
 #include <iomanip>
 #include <stdio.h>
 #include <string>
@@ -27,7 +29,7 @@ extern "C" {
  */
 RobotPose::RobotPose(RobotInterface *r, char* p){
 	robot = r;
-	
+	 std::srand(time(0));
 	//Create all six FIR filters
 	fir_x_ns = RobotPose::createFilter(coef_filename,0.0);
 	fir_y_ns = RobotPose::createFilter(coef_filename,0.0);
@@ -237,8 +239,9 @@ void RobotPose::centerInCell(){
 	int centerError = pose_cam->getCenterError(pairs);
 	int turnError = pose_cam->getTurnError(pairs);
 	int cellError = pose_cam->getCellError(pairs);
-
-	printf("Centering: centerError %d, turnError %d, cellError %d\n", centerError, turnError, cellError);
+	float randomTheta = (float)std::rand()/RAND_MAX * (M_PI/5) - (M_PI/10);
+	
+	printf("Centering: centerError %d, turnError %d, cellError %d, randomTheta %f\n", centerError, turnError, cellError, (180/M_PI)*randomTheta);
 	centeringCount++;
 	if(centeringCount > 30)
 		printf("Centering took too long\n");
@@ -248,7 +251,9 @@ void RobotPose::centerInCell(){
 	//If robot sees a pair of squares not centered
 	else if(pairs.size() > 0){
 		printf("Adjusting based on pairs\n");
-		strafeTo(centerError);
+		if(strafeTo(centerError)){
+			robot->Move(RI_MOVE_BACKWARD, 7);
+		}
 		if(cellError > CENTER_EPSILON){
 			robot->Move(RI_MOVE_FORWARD, 5);
 		}
@@ -258,22 +263,24 @@ void RobotPose::centerInCell(){
 		centerInCell();
 	}
 	//Else if robot only sees unconnected squares
-	/*
+	
 	else if(turnError != 0){
 		printf("Adjusting based on single squares\n");
 		if(turnError > SIDE_EPSILON){
-			robot->Move(RI_TURN_RIGHT, 5);
+			robot->Move(RI_TURN_RIGHT, 1);
+			robot->Move(RI_STOP, 5);
 		}
 		else if(turnError < -SIDE_EPSILON){
-			robot->Move(RI_TURN_LEFT, 5);
+			robot->Move(RI_TURN_LEFT, 1);
+			robot->Move(RI_STOP, 5);
 		}
 		centerInCell();
-	}*/
+	}
 	//Else robot sees no squares
 	else{
 	  	robot->Move(RI_MOVE_BACKWARD, 7);
 		printf("Turning using state: %f\n", (180/M_PI)*maze_turns[(int)current_cell.x][(int)current_cell.y]);
-		turnTo(maze_turns[(int)current_cell.x][(int)current_cell.y]);
+		turnTo(maze_turns[(int)current_cell.x][(int)current_cell.y] + randomTheta);
 		centerInCell();
 	}
 }
@@ -394,7 +401,7 @@ void RobotPose::turnTo(float goal_theta) {
 	float error_theta = error_theta1<error_theta2?error_theta1:error_theta2;
 	//Don't turn if error theta not large enough
 	//printPoses();
-	if(error_theta>=(-TURN_TO_EPSILON) && error_theta<= (TURN_TO_EPSILON)){
+	if(error_theta>=(-1 * TURN_TO_EPSILON) && error_theta<= (TURN_TO_EPSILON)){
 		 //printf("Theta too small\n");
 		 return;
 	}
