@@ -304,10 +304,12 @@ void RobotPose::moveTo(float x, float y, float goal_theta) {
 	//Determine errors in pose
 	float error_distance;
 	float total_PID;
-	if(goal_theta==0.0 || goal_theta==M_PI){
+	if(abs(goal_theta-0.0)<1 || abs(goal_theta-M_PI)<1){
+		printf("X ");
 		error_distance = pose_kalman.x - x;
 		total_PID = PID_y->UpdatePID(error_distance, pose_kalman.x);
 	}else{
+	  	printf("Y ");
 		error_distance = pose_kalman.y - y;
 		total_PID = PID_y->UpdatePID(error_distance, pose_kalman.y);
 	}

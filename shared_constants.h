@@ -96,5 +96,12 @@ const double derivative = 1.0;
  */
 //float uncertainty_default [] = {.05, .05, .05, .05, .05, .05, .05, .05, .05};
 
+float maze_turns[7][5] = {{-M_PI_2, 0.0, -M_PI_2, M_PI, -M_PI_2},
+			{-M_PI_2, 0, -M_PI_2, 0, -M_PI_2},
+			{-M_PI_2, M_PI, -M_PI_2, 0.0, -M_PI_2},
+			{-M_PI_2, 0, -M_PI_2, 0, -M_PI_2},
+			{-M_PI_2, M_PI, -M_PI_2, 0.0, -M_PI_2},
+			{-M_PI_2, 0, -M_PI_2, 0, -M_PI_2},
+			{M_PI, M_PI, M_PI_2, 0.0, 0.0}};
 
 #endif
