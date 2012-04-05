@@ -67,7 +67,9 @@ RobotPose::RobotPose(RobotInterface *r, char* p){
 		current_cell.theta = M_PI_2;
 		printf("Player 2\n");
 	}
-	
+		
+	centeringCount = 0;
+
 
 	//Initialize PID controllers
 	PID_x = new PIDController(iMax,iMin,integral,proportional,derivative);
@@ -254,18 +256,20 @@ void RobotPose::centerInCell(){
 		if(strafeTo(centerError)){
 			robot->Move(RI_MOVE_BACKWARD, 7);
 		}
+		if(cellError < -CENTER_EPSILON || cellError > 2*CENTER_EPSILON){
+			robot->Move(RI_MOVE_BACKWARD, 5);
+		}
 		if(cellError > CENTER_EPSILON){
 			robot->Move(RI_MOVE_FORWARD, 5);
-		}
-		else if(cellError < -CENTER_EPSILON){
-			robot->Move(RI_MOVE_BACKWARD, 5);
 		}
 		centerInCell();
 	}
 	//Else if robot only sees unconnected squares
-	
+	/*
 	else if(turnError != 0){
-		printf("Adjusting based on single squares\n");
+		printf("Adjusting based on single squares mod %d\n", centeringCount % 4);
+
+		
 		if(turnError > SIDE_EPSILON){
 			robot->Move(RI_TURN_RIGHT, 1);
 			robot->Move(RI_STOP, 5);
@@ -274,8 +278,9 @@ void RobotPose::centerInCell(){
 			robot->Move(RI_TURN_LEFT, 1);
 			robot->Move(RI_STOP, 5);
 		}
+		
 		centerInCell();
-	}
+	}*/
 	//Else robot sees no squares
 	else{
 	  	robot->Move(RI_MOVE_BACKWARD, 7);
