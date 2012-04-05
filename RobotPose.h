@@ -80,6 +80,7 @@ private:
 	int room_start;
 	int room_cur;
 	int player;
+	int centeringCount;
 	float theta_ns_trans;
   
 

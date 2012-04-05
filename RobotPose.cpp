@@ -161,11 +161,11 @@ bool RobotPose::strafeTo(int delta_x){
 	//move the robot left or right
 	if(delta_x < -1 * STRAFE_EPSILON){
 		robot->Move(RI_MOVE_FWD_LEFT, robot_speed);
-		printf("Moving Left\n");
+		printf("Strafing Left\n");
 	}
 	else if(delta_x > STRAFE_EPSILON){
 		robot->Move(RI_MOVE_FWD_RIGHT, robot_speed);
-		printf("Moving Right\n");
+		printf("Strafing Right\n");
 	}
 	else{
 		//Base case
@@ -224,6 +224,7 @@ void RobotPose::moveToCell(int x, int y){
 	moveTo(pose_goal.x, pose_goal.y, pose_goal.theta);
 	current_cell.x = x;
 	current_cell.y = y;
+	centeringCount = 0;
 	centerInCell();
 
 }
@@ -238,11 +239,15 @@ void RobotPose::centerInCell(){
 	int cellError = pose_cam->getCellError(pairs);
 
 	printf("Centering: centerError %d, turnError %d, cellError %d\n", centerError, turnError, cellError);
-	if(pairs.size() > 0 && abs(cellError) < CENTER_EPSILON && abs(centerError) < STRAFE_EPSILON){
+	centeringCount++;
+	if(centeringCount > 30)
+		printf("Centering took too long\n");
+	else if(pairs.size() > 0 && abs(cellError) < CENTER_EPSILON && abs(centerError) < STRAFE_EPSILON){
 		printf("Centered in cell!\n");
 	}	
 	//If robot sees a pair of squares not centered
 	else if(pairs.size() > 0){
+		printf("Adjusting based on pairs\n");
 		strafeTo(centerError);
 		if(cellError > CENTER_EPSILON){
 			robot->Move(RI_MOVE_FORWARD, 5);
@@ -253,7 +258,9 @@ void RobotPose::centerInCell(){
 		centerInCell();
 	}
 	//Else if robot only sees unconnected squares
+	/*
 	else if(turnError != 0){
+		printf("Adjusting based on single squares\n");
 		if(turnError > SIDE_EPSILON){
 			robot->Move(RI_TURN_RIGHT, 5);
 		}
@@ -261,10 +268,11 @@ void RobotPose::centerInCell(){
 			robot->Move(RI_TURN_LEFT, 5);
 		}
 		centerInCell();
-	}
+	}*/
 	//Else robot sees no squares
 	else{
-
+	  	robot->Move(RI_MOVE_BACKWARD, 7);
+		printf("Turning using state: %f\n", (180/M_PI)*maze_turns[(int)current_cell.x][(int)current_cell.y]);
 		turnTo(maze_turns[(int)current_cell.x][(int)current_cell.y]);
 		centerInCell();
 	}
@@ -355,8 +363,8 @@ void RobotPose::moveTo(float x, float y, float goal_theta) {
 	//Robot has reached destination
 	else {
 		printf("ARRIVED! %f %f\n", x, y);
-		resetPose(x, y, goal_theta);
-		//resetPose(pose_kalman.x, pose_kalman.y, pose_kalman.theta);
+		//resetPose(x, y, goal_theta);
+		resetPose(pose_kalman.x, pose_kalman.y, pose_kalman.theta);
 	}
 }
 
