@@ -33,12 +33,12 @@ int main(int argv, char **argc)
 	 * Move forward down the hallway
 	 */
 	
-	/*
+	
 	//Robot 2
 	robotPose.moveToCell(5,2);
 	robotPose.moveToCell(4,2);
 	robotPose.moveToCell(4,1);
-	*/
+	
 	
 	/*
 	//Robot 1
@@ -47,7 +47,7 @@ int main(int argv, char **argc)
 	robotPose.moveToCell(1,4);
 	*/
 	
-	robotPose.centerInCell();
+	//robotPose.centerInCell();
 
 	delete(robot);
 	return 0;

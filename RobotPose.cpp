@@ -284,8 +284,8 @@ void RobotPose::centerInCell(){
 	//Else robot sees no squares
 	else{
 	  	robot->Move(RI_MOVE_BACKWARD, 7);
-		printf("Turning using state: %f\n", (180/M_PI)*maze_turns[(int)current_cell.x][(int)current_cell.y]);
-		turnTo(maze_turns[(int)current_cell.x][(int)current_cell.y] + randomTheta);
+		printf("Turning using state: %f\n", (180/M_PI)*stateTurns[player-1][(int)current_cell.x][(int)current_cell.y]);
+		turnTo(stateTurns[player-1][(int)current_cell.x][(int)current_cell.y] + randomTheta);
 		centerInCell();
 	}
 }
