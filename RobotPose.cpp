@@ -264,11 +264,8 @@ void RobotPose::centerInCell(){
 	}
 	//Else robot sees no squares
 	else{
-		float searchTheta = pose_kalman.theta + M_PI/4;
-		if(searchTheta > M_PI)
-			searchTheta -= M_PI;
-		printf("Search theta: %f\n", (180/M_PI)*searchTheta);
-		turnTo(searchTheta);
+
+		turnTo(maze_turns[(int)current_cell.x][(int)current_cell.y]);
 		centerInCell();
 	}
 }
