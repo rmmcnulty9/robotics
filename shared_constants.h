@@ -35,7 +35,8 @@ float ns_x_to_cm[] = {0.0, 0.0, 1.0 / 34.0, 1.0 / 30.0, 1.0 / 34.0, 1.0 / 37.0};
 float ns_y_to_cm[] = {0.0, 0.0, 1.0 / 34.0, 1.0 / 39.0, 1.0 / 25.0, 1.0 / 29.0};
 float we_to_cm = 2.5; //0.5; 
 //NS theta skew correction constants
-float ns_theta_offsets[] = {0.0, 0.0, /*0.155946*/ -12.0*M_PI/180 ,  M_PI_2, -0.101754, 1.488696};
+//float ns_theta_offsets[] = {0.0, 0.0, /*0.155946*/ -12.0*M_PI/180 ,  M_PI_2, -0.101754, 1.488696};
+float ns_theta_offsets[] = {0.0, 0.0,0.0, 0.0, 0.0, 0.0};
 
 // Constants used for JOHNNY5
 //Fully Charged
@@ -65,7 +66,7 @@ float uncertainty_weakest_ns [] = {.06, .06, .06, .1, .1, .1, .12, .12, .12};
 //Rotation for each room, to put the axis in robot frame
 //float start_pose_thetas[] = {0.0, 0.0, 1.3554 - M_PI, -1.571900 - M_PI_2, 0.080450 - M_PI_2, -1.430050 - M_PI_2};
 
-float start_pose_thetas[] = {0.0, 0.0, 0.0, 0.0, 0.0, 0.0};
+float start_pose_thetas[] = {0.0, 0.0, 1.1505996 - M_PI_2 , -1.3631533 - M_PI_2, 0.080450 - M_PI_2, -1.5208379 - M_PI_2};
 
 const float we_to_rad = M_PI / -120.0;
 const float robot_diameter_cm = 29.0;
