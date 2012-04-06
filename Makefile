@@ -59,3 +59,4 @@ clean:
 	rm -rf camera_teser
 	rm -rf maze_navigator
 	rm -rf hall_navigator
+	rm *.jpg

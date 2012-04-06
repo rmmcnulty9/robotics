@@ -104,10 +104,10 @@ list<squarePair> CameraPose::updateCamera(){
 	
 	sprintf(file_name,"filtered.%04d.jpg", image_ctr);
 	cvSaveImage(file_name,filteredImage);
-/*
+
  	sprintf(file_name,"yellow.%04d.jpg",image_ctr);
 	cvSaveImage(file_name,yellow);
-
+/*
 	sprintf(file_name,"pinklow.%04d.jpg", image_ctr);
 	cvSaveImage(file_name,pinkLow);
 

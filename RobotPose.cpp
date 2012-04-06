@@ -37,9 +37,9 @@ RobotPose::RobotPose(RobotInterface *r, char* p){
 	//We used a different set of coefficents for the theta
 	fir_theta_ns = RobotPose::createFilter(ns_theta_coef_filename,0.0);
   
-	fir_left_we = RobotPose::createFilter(coef_filename,0.0);
-	fir_right_we = RobotPose::createFilter(coef_filename,0.0);
-	fir_rear_we = RobotPose::createFilter(coef_filename,0.0);
+	fir_x_we = RobotPose::createFilter(coef_filename,0.0);
+	fir_y_we = RobotPose::createFilter(coef_filename,0.0);
+	//fir_rear_we = RobotPose::createFilter(coef_filename,0.0);
 
 	/*
 	* Resets the pose values & initializes start_pose
@@ -529,12 +529,6 @@ bool RobotPose::updateWE(bool turning) {
 	int left = robot->getWheelEncoder(RI_WHEEL_LEFT);
 	int right = robot->getWheelEncoder(RI_WHEEL_RIGHT);
 	int rear = robot->getWheelEncoder(RI_WHEEL_REAR);
-	//Filter WE data ignoring the left and right values while turning
-	if(!turning){
-//		left = firFilter(fir_left_we, left);
-//		right = firFilter(fir_right_we, right);
-	}
-	rear = firFilter(fir_rear_we, rear);
 	//Transform data
 	float dy = ((left * sin(150.0 * M_PI/180.0)) + (right * sin(30.0 * M_PI/180.0)) + (rear * sin(90.0 * M_PI/180.0)))/3.0;
 	float dx = ((left * cos(150.0 * M_PI/180.0)) + (right * cos(30.0 * M_PI/180.0)))/2.0;
@@ -557,9 +551,16 @@ bool RobotPose::updateWE(bool turning) {
 	if (!turning) {
 		dx_2 = dx * cos(pose_we.theta - M_PI_2) - dy * sin(pose_we.theta - M_PI_2);
 		dy_2 = dx * sin(pose_we.theta - M_PI_2) + dy * cos(pose_we.theta - M_PI_2);
-	//	printf("HERE %f %f %f - %f %f - %f %f - %d %d %d\n", pose_we.x, pose_we.y, pose_we.theta,dx, dy,  dx_2, dy_2, left, right, rear);
+	//	printf("HERE %f %f %f - %f %f - %f %f - %d %d %d\n", pose_we.x, pose_we.y, pose_we.theta,
+	//	       dx, dy, 
+	//		dx_2, dy_2, 
+	//		left, right, rear);
 		pose_we.x += dx_2*we_to_cm;
 		pose_we.y += dy_2*we_to_cm;
+		
+		//pose_we.x = firFilter(fir_x_we, pose_we.x);
+		//pose_we.y = firFilter(fir_y_we, pose_we.y);
+		
 	}
 	return true;
 }

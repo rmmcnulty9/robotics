@@ -88,8 +88,8 @@ private:
 
 
 	//FIR Filters
-	filter *fir_left_we;
-	filter *fir_right_we;
+	filter *fir_x_we;
+	filter *fir_y_we;
 	filter *fir_rear_we;
 	filter *fir_x_ns;
 	filter *fir_y_ns;
