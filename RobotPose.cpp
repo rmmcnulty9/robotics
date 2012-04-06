@@ -231,6 +231,8 @@ void RobotPose::moveToCell(int x, int y){
 	centeringCount = 0;
 	printf("\n**************************\nCentering in cell (%d,%d)\n**************************\n\n",x,y);
 	centerInCell();
+	resetPose(pose_kalman.x, pose_kalman.y, pose_kalman.theta);
+
 
 }
 
@@ -354,7 +356,7 @@ void RobotPose::moveTo(float x, float y, float goal_theta) {
 		rovioKalmanFilterSetVelocity(&kf,velocity);
 	}
 	else {
-		robot_speed = 5;
+		robot_speed = 4;
 		velocity[0] = vel_5 * cos(pose_kalman.theta);
 		velocity[1] = vel_5 * sin(pose_kalman.theta);
 		velocity[2] = 0.0;
@@ -377,7 +379,6 @@ void RobotPose::moveTo(float x, float y, float goal_theta) {
 	else {
 		printf("ARRIVED! %f %f\n", x, y);
 		//resetPose(x, y, goal_theta);
-		resetPose(pose_kalman.x, pose_kalman.y, pose_kalman.theta);
 	}
 }
 

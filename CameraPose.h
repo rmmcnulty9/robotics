@@ -67,8 +67,8 @@ class CameraPose {
 	static const int YELLOW = 1;
 
 	//Constants for square locations when at center of cell
-	static const int Y_CELL_CENTER_PINK = 220 - 30;
-	static const int Y_CELL_CENTER_YELLOW = 170 - 30;
+	static const int Y_CELL_CENTER_PINK = 220;
+	static const int Y_CELL_CENTER_YELLOW = 170;
 	static const int X_CELL_CENTER_RIGHT = 530;
 	static const int X_CELL_CENTER_LEFT = 120;
   
