@@ -24,6 +24,12 @@ int main(int argv, char **argc)
 	RobotInterface *robot = new RobotInterface(argc[1],0);
 	RobotPose robotPose(robot, argc[2]);
 	robot->Move(RI_HEAD_MIDDLE, RI_FASTEST);
+	while(1){
+	  robotPose.updatePosition();
+	  robotPose.printPoses();
+	}
+	
+	return 0;
 	/*
 	while(true){
 	robotPose.updatePosition(false);
@@ -33,7 +39,7 @@ int main(int argv, char **argc)
 	 * Move forward down the hallway
 	 */
 	
-	
+	/*
 	//Robot 2
 	robotPose.moveToCell(5,2);
 	robotPose.moveToCell(4,2);
@@ -42,15 +48,31 @@ int main(int argv, char **argc)
 	robotPose.moveToCell(3,0);
 	robotPose.moveToCell(2,0);
 	robotPose.moveToCell(2,1);
-
+	*/
 	
-	/*
+	
 	//Robot 1
+	/*
+	robotPose.moveToCell(0,1);
+	robotPose.moveToCell(0,0);
+	robotPose.moveToCell(1,0);
+	robotPose.moveToCell(2,0);
+	robotPose.moveToCell(3,0);
+	robotPose.moveToCell(3,1);
+	*/
+	/*
+	robotPose.moveToCell(1,2);
+	robotPose.moveToCell(2,2);
+	robotPose.moveToCell(2,1);
+	robotPose.moveToCell(2,0);
+	robotPose.moveToCell(3,0);
+	*/
 	robotPose.moveToCell(0,3);
 	robotPose.moveToCell(0,4);
 	robotPose.moveToCell(1,4);
-	*/
-	
+	robotPose.moveToCell(2,4);
+	robotPose.moveToCell(2,3);
+	robotPose.moveToCell(2,2);
 	//robotPose.centerInCell();
 
 	delete(robot);

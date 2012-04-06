@@ -246,7 +246,7 @@ void RobotPose::centerInCell(){
 	
 	printf("Centering: centerError %d, turnError %d, cellError %d, randomTheta %f\n", centerError, turnError, cellError, (180/M_PI)*randomTheta);
 	centeringCount++;
-	if(centeringCount > 30)
+	if(centeringCount > 14)
 		printf("Centering took too long\n");
 	else if(pairs.size() > 0 && abs(cellError) < CENTER_EPSILON && abs(centerError) < STRAFE_EPSILON){
 		printf("Centered in cell!\n");
@@ -640,7 +640,7 @@ bool RobotPose::updateNS() {
 	pose_ns.y = firFilter(fir_y_ns,y);
 	pose_ns.theta = firFilter(fir_theta_ns, theta+(jump_ctr*2*M_PI)) - (jump_ctr*2*M_PI);
   
-	//Rotate theta
+	//Rotate theta2
 	pose_ns.theta = robot->Theta() + ns_theta_offsets[room_cur];
 	return true;
 }
