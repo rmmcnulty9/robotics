@@ -233,7 +233,7 @@ void RobotPose::moveToCell(int x, int y){
 	printf("\n**************************\nCentering in cell (%d,%d)\n**************************\n\n",x,y);
 	centerInCell();
 	resetPose(pose_kalman.x, pose_kalman.y, pose_kalman.theta);
-
+	//robot->updateMap(x, y); 
 
 }
 

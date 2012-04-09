@@ -43,6 +43,10 @@ int main(int argv, char **argc)
 	robot->Move(RI_HEAD_MIDDLE, RI_FASTEST);
 	robotPose.getMap();
 	robotPose.printMap();
+	printf("%d\n",robot->reserveMap(0,1));
+	robotPose.printMap();
+	printf("%d\n",robot->reserveMap(0,3));
+	robotPose.printMap();
 	/*
 	while(true){
 	robotPose.updatePosition(false);
