@@ -6,6 +6,8 @@
 #include <math.h>
 #ifndef __CONSTANTS__
 #define __CONSTANTS__
+#include <list>
+using namespace std;
 
 typedef struct {
 	float x;
@@ -13,7 +15,12 @@ typedef struct {
 	float theta;
 } pose;
 
-
+typedef struct {
+	list<int> moves_x;
+	list<int> moves_y;
+	int curr_x;
+	int curr_y;
+} path;
 
 float *ns_x_to_cm;
 float *ns_y_to_cm;
