@@ -67,7 +67,8 @@ RobotPose::RobotPose(RobotInterface *r, char* p){
 		current_cell.theta = M_PI_2;
 		printf("Player 2\n");
 	}
-		
+	score1 = 0;
+	score2 = 0;
 	centeringCount = 0;
 
 
@@ -666,6 +667,36 @@ void RobotPose::changeWEScalingConstant(float we) {
  */
 void RobotPose::changeUncertainty(float *uc){
 	rovioKalmanFilterSetUncertainty(&kf,uc); 
+}
+
+/*
+ * Get map in array form 
+ */
+int[][][] RobotPose::getMap(){
+	int[][][] map = new int[7][5][2];
+	map_obj_t * mapList = getMap(&score1, &score2);
+	if(mapList == NULL){
+		printf("Error getting map\n");
+		return map;
+	}
+	for(int y=0; y<5; y++){
+		for(int x=0; x<7; x++){
+			map[x][y][0] = (int)mapList.type;
+			map[x][y][1] = mapList.points;
+			mapList = mapList.next;
+		}
+	}
+	return map;
+}
+
+void RobotPose::printMap(){
+	for(int y=0; y<5; y++){
+		for(int x=0; x<7; x++){
+			printf("%d,%d\t", map[x][y][0], map[x][y][1]);
+		  
+		}
+		printf("\n");
+	}
 }
 
 /*

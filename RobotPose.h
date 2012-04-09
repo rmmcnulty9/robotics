@@ -46,10 +46,16 @@ public:
 	void resetPose(float x, float y, float theta);
 	void changeWEScalingConstant(float we);
 	void changeUncertainty(float *uc);
-  
+	
+	
 	// Camera functions
 	void moveToCell(int x, int y);
 	bool strafeTo(int delta_x);
+	
+	//Map functions
+	int[][][] getMap();
+	void printMap();
+	
 	//Thresholds for movement
 	static const float MOVE_TO_EPSILON = 10.0;
 	static const float TURN_TO_EPSILON = 15.0*(M_PI/180);
@@ -61,6 +67,8 @@ public:
 	//Cell size constants
 	static const int CELL_DIMENSION_CM = 65;
 	static const int CELL_EPSILON_CM = 3;
+	
+	
 
 private:
 	bool updateWE(bool turning);
@@ -85,7 +93,9 @@ private:
 	int centeringCount;
 	float theta_ns_trans;
   
-
+	int score1;
+	int score2;
+	int* map;
 
 	//FIR Filters
 	filter *fir_x_we;
