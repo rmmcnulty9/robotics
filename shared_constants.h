@@ -16,8 +16,8 @@ typedef struct {
 } pose;
 
 typedef struct {
-	list<int> moves_x;
-	list<int> moves_y;
+	list<int> *moves_x;
+	list<int> *moves_y;
 	int curr_x;
 	int curr_y;
 } path;

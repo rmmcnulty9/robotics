@@ -6,7 +6,7 @@ CPP_LIB_FLAGS=${LIB_FLAGS} -lrobot_if++
 LIB_LINK=-lhighgui -lcv -lcxcore -lm 
 LIB_KALMAN = ${LIB_LINK} -lgslcblas -L/usr/lib64/atlas/ -lclapack
 
-all:  maze_navigator CameraPose RobotPose PIDController
+all:  maze_navigator CameraPose RobotPose PIDController maze_strategy
 #all: data_collector simulator PIDController RobotPose base_navigator camera_tester maze_navigator
 
 #camera_tester: camera_tester.cpp
