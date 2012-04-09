@@ -41,7 +41,8 @@ int main(int argv, char **argc)
 	RobotInterface *robot = new RobotInterface(argc[1],0);
 	RobotPose robotPose(robot, argc[2]);
 	robot->Move(RI_HEAD_MIDDLE, RI_FASTEST);
-
+	robotPose.getMap();
+	robotPose.printMap();
 	/*
 	while(true){
 	robotPose.updatePosition(false);
@@ -61,12 +62,14 @@ int main(int argv, char **argc)
 	robotPose.moveToCell(2,0);
 	robotPose.moveToCell(2,1);	
 	*/
+	/*
 	robotPose.moveToCell(5,2);
 	robotPose.moveToCell(4,2);
 	robotPose.moveToCell(4,1);
 	robotPose.moveToCell(4,0);
 	robotPose.moveToCell(5,0);
-		robotPose.moveToCell(6,0);
+	robotPose.moveToCell(6,0);
+	*/
 	//Robot 1
 	/*
 	robotPose.moveToCell(0,1);

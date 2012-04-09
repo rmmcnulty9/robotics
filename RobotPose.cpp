@@ -70,7 +70,7 @@ RobotPose::RobotPose(RobotInterface *r, char* p){
 	score1 = 0;
 	score2 = 0;
 	centeringCount = 0;
-
+	//map = new int[7][5][2];
 
 	//Initialize PID controllers
 	PID_x = new PIDController(iMax,iMin,integral,proportional,derivative);
@@ -672,27 +672,41 @@ void RobotPose::changeUncertainty(float *uc){
 /*
  * Get map in array form 
  */
-int[][][] RobotPose::getMap(){
-	int[][][] map = new int[7][5][2];
-	map_obj_t * mapList = getMap(&score1, &score2);
+void RobotPose::getMap(){
+	map_obj_t * mapList = robot->getMap(&score1, &score2);
 	if(mapList == NULL){
 		printf("Error getting map\n");
-		return map;
 	}
 	for(int y=0; y<5; y++){
 		for(int x=0; x<7; x++){
-			map[x][y][0] = (int)mapList.type;
-			map[x][y][1] = mapList.points;
-			mapList = mapList.next;
+			map[x][y][0] = (int)mapList->type;
+			map[x][y][1] = mapList->points;
+			mapList = mapList->next;
 		}
 	}
-	return map;
 }
-
+/*
+ * Print map array for debugging
+ */
 void RobotPose::printMap(){
 	for(int y=0; y<5; y++){
 		for(int x=0; x<7; x++){
-			printf("%d,%d\t", map[x][y][0], map[x][y][1]);
+			if(player == 1 && map[x][y][0] == MAP_OBJ_ROBOT_1)
+				printf("@\t");
+			else if(player == 2 && map[x][y][0] == MAP_OBJ_ROBOT_2)
+				printf("@\t");			
+			else if(player == 1 && map[x][y][0] == MAP_OBJ_ROBOT_2)
+				printf("E\t");
+			else if(player == 2 && map[x][y][0] == MAP_OBJ_ROBOT_1)
+				printf("E\t");
+			else if(map[x][y][0] == MAP_OBJ_POST)
+				printf("XXX\t");			
+			else if(map[x][y][0] == MAP_OBJ_RESERVE_1 )
+				printf("R1,%d\t",map[x][y][1]);			
+			else if(map[x][y][0] == MAP_OBJ_RESERVE_2 )
+				printf("R2,%d\t",map[x][y][1]);
+			else
+				printf("$%d\t",map[x][y][1]);
 		  
 		}
 		printf("\n");

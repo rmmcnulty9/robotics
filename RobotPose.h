@@ -53,7 +53,7 @@ public:
 	bool strafeTo(int delta_x);
 	
 	//Map functions
-	int[][][] getMap();
+	void getMap();
 	void printMap();
 	
 	//Thresholds for movement
@@ -95,7 +95,7 @@ private:
   
 	int score1;
 	int score2;
-	int* map;
+	int map[7][5][2];
 
 	//FIR Filters
 	filter *fir_x_we;
