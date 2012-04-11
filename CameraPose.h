@@ -36,6 +36,7 @@ class CameraPose {
 	void printCenters(list<squarePair> pairs);
 	int getCenterError(list<squarePair> pairs);
 	int getCellError(list<squarePair> pairs);
+	int getCellErrorX(list<squarePair> pairs);
 	int getTurnError(list<squarePair> pairs);
 	void removeOverlap(squares_t *squares);
 	int getSquareSide(squares_t *squares);
@@ -69,8 +70,8 @@ class CameraPose {
 	//Constants for square locations when at center of cell
 	static const int Y_CELL_CENTER_PINK = 220;
 	static const int Y_CELL_CENTER_YELLOW = 170;
-	static const int X_CELL_CENTER_RIGHT = 530;
-	static const int X_CELL_CENTER_LEFT = 120;
+	static const int X_CELL_CENTER_RIGHT = 540;
+	static const int X_CELL_CENTER_LEFT = 115;
   
 };
 

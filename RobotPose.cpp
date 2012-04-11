@@ -79,6 +79,8 @@ RobotPose::RobotPose(RobotInterface *r, char* p){
 	PID_camera = new PIDController(iMax,iMin,integral, proportional, derivative);	
 	//Create CameraPose object
 	pose_cam = new CameraPose(robot);
+
+	
 }
 
 RobotPose::~RobotPose(){
@@ -241,13 +243,15 @@ void RobotPose::moveToCell(int x, int y){
  * Center robot once kalman determines in next cell
  */
 void RobotPose::centerInCell(){
-  	list<squarePair> pairs = pose_cam->updateCamera();
+	robot->Move(RI_STOP, 1);
+	list<squarePair> pairs = pose_cam->updateCamera();
 	int centerError = pose_cam->getCenterError(pairs);
 	int turnError = pose_cam->getTurnError(pairs);
 	int cellError = pose_cam->getCellError(pairs);
+	int cellErrorX = pose_cam->getCellErrorX(pairs);
 	float randomTheta = (float)std::rand()/RAND_MAX * (M_PI/5) - (M_PI/10);
 	
-	printf("Centering: centerError %d, turnError %d, cellError %d, randomTheta %f\n", centerError, turnError, cellError, (180/M_PI)*randomTheta);
+	printf("Centering: centerError %d, turnError %d, cellError %d, cellErrorX %d, randomTheta %f\n", centerError, turnError, cellError, cellErrorX, (180/M_PI)*randomTheta);
 	centeringCount++;
 	if(centeringCount > 14)
 		printf("Centering took too long\n");
@@ -258,7 +262,7 @@ void RobotPose::centerInCell(){
 	else if(pairs.size() > 0){
 		printf("Adjusting based on pairs\n");
 		if(strafeTo(centerError)){
-			robot->Move(RI_MOVE_BACKWARD, 7);
+			robot->Move(RI_MOVE_BACKWARD, 5);
 		}
 		if(cellError < -CENTER_EPSILON || cellError > 2*CENTER_EPSILON){
 			robot->Move(RI_MOVE_BACKWARD, 5);
@@ -310,11 +314,27 @@ void RobotPose::moveTo(float x, float y, float goal_theta) {
     
 	//Only update camera once every three sensor updates
 	static int cam_update_flag = 0;
+	static int pairs_flag = 0;
 	if(cam_update_flag==1){
 		list<squarePair> pairs = pose_cam->updateCamera();
 		int turnError = pose_cam->getTurnError(pairs);
 		bool strafed = strafeTo(pose_cam->getCenterError(pairs));
 		cam_update_flag=0;
+		if(pairs.size() == 0)
+			pairs_flag++;
+		//Can't see any squares
+		if(pairs_flag > 2){
+			printf("!!!!! Not enough squares !!!!!\n");
+			float randomTheta = (float)std::rand()/RAND_MAX * (M_PI/5) - (M_PI/10);
+			if(pairs_flag % 2 == 0)
+				turnTo(goal_theta + abs(randomTheta));
+			else if(pairs_flag % 2 == 1)
+				turnTo(goal_theta - abs(randomTheta));
+			pairs_flag = 0;
+			list<squarePair> pairs = pose_cam->updateCamera();
+			int turnError = pose_cam->getTurnError(pairs);
+			bool strafed = strafeTo(pose_cam->getCenterError(pairs));
+		}
 		//printf("Square height error: %d\n", pose_cam->getCellError(pairs));
 	}
 	cam_update_flag+=1;
@@ -424,17 +444,17 @@ void RobotPose::turnTo(float goal_theta) {
 	int robot_speed; 
 	float velocity[3];
 	if(PID_res > 1.0){
-		robot_speed = 3;
+		robot_speed = 2;
 	}
 	else if(PID_res < 1.0/* && PID_res > 0.25 */){
-	      robot_speed = 4;
+	      robot_speed = 3;
 	}else {
-		robot_speed = 5;
+		robot_speed = 4;
 	}
 	//Turn depending on error angle
 	if(error_theta==error_theta1){
 		printf("Turning Left %f\n", error_theta1*(180/M_PI));
- 		robot->Move(RI_TURN_LEFT, robot_speed);
+ 		//robot->Move(RI_TURN_LEFT, robot_speed);
  		robot->Move(RI_TURN_LEFT, robot_speed);
 		robot->Move(RI_STOP, robot_speed);
 		
@@ -442,7 +462,7 @@ void RobotPose::turnTo(float goal_theta) {
 	}
 	else if(error_theta==error_theta2){
 		printf("Turning Right %f\n", error_theta2*(180/M_PI));
-		robot->Move(RI_TURN_RIGHT, robot_speed);
+		//robot->Move(RI_TURN_RIGHT, robot_speed);
 		robot->Move(RI_TURN_RIGHT, robot_speed);
 		robot->Move(RI_STOP, robot_speed);
 		
@@ -601,8 +621,8 @@ bool RobotPose::updateNS() {
 		pose_start.x = x_2 - pose_start.x;
 		pose_start.y = y_2 - pose_start.y;
 		room_cur = new_room;
-		for( int i=0;i<7;i++)
-		  updatePosition(false);
+		//for( int i=0;i<7;i++)
+		//  updatePosition(false);
 	}
     
 	x = robot->X();
