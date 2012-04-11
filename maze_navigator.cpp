@@ -43,10 +43,8 @@ int main(int argv, char **argc)
 	robot->Move(RI_HEAD_MIDDLE, RI_FASTEST);
 	robotPose.getMap();
 	robotPose.printMap();
-	printf("%d\n",robot->reserveMap(0,1));
-	robotPose.printMap();
-	printf("%d\n",robot->reserveMap(0,3));
-	robotPose.printMap();
+
+
 	/*
 	while(true){
 	robotPose.updatePosition(false);
@@ -90,7 +88,7 @@ int main(int argv, char **argc)
 	robotPose.moveToCell(2,0);
 	robotPose.moveToCell(3,0);
 	*/
-	/*
+	
 	robotPose.moveToCell(0,3);
 	robotPose.moveToCell(0,4);
 	robotPose.moveToCell(1,4);
@@ -98,7 +96,7 @@ int main(int argv, char **argc)
 	robotPose.moveToCell(2,3);
 	robotPose.moveToCell(2,2);
 	//robotPose.centerInCell();
-*/
+
 	delete(robot);
 	return 0;
 

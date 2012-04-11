@@ -216,7 +216,7 @@ void RobotPose::moveToCell(int x, int y){
 		pose_goal.theta = M_PI;
 	}
 	else{
-		printf("Wrong coordinates %f, %f\n", diff_x, diff_y);
+		printf("\n!!!!!!!!!!!!!!!!!\nWrong coordinates %f, %f\n!!!!!!!!!!!!!!!!!\n\n", diff_x, diff_y);
 	}
 	turnTo(pose_goal.theta);
 	//Increment cell values
@@ -288,8 +288,8 @@ void RobotPose::centerInCell(){
 	//Else robot sees no squares
 	else{
 	  	robot->Move(RI_MOVE_BACKWARD, 7);
-		printf("Turning using state: %f\n", (180/M_PI)*stateTurns[player-1][(int)current_cell.x][(int)current_cell.y]);
-		turnTo(stateTurns[player-1][(int)current_cell.x][(int)current_cell.y] + randomTheta);
+		printf("Turning using state: %f\n", (180/M_PI)*stateTurns[player-1][(int)current_cell.y][(int)current_cell.x]);
+		turnTo(stateTurns[player-1][(int)current_cell.y][(int)current_cell.x] + randomTheta);
 		centerInCell();
 	}
 }
@@ -679,8 +679,8 @@ void RobotPose::getMap(){
 	}
 	for(int y=0; y<5; y++){
 		for(int x=0; x<7; x++){
-			map[x][y][0] = (int)mapList->type;
-			map[x][y][1] = mapList->points;
+			map[y][x][0] = (int)mapList->type;
+			map[y][x][1] = mapList->points;
 			mapList = mapList->next;
 		}
 	}
@@ -691,22 +691,22 @@ void RobotPose::getMap(){
 void RobotPose::printMap(){
 	for(int y=0; y<5; y++){
 		for(int x=0; x<7; x++){
-			if(player == 1 && map[x][y][0] == MAP_OBJ_ROBOT_1)
+			if(player == 1 && map[y][x][0] == MAP_OBJ_ROBOT_1)
 				printf("@\t");
-			else if(player == 2 && map[x][y][0] == MAP_OBJ_ROBOT_2)
+			else if(player == 2 && map[y][x][0] == MAP_OBJ_ROBOT_2)
 				printf("@\t");			
-			else if(player == 1 && map[x][y][0] == MAP_OBJ_ROBOT_2)
+			else if(player == 1 && map[y][x][0] == MAP_OBJ_ROBOT_2)
 				printf("E\t");
-			else if(player == 2 && map[x][y][0] == MAP_OBJ_ROBOT_1)
+			else if(player == 2 && map[y][x][0] == MAP_OBJ_ROBOT_1)
 				printf("E\t");
-			else if(map[x][y][0] == MAP_OBJ_POST)
+			else if(map[y][x][0] == MAP_OBJ_POST)
 				printf("XXX\t");			
-			else if(map[x][y][0] == MAP_OBJ_RESERVE_1 )
-				printf("R1,%d\t",map[x][y][1]);			
-			else if(map[x][y][0] == MAP_OBJ_RESERVE_2 )
-				printf("R2,%d\t",map[x][y][1]);
+			else if(map[y][x][0] == MAP_OBJ_RESERVE_1 )
+				printf("R1,%d\t",map[y][x][1]);			
+			else if(map[y][x][0] == MAP_OBJ_RESERVE_2 )
+				printf("R2,%d\t",map[y][x][1]);
 			else
-				printf("$%d\t",map[x][y][1]);
+				printf("$%d\t",map[y][x][1]);
 		  
 		}
 		printf("\n");
