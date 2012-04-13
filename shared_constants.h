@@ -6,7 +6,7 @@
 #include <math.h>
 #ifndef __CONSTANTS__
 #define __CONSTANTS__
-#include <list>
+#include <vector>
 using namespace std;
 
 typedef struct {
@@ -16,10 +16,11 @@ typedef struct {
 } pose;
 
 typedef struct {
-	list<int> *moves_x;
-	list<int> *moves_y;
+	vector<int> *moves_x;
+	vector<int> *moves_y;
 	int curr_x;
 	int curr_y;
+	int value;
 } path;
 
 float *ns_x_to_cm;
