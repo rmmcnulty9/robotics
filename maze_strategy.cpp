@@ -1,10 +1,12 @@
 #include "shared_constants.h"
 #include <stdlib.h>
+#include <stdio.h>
 #include <robot_if++.h>
 #include <unistd.h>
 #define R1 0
 #define R2 1
 
+void getMap();
 void get_moves(path *r1, path *r2);
 void search_paths(path *r1, vector<int> *path_x, vector<int> *path_y, int value, int bonus, int depth, int max_depth, int pos_x, int pos_y, int r2x, int r2y);
 void try_move(path *r1, path *r2);
@@ -14,6 +16,11 @@ int valid_move(path *r1, path *r2);
 int moves_left = 27;
 int r1_score = 0;
 int r2_score = 0;
+
+//The true score of the game from ther server
+int score1=0, score2=0;
+
+int path_found=0;
 
 path **paths;
 path *r1;
@@ -25,7 +32,7 @@ RobotInterface *robot;
 map_obj_t *robot_map;
 
 
-int main() {
+int main(int argv, char **argc) {
 	paths = new path*[2];
 	paths[0] = (path*)malloc(sizeof(path));
 	paths[0]->moves_x = new vector<int>();
@@ -41,7 +48,7 @@ int main() {
 	paths[1]->curr_x = 6;
 	paths[1]->curr_y = 2;
 
-	maze[0][0] = 5;
+	/*maze[0][0] = 5;
 	maze[0][1] = 3;
 	maze[0][2] = 4;
 	maze[0][3] = 1;
@@ -79,12 +86,13 @@ int main() {
 	maze[4][3] = 1;
 	maze[4][4] = 4;
 	maze[4][5] = 3;
-	maze[4][6] = 5;
+	maze[4][6] = 5; */
 	
 	//getMap();
-	robot = new RobotInterface("bender", 0);
-	robot_map = robot->getMap(&r1_score, &r2_score);
-    
+	robot = new RobotInterface("walle", 1);
+	robot->update();
+	getMap();
+	
 	while (moves_left > 0) {
 		move(paths[0], paths[1]);
 		move(paths[1], paths[0]);
@@ -106,7 +114,7 @@ void get_moves(path *r1, path *r2) {
 	
 
 	
-	while (r1->value == 0) {
+	while (r1->value == 0&& depth<35) {
 	    for (int i = 0; i < 5; i++) {
 		for (int j = 0; j < 7; j++) {
 		    maze_visited[i][j] = 1;
@@ -114,13 +122,31 @@ void get_moves(path *r1, path *r2) {
 	    }
 	    
 	    search_paths(r1, path_x, path_y, 0, 0, 0, depth++, pos_x, pos_y, r2->curr_x, r2->curr_y);
+	    
+	    
+	    printf("Paths: %d\n",r1->moves_x->size());
+	    
+	    for(int r=0;r<5;r++){
+		for(int c=0;c<7;c++){
+		  printf("%d\t",maze[r][c]);
+		}
+		printf("\n");
+	    }
+	    printf("\n");
+	    printf("\n");
+	    printf("\n");
+	    
+	
+	    
 	}
 }
 
-void search_paths(path *r1, vector<int> *path_x, vector<int> *path_y, int value, int bonus, int depth, int max_depth, int pos_x, int pos_y, int r2x, int r2y) {
-    if (pos_x > 0 && pos_y > 0 && pos_x < 7 && pos_y < 5 
+void search_paths(path *r1, vector<int> *path_x, vector<int> *path_y,
+		  int value, int bonus, int depth,
+		  int max_depth, int pos_x, int pos_y, int r2x, int r2y) {
+    if (pos_x >= 0 && pos_y >= 0 && pos_x < 7 && pos_y < 5 
 	    && maze[pos_y][pos_x] >= 0 
-	    && !(pos_x == r2x && pos_y == r2y) 
+	    /*&& !(pos_x == r2x && pos_y == r2y) */
 	    && maze_visited[pos_y][pos_x]) {
 	
 	maze_visited[pos_y][pos_x] = 0;
@@ -190,22 +216,25 @@ void try_move(path *r1, path *r2) {
 }
 
 void move(path *r1, path *r2) {
-	if (valid_move(r1, r2)) {
+
+    int ret = robot->reserveMap(r1-> curr_x, r1->curr_y);
+    printf("Ret: %d: %d %d \n",ret,r1->curr_x,r1->curr_y);
+	if (0==ret) {
 		r1->curr_x = r1->moves_x->front();
 		r1->curr_y = r1->moves_y->front();
 		// reserve r1->curr_x and r1->curr_y 
-		robot->reserveMap(r1->curr_x, r1->curr_y);
 		
 		r1->moves_x->erase(r1->moves_x->begin());
 		r1->moves_y->erase(r1->moves_y->begin());
     
-		sleep(2000);
+		sleep(1);
 		if (maze[r1->curr_y][r1->curr_x] > 0) {
 			moves_left--;
 			r1_score += maze[r1->curr_y][r1->curr_x];
-			maze[r1->curr_y][r1->curr_x] = 0;
+			//maze[r1->curr_y][r1->curr_x] = 0;
+			getMap();
 		}
-		
+		printf("Here\n");
 		// moveToCell goes here
 		robot->updateMap(r1->curr_x, r1->curr_y);
 	}
@@ -217,19 +246,26 @@ void move(path *r1, path *r2) {
 }
 
 int valid_move(path *r1, path *r2) {
-	return !(r1->moves_x->front() == r2->curr_x && r1->moves_y->front() == r2->curr_y);
+	return (r1->moves_x->size()>0 && !(r1->moves_x->front() == r2->curr_x && r1->moves_y->front() == r2->curr_y));
 }
 
-/*void RobotPose::getMap(){
+void getMap(){
 	map_obj_t * mapList = robot->getMap(&score1, &score2);
 	if(mapList == NULL){
 		printf("Error getting map\n");
 	}
 	for(int y=0; y<5; y++){
 		for(int x=0; x<7; x++){
-			maze[y][x][0] = (int)mapList->type;
-			maze[y][x][1] = mapList->points;
+			if(MAP_OBJ_POST == (int)mapList->type){
+			  maze[y][x] = -1;
+			}else if(MAP_OBJ_ROBOT_1  == (int)mapList->type){
+			  maze[y][x] = 0;
+			}else if(MAP_OBJ_ROBOT_2 == (int)mapList->type){
+			  maze[y][x] = -3;
+			}else{
+			  maze[y][x] = mapList->points;	
+			}
 			mapList = mapList->next;
 		}
 	}
-}*/
+}
