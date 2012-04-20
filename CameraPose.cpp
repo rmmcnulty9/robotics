@@ -365,17 +365,13 @@ int CameraPose::getCellError(list<squarePair> pairs){
 		if(it->color == PINK){
 			error += it->left->center.y - Y_CELL_CENTER_PINK;
 			error += it->right->center.y - Y_CELL_CENTER_PINK;
-			
-			error += it->left->center.x - X_CELL_CENTER_LEFT;
-			error += it->left->center.x - X_CELL_CENTER_RIGHT;
+
 			
 			printf("PINK left x %d, right x %d\n", it->left->center.x, it->right->center.x);
 		}else if(it->color == YELLOW){
 			error += it->left->center.y - Y_CELL_CENTER_YELLOW;
 			error += it->right->center.y - Y_CELL_CENTER_YELLOW;
 			
-			error += it->left->center.x - X_CELL_CENTER_LEFT;
-			error += it->left->center.x - X_CELL_CENTER_RIGHT;
 			
 			printf("Yellow left x %d, right x %d\n", it->left->center.x, it->right->center.x);
 
