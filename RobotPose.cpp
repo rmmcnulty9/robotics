@@ -262,13 +262,13 @@ void RobotPose::centerInCell(){
 	else if(pairs.size() > 0){
 		printf("Adjusting based on pairs\n");
 		if(strafeTo(centerError)){
-			robot->Move(RI_MOVE_BACKWARD, 5);
+			robot->Move(RI_MOVE_BACKWARD, 3);
 		}
 		if(cellError < -CENTER_EPSILON || cellError > 2*CENTER_EPSILON){
-			robot->Move(RI_MOVE_BACKWARD, 5);
+			robot->Move(RI_MOVE_BACKWARD, 3);
 		}
 		if(cellError > CENTER_EPSILON){
-			robot->Move(RI_MOVE_FORWARD, 5);
+			robot->Move(RI_MOVE_FORWARD, 3);
 		}
 		centerInCell();
 	}
@@ -291,7 +291,7 @@ void RobotPose::centerInCell(){
 	}*/
 	//Else robot sees no squares
 	else{
-	  	robot->Move(RI_MOVE_BACKWARD, 7);
+	  	robot->Move(RI_MOVE_BACKWARD, 5);
 		printf("Turning using state: %f\n", (180/M_PI)*stateTurns[player-1][(int)current_cell.y][(int)current_cell.x]);
 		turnTo(stateTurns[player-1][(int)current_cell.y][(int)current_cell.x] + randomTheta);
 		centerInCell();

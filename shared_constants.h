@@ -31,7 +31,7 @@ float *ns_theta_offsets;
 // Constants used for ROSIE
 //Fully Charged
 float rosie_ns_x_to_cm[] = {0.0, 0.0, 1.0 / 33.0, 1.0 / 30.0, 1.0 / 34.0, 1.0 / 37.0};
-float rosie_ns_y_to_cm[] = {0.0, 0.0, 1.0 / 43.0, 1.0 / 39.0, 1.0 / 25.0, 1.0 / 29.0};
+float rosie_ns_y_to_cm[] = {0.0, 0.0, 1.0 / 40.0, 1.0 / 39.0, 1.0 / 25.0, 1.0 / 29.0};
 float rosie_we_to_cm = 2.5; //0.5; 
 float rosie_ns_theta_offsets[] = {0.0, 0.0,0.0, 85.0*M_PI/180, 0.0, 85.0*M_PI/180};
 

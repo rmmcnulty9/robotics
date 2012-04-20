@@ -68,7 +68,8 @@ public:
 	static const int CELL_DIMENSION_CM = 65;
 	static const int CELL_EPSILON_CM = 3;
 	
-	
+	int player;
+
 
 private:
 	bool updateWE(bool turning);
@@ -89,7 +90,6 @@ private:
 	PIDController *PID_camera;
 	int room_start;
 	int room_cur;
-	int player;
 	int centeringCount;
 	float theta_ns_trans;
   
