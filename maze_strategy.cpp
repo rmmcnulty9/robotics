@@ -3,8 +3,13 @@
 #include <stdio.h>
 #include <robot_if++.h>
 #include <unistd.h>
+#include "RobotPose.cpp"
+#include "CameraPose.cpp"
+#include <iostream>
+#include <string>
 #define R1 0
 #define R2 1
+
 
 void getMap();
 void get_moves(path *r1, path *r2);
@@ -28,6 +33,7 @@ path *r2;
 
 int maze[5][7];
 int maze_visited[5][7];
+RobotPose *robotPose;
 RobotInterface *robot;
 map_obj_t *robot_map;
 
@@ -48,48 +54,34 @@ int main(int argv, char **argc) {
 	paths[1]->curr_x = 6;
 	paths[1]->curr_y = 2;
 
-	/*maze[0][0] = 5;
-	maze[0][1] = 3;
-	maze[0][2] = 4;
-	maze[0][3] = 1;
-	maze[0][4] = 6;
-	maze[0][5] = 2;
-	maze[0][6] = 10;
+// Make sure we have a valid command line argument
+	if(argv <= 2) {
+		std::cout << "Usage: robot_test <address of robot> " << std::endl;
+		exit(-1);
+	}
     
-	maze[1][0] = 1;
-	maze[1][1] = -1;
-	maze[1][2] = 6;
-	maze[1][3] = -1;
-	maze[1][4] = 1;
-	maze[1][5] = -1;
-	maze[1][6] = 3;
+	if(0==strncmp(argc[1],"rosie",strlen("rosie"))){
+	      ns_x_to_cm = rosie_ns_x_to_cm;
+	      ns_y_to_cm = rosie_ns_x_to_cm;
+	      we_to_cm = rosie_we_to_cm;
+	      ns_theta_offsets = rosie_ns_theta_offsets;
+	      
+	      // If rosies's WE are bad set them to NS???
+	      
+	}else if(0==strncmp(argc[1],"bender",strlen("bender"))){
+	      ns_x_to_cm = bender_ns_x_to_cm;
+	      ns_y_to_cm = bender_ns_x_to_cm;
+	      we_to_cm = bender_we_to_cm;
+	      ns_theta_offsets = bender_ns_theta_offsets;
+	}else{
+	      printf("Bot Not supported!\n"); 
+	      exit(-1);
+	}
     
-	maze[2][0] = 0;
-	maze[2][1] = 2;
-	maze[2][2] = 5;
-	maze[2][3] = 10;
-	maze[2][4] = 5;
-	maze[2][5] = 2;
-	maze[2][6] = 0;
-    
-	maze[3][0] = 3;
-	maze[3][1] = -1;
-	maze[3][2] = 4;
-	maze[3][3] = -1;
-	maze[3][4] = 6;
-	maze[3][5] = -1;
-	maze[3][6] = 1;
-    
-	maze[4][0] = 10;
-	maze[4][1] = 2;
-	maze[4][2] = 6;
-	maze[4][3] = 1;
-	maze[4][4] = 4;
-	maze[4][5] = 3;
-	maze[4][6] = 5; */
+	// Setup the robot
+	RobotInterface *robot = new RobotInterface(argc[1],0);
+	RobotPose robotPose(robot, argc[2]);
 	
-	//getMap();
-	robot = new RobotInterface("walle", 1);
 	robot->update();
 	getMap();
 	

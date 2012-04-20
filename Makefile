@@ -33,9 +33,9 @@ RobotPose: RobotPose.cpp
 CameraPose: CameraPose.cpp
 	g++ ${CFLAGS} -c CameraPose.cpp
 
-maze_strategy: maze_strategy.cpp
+maze_strategy: maze_strategy.cpp RobotPose.o rovioKalmanFilter.o PIDController.o CameraPose.o
 	g++ ${CFLAGS} -c maze_strategy.cpp
-	g++ ${CFLAGS} -o maze_strategy maze_strategy.o ${CPP_LIB_FLAGS}
+	g++ ${CFLAGS} -o maze_strategy maze_strategy.o PIDController.o rovioKalmanFilter.o  ${CPP_LIB_FLAGS} ${LIB_KALMAN}
 
 #simulator: simulator.c
 #	gcc ${CFLAGS} -c simulator.c
@@ -59,4 +59,4 @@ clean:
 	rm -rf camera_teser
 	rm -rf maze_navigator
 	rm -rf hall_navigator
-	rm *.jpg
+	rm -f *.jpg
