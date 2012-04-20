@@ -136,7 +136,7 @@ void RobotPose::initPose() {
 	int deltat = 1;
 
 	initKalmanFilter(&kf, initialPose, Velocity, deltat);
-	rovioKalmanFilterSetUncertainty(&kf, uncertainty_weakest_we);
+	rovioKalmanFilterSetUncertainty(&kf, uncertainty_normal);
 
 }
 
