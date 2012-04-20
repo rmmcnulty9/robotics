@@ -36,7 +36,7 @@ int main(int argv, char **argc) {
 
 	// Make sure we have a valid command line argument
 	if (argv <= 2) {
-		std::cout << "Usage: robot_test <address of robot> " << std::endl;
+		std::cout << "Usage: maze_strategy <address of robot> <team of robot (1 or 2)>" << std::endl;
 		exit(-1);
 	}
     
@@ -92,7 +92,7 @@ int main(int argv, char **argc) {
 * Uses depth-first search with iterative deepening
 * */
 void get_moves(path *r1, path *r2) {
-	int depth = 3;	
+	int depth = 2;	
 	vector<int> *path_x = new vector<int>();
 	vector<int> *path_y = new vector<int>();
 	printf("(%d, %d)\n", r1->curr_x, r1->curr_y);
@@ -103,7 +103,7 @@ void get_moves(path *r1, path *r2) {
 	
 	// come up with a sequence of moves and put them into r1->moves_x and r1->moves_y
 	getMap(); // make sure the map data is fresh before we start searching
-	while (r1->value == 0 && depth < 35) {
+	while (r1->value == 0 && depth <= 35) {
 	    for (int i = 0; i < 5; i++) {
 			for (int j = 0; j < 7; j++) {
 				maze_visited[i][j] = 1;
@@ -114,7 +114,8 @@ void get_moves(path *r1, path *r2) {
 		search_paths(r1, path_x, path_y, 0, 0, 0, depth++, r1->curr_x, r1->curr_y, r2->curr_x, r2->curr_y);
 	    
 		// Print path information
-		printf("Paths: %d\n", r1->moves_x->size());
+		printf("Path length: %d\n", r1->moves_x->size());
+		printf("Depth: %d\n", depth - 1);
 		for (int k = 0; k < r1->moves_x->size(); k++) {
 			int x = r1->moves_x->at(k);
 			int y = r1->moves_y->at(k);
