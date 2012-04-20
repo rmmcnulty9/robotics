@@ -72,6 +72,12 @@ int main(int argv, char **argc) {
 	      ns_x_to_cm = bender_ns_x_to_cm;
 	      ns_y_to_cm = bender_ns_x_to_cm;
 	      we_to_cm = bender_we_to_cm;
+	      ns_theta_offsets = bender_ns_theta_offsets;	
+	  
+	}else if(0==strncmp(argc[1],"walle",strlen("walle"))){
+	      ns_x_to_cm = bender_ns_x_to_cm;
+	      ns_y_to_cm = bender_ns_x_to_cm;
+	      we_to_cm = bender_we_to_cm;
 	      ns_theta_offsets = bender_ns_theta_offsets;
 	}else{
 	      printf("Bot Not supported!\n"); 
@@ -162,11 +168,11 @@ void search_paths(path *r1, vector<int> *path_x, vector<int> *path_y,
 	    int delta_y2 = path_y->at(last - 1) - path_y->at(last - 2);
 	    
 	    if (delta_x1 == delta_x2 && delta_y1 == delta_y2) {
-		bonus += 2;
+		bonus += 2; //2;
 	    }
 	}
     
-	value += maze[pos_y][pos_x] + bonus;
+	value += maze[pos_y][pos_x];
 	depth++;
     
 	if (depth >= max_depth) {
@@ -222,7 +228,7 @@ void try_move(path *r1, path *r2) {
 
 void move(path *r1, path *r2) {
     int ret = -1;
-    if((r1->moves_x->size()>0 && !(r1->moves_x->front() == r2->curr_x))){
+    if((r1->moves_x->size()>0 )){ //&& !(r1->moves_x->front() == r2->curr_x))
       ret = robot->reserveMap(r1->moves_x->front(), r1->moves_y->front());
       printf("Ret: %d: %d %d \n",ret,r1->moves_x->front(),r1->moves_y->front());
     }
@@ -230,11 +236,15 @@ void move(path *r1, path *r2) {
 		r1->curr_x = r1->moves_x->front();
 		r1->curr_y = r1->moves_y->front();
 		// reserve r1->curr_x and r1->curr_y 
+		
+		
 		robotPose->moveToCell(r1->curr_x, r1->curr_y);
+		
+		
 		r1->moves_x->erase(r1->moves_x->begin());
 		r1->moves_y->erase(r1->moves_y->begin());
     
-		//sleep(2);
+		sleep(1);
 		if (maze[r1->curr_y][r1->curr_x] > 0) {
 			moves_left--;
 			r1_score += maze[r1->curr_y][r1->curr_x];

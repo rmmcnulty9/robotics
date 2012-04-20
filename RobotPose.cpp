@@ -67,6 +67,16 @@ RobotPose::RobotPose(RobotInterface *r, char* p){
 		current_cell.theta = M_PI_2;
 		printf("Player 2\n");
 	}
+	if(strcmp(p,"3") == 0){
+		player = 1;
+		
+		current_cell.x = 5.0;
+		current_cell.y = 4.0;
+		//pose_goal.x = 0.0;
+		//pose_goal.y = CELL_DIMENSION_CM * 2.0;
+		current_cell.theta = -M_PI_2;
+		printf("Player 3\n");
+	}
 	score1 = 0;
 	score2 = 0;
 	centeringCount = 0;
