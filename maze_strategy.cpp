@@ -302,6 +302,9 @@ void getMap(){
 			}else{
 			 maze[y][x] = -999; 
 			}
+			
+			if(y==0)
+			      maze[y][x] = -9;
 			mapList = mapList->next;
 		}
 	}
