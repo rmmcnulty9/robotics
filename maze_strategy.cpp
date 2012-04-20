@@ -22,7 +22,7 @@ int moves_left = 27;
 int r1_score = 0;
 int r2_score = 0;
 
-//The true score of the game from ther server
+//The true score of the game from the server
 int score1=0, score2=0;
 
 int path_found=0;
@@ -79,7 +79,10 @@ int main(int argv, char **argc) {
 	}
     
 	// Setup the robot
-	RobotInterface *robot = new RobotInterface(argc[1],0);
+	
+	printf("%s %d\n", argc[1], atoi(argc[2]));
+	
+	robot = new RobotInterface(argc[1],atoi(argc[2]));
 	RobotPose robotPose(robot, argc[2]);
 	
 	robot->update();
@@ -242,6 +245,7 @@ int valid_move(path *r1, path *r2) {
 }
 
 void getMap(){
+  assert(NULL!= robot);
 	map_obj_t * mapList = robot->getMap(&score1, &score2);
 	if(mapList == NULL){
 		printf("Error getting map\n");
