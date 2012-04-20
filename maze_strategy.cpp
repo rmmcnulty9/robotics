@@ -83,14 +83,16 @@ int main(int argv, char **argc) {
 	printf("%s %d\n", argc[1], atoi(argc[2]));
 	
 	robot = new RobotInterface(argc[1],atoi(argc[2]));
-	RobotPose robotPose(robot, argc[2]);
+	robotPose = new RobotPose(robot, argc[2]);
 	
 	robot->update();
 	getMap();
 	
 	while (moves_left > 0) {
-		move(paths[0], paths[1]);
-		move(paths[1], paths[0]);
+		if(robotPose->player == 1)
+			move(paths[0], paths[1]);
+		else if(robotPose->player == 2)
+			move(paths[1], paths[0]);
 	}
 }
 
@@ -100,7 +102,7 @@ void get_moves(path *r1, path *r2) {
 	vector<int> *path_y = new vector<int>();
 	int pos_x = r1->curr_x;
 	int pos_y = r1->curr_y;
-	
+	printf("(%d, %d)\n",pos_x, pos_y);
     
 	//r1->moves_x->clear();
 	//r1->moves_y->clear();
@@ -120,6 +122,13 @@ void get_moves(path *r1, path *r2) {
 	    
 	    
 	    printf("Paths: %d\n",r1->moves_x->size());
+	    for(int k=0;k<r1->moves_x->size();k++){
+	      int x = r1->moves_x->at(k);
+	      int y = r1->moves_y->at(k);
+	     printf("(%d %d) -> ",x, y); 
+	    }
+	    
+	    printf("%d \n", r1->value);
 	    
 	    for(int r=0;r<5;r++){
 		for(int c=0;c<7;c++){
@@ -131,7 +140,7 @@ void get_moves(path *r1, path *r2) {
 	    printf("\n");
 	    printf("\n");
 	    
-	
+	//exit(0);
 	    
 	}
 }
@@ -173,6 +182,7 @@ void search_paths(path *r1, vector<int> *path_x, vector<int> *path_y,
 	    }
 	}
 	else {
+	 
 	    path_x->push_back(pos_x + 1);
 	    path_y->push_back(pos_y);
 	    search_paths(r1, path_x, path_y, value, bonus, depth, max_depth, path_x->back(), path_y->back(), r2x, r2y);
@@ -211,27 +221,31 @@ void try_move(path *r1, path *r2) {
 }
 
 void move(path *r1, path *r2) {
-
-    int ret = robot->reserveMap(r1-> curr_x, r1->curr_y);
-    printf("Ret: %d: %d %d \n",ret,r1->curr_x,r1->curr_y);
+    int ret = -1;
+    if((r1->moves_x->size()>0 && !(r1->moves_x->front() == r2->curr_x))){
+      ret = robot->reserveMap(r1->moves_x->front(), r1->moves_y->front());
+      printf("Ret: %d: %d %d \n",ret,r1->moves_x->front(),r1->moves_y->front());
+    }
 	if (0==ret) {
 		r1->curr_x = r1->moves_x->front();
 		r1->curr_y = r1->moves_y->front();
 		// reserve r1->curr_x and r1->curr_y 
-		
+		robotPose->moveToCell(r1->curr_x, r1->curr_y);
 		r1->moves_x->erase(r1->moves_x->begin());
 		r1->moves_y->erase(r1->moves_y->begin());
     
-		sleep(1);
+		//sleep(2);
 		if (maze[r1->curr_y][r1->curr_x] > 0) {
 			moves_left--;
 			r1_score += maze[r1->curr_y][r1->curr_x];
 			//maze[r1->curr_y][r1->curr_x] = 0;
 			getMap();
 		}
-		printf("Here\n");
+		
 		// moveToCell goes here
 		robot->updateMap(r1->curr_x, r1->curr_y);
+		
+		
 	}
 	else { // give up and try generating new moves
 		r1->moves_x->clear();
@@ -250,18 +264,36 @@ void getMap(){
 	if(mapList == NULL){
 		printf("Error getting map\n");
 	}
+	int robot1 = 0;
+	int robot2 = 0;
+	if(robotPose->player == 1){
+		robot2 = -1;
+	}
+	else if(robotPose->player == 2){
+		robot1 = -1;
+	}
 	for(int y=0; y<5; y++){
 		for(int x=0; x<7; x++){
+		  
 			if(MAP_OBJ_POST == (int)mapList->type){
 			  maze[y][x] = -1;
 			}else if(MAP_OBJ_ROBOT_1  == (int)mapList->type){
-			  maze[y][x] = 0;
+			  maze[y][x] = robot1;
 			}else if(MAP_OBJ_ROBOT_2 == (int)mapList->type){
-			  maze[y][x] = -3;
-			}else{
+			  maze[y][x] = robot2;
+			}else if(MAP_OBJ_PELLET == (int)mapList->type){
 			  maze[y][x] = mapList->points;	
+			}else if(MAP_OBJ_EMPTY == (int)mapList->type){
+			  maze[y][x] = mapList->points;	
+			}else if(MAP_OBJ_RESERVE_1 == (int)mapList->type){
+			  maze[y][x] = robot1;	
+			}else if(MAP_OBJ_RESERVE_2 == (int)mapList->type){
+			  maze[y][x] = robot2;	
+			}else{
+			 maze[y][x] = -999; 
 			}
 			mapList = mapList->next;
 		}
 	}
+	
 }
