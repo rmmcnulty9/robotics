@@ -169,7 +169,9 @@ void search_paths(path *r1, vector<int> *path_x, vector<int> *path_y,
 				bonus += 2; //2;
 			}
 		}
-
+		// Reduce bonus for first and last rows
+		if(pos_y == 0 || pos_y == 4)
+			bonus += -4;
 		value += maze[pos_y][pos_x];
 		depth++;
     
@@ -241,10 +243,10 @@ void move(path *r1, path *r2) {
 		r1->moves_y->erase(r1->moves_y->begin());
 		
 		// Move to cell if we are not debugging
-		//robotPose->moveToCell(r1->curr_x, r1->curr_y);
+		robotPose->moveToCell(r1->curr_x, r1->curr_y);
 	
 		// Sleep if we are debugging
-		sleep(1);
+		//sleep(1);
 		
 		robot->updateMap(r1->curr_x, r1->curr_y);
 		
@@ -312,9 +314,9 @@ void getMap() {
 			}
 			
 			// North star is bad in this row so we don't go there
-			if (y==0) {
-				maze[y][x] = -9;
-			}
+			//if (y==0) {
+			//	maze[y][x] = -9;
+			//}
 			
 			mapList = mapList->next;
 		}
