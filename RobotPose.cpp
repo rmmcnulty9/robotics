@@ -234,7 +234,14 @@ void RobotPose::moveToCell(int x, int y){
 	//Increment cell values
 	pose_goal.x = pose_kalman.x + CELL_DIMENSION_CM*diff_y;
 	pose_goal.y = pose_kalman.y + CELL_DIMENSION_CM*diff_x;
-	
+	if(y==0 || y==4){
+		pose_goal.x = pose_kalman.x + (4.0/5.0)*CELL_DIMENSION_CM*diff_y;
+		pose_goal.y = pose_kalman.y + CELL_DIMENSION_CM*diff_x;
+	}
+	else{
+		pose_goal.x = pose_kalman.x + CELL_DIMENSION_CM*diff_y;
+		pose_goal.y = pose_kalman.y + CELL_DIMENSION_CM*diff_x;
+	}
 	//MoveTo handles all movement
 	printf("\n====================================\nMoving to cell (%d,%d)\nGoal: %f,%f,%f\n====================================\n\n",
 		x,y,pose_goal.x, pose_goal.y, pose_goal.theta*(180/M_PI));

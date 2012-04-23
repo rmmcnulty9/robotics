@@ -16,6 +16,10 @@
 #include <string>
 #include "maze_strategy.h"
 
+/*
+* Main function of the program. Works for both sides of the maze,
+* so two instances of the program can compete against each other.
+* */
 int main(int argv, char **argc) {
     
 	// Initialization
@@ -36,11 +40,11 @@ int main(int argv, char **argc) {
 
 	// Make sure we have a valid command line argument
 	if (argv <= 2) {
-		std::cout << "Usage: maze_strategy <address of robot> <team of robot (1 or 2)>" << std::endl;
+		std::cout << "Usage: maze_strategy <name of robot> <team of robot (1 or 2)>" << std::endl;
 		exit(-1);
 	}
     
-    // Get the correct constants for our robot
+	// Get the correct constants for our robot
 	if (0 == strncmp(argc[1], "rosie", strlen("rosie"))) {
 		ns_x_to_cm = rosie_ns_x_to_cm;
 		ns_y_to_cm = rosie_ns_x_to_cm;
@@ -144,7 +148,8 @@ void get_moves(path *r1, path *r2) {
 }
 
 /*
-* Tries to find a valid path for r1 to follow
+* Considers all paths of a given depth for r1 to follow (and picks the best one), 
+* using recursive depth-first search
 * */
 void search_paths(path *r1, vector<int> *path_x, vector<int> *path_y,
 	int value, int bonus, int depth,
